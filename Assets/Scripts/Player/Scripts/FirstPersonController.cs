@@ -1,6 +1,9 @@
 namespace EasyPeasyFirstPersonController
 {
     using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+    using UnityEngine.InputSystem;
+#endif
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -43,6 +46,9 @@ namespace EasyPeasyFirstPersonController
         private float xRotation = 0f;
         private float currentTilt;
         private float tiltVelocity;
+
+        // Track whether the right mouse button is currently held
+        private bool rmbHeld = false;
 
         public PlayerBaseState CurrentState { get => currentState; set => currentState = value; }
 
@@ -133,6 +139,26 @@ namespace EasyPeasyFirstPersonController
 
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
 
+            // Detect right mouse hold so we can lock cursor and allow looking + moving while RMB is held.
+            bool rightMouseHeld;
+#if ENABLE_INPUT_SYSTEM
+            rightMouseHeld = Mouse.current != null && Mouse.current.rightButton.isPressed;
+#else
+            rightMouseHeld = Input.GetMouseButton(1);
+#endif
+            rmbHeld = rightMouseHeld;
+
+            if (rightMouseHeld)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
             currentState.UpdateState();
             HandleRotation();
             UpdateVisuals();
@@ -140,6 +166,9 @@ namespace EasyPeasyFirstPersonController
 
         private void HandleRotation()
         {
+            // Don't attempt to rotate if input component is missing or RMB is not held
+            if (input == null || !rmbHeld) return;
+
             float mouseX = input.lookInput.x * mouseSensitivity;
             float mouseY = input.lookInput.y * mouseSensitivity;
 
@@ -180,32 +209,32 @@ namespace EasyPeasyFirstPersonController
 
             // Smoothly transition the actual camera Y to include the bob offset
             float desiredY = originalCamY + targetBobOffset;
-
+            
             // Apply Camera Shake (Realistic Directional Impact)
             if (cameraShakeTimer > 0)
             {
                 cameraShakeTimer -= Time.deltaTime;
-
-                float normalizedTime = cameraShakeTimer / 0.4f;
-                float shakeFactor = normalizedTime * normalizedTime * normalizedTime;
-
+                
+                float normalizedTime = cameraShakeTimer / 0.4f; 
+                float shakeFactor = normalizedTime * normalizedTime * normalizedTime; 
+                
                 // 1. Sharp dip downwards based on frontal impact
                 float frontalImpact = Mathf.Abs(cameraShakeDirection.z) + 0.5f;
                 float dipY = -cameraShakeIntensity * shakeFactor * frontalImpact;
-
+                
                 // 2. Sharp rotational roll towards the impact side
                 float sideImpact = cameraShakeDirection.x;
                 float dipTilt = (cameraShakeIntensity * 15f) * sideImpact * shakeFactor;
-
+                
                 // If it's purely a frontal crash with no side impact, add a slight random tilt
-                if (Mathf.Abs(sideImpact) < 0.1f)
+                if (Mathf.Abs(sideImpact) < 0.1f) 
                     dipTilt = (cameraShakeIntensity * 5f) * shakeFactor * (Mathf.PerlinNoise(Time.time, 0) > 0.5f ? 1 : -1);
-
+                
                 // 3. Organic rattle (much lighter now)
                 float rattle = (Mathf.PerlinNoise(Time.time * 30f, 0f) - 0.5f) * (cameraShakeIntensity * 0.2f) * shakeFactor;
 
                 desiredY += dipY + rattle;
-                currentTilt += dipTilt + (rattle * 5f);
+                currentTilt += dipTilt + (rattle * 5f); 
             }
 
             float smoothedY = Mathf.Lerp(cameraParent.localPosition.y, desiredY, Time.deltaTime * 15f);
