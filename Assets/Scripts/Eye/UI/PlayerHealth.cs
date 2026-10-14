@@ -4,7 +4,18 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
-    private float currentHealth;
+    private float currentHealth = -1f;
+
+    private float Current
+    {
+        get
+        {
+            if (currentHealth < 0f) currentHealth = maxHealth;
+            return currentHealth;
+        }
+    }
+
+    public float Normalized => Current / maxHealth;
 
     public event Action<float> OnHealthChanged;
 
@@ -12,9 +23,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+        currentHealth = Mathf.Clamp(Current - amount, 0, maxHealth);
         OnHealthChanged?.Invoke(currentHealth / maxHealth);
     }
-
-    public float Normalized => currentHealth / maxHealth;
 }

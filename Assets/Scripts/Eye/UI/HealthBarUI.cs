@@ -8,6 +8,11 @@ public class HealthBarUI : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private Slider slider;
 
+    private void Start()
+    {
+        UpdateBar(health.Normalized);
+    }
+
     private void OnEnable()
     {
         eye.OnEyeToggled += ShowHide;
