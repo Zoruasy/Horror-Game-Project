@@ -1,6 +1,9 @@
 namespace EasyPeasyFirstPersonController
 {
     using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+    using UnityEngine.InputSystem;
+#endif
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -43,6 +46,9 @@ namespace EasyPeasyFirstPersonController
         private float xRotation = 0f;
         private float currentTilt;
         private float tiltVelocity;
+
+        // Track whether the right mouse button is currently held
+        private bool rmbHeld = false;
 
         public PlayerBaseState CurrentState { get => currentState; set => currentState = value; }
 
@@ -133,6 +139,26 @@ namespace EasyPeasyFirstPersonController
 
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
 
+            // Detect right mouse hold so we can lock cursor and allow looking + moving while RMB is held.
+            bool rightMouseHeld;
+#if ENABLE_INPUT_SYSTEM
+            rightMouseHeld = Mouse.current != null && Mouse.current.rightButton.isPressed;
+#else
+            rightMouseHeld = Input.GetMouseButton(1);
+#endif
+            rmbHeld = rightMouseHeld;
+
+            if (rightMouseHeld)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
             currentState.UpdateState();
             HandleRotation();
             UpdateVisuals();
@@ -140,6 +166,9 @@ namespace EasyPeasyFirstPersonController
 
         private void HandleRotation()
         {
+            // Don't attempt to rotate if input component is missing or RMB is not held
+            if (input == null || !rmbHeld) return;
+
             float mouseX = input.lookInput.x * mouseSensitivity;
             float mouseY = input.lookInput.y * mouseSensitivity;
 
