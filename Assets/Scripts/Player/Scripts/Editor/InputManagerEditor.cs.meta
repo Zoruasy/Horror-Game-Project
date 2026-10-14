@@ -5,5 +5,5 @@ AssetOrigin:
   productId: 317073
   packageName: Easy Peasy First Person Controller
   packageVersion: 1.3
-  assetPath: Assets/EasyPeasyFirstPersonController/Scripts/Editor/InputManagerEditor.cs
+  assetPath: Assets/Scripts/Player/Scripts/Editor/InputManagerEditor.cs
   uploadId: 978510
