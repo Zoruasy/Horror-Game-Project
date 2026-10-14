@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 
@@ -76,10 +76,6 @@ namespace EasyPeasyFirstPersonController
             {
                 SwitchState(factory.Jumping());
             }
-            else if (ctx.input.slide && ctx.input.sprint)
-            {
-                SwitchState(factory.Sliding());
-            }
             else if (!ctx.isGrounded)
             {
                 SwitchState(factory.Fall());
@@ -87,10 +83,6 @@ namespace EasyPeasyFirstPersonController
             else if (ctx.input.crouch && ctx.isGrounded)
             {
                 SwitchState(factory.Crouching());
-            }
-            else if (ctx.isInWater)
-            {
-                SwitchState(factory.Swimming());
             }
 
         }

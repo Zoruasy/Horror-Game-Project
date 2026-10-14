@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 
@@ -9,18 +9,20 @@ namespace EasyPeasyFirstPersonController
 
         public override void EnterState()
         {
+            // immediate crouch
             if (!ctx.enableSmoothCrouch)
             {
-                float crouchHeight = ctx.crouchingCharacterControllerHeight;
-                ctx.characterController.height = crouchHeight;
-                ctx.characterController.center = new Vector3(0, crouchHeight / 2f, 0);
+                ctx.characterController.height = ctx.crouchingCharacterControllerHeight;
+                ctx.characterController.center = new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0);
             }
         }
 
         public override void UpdateState()
         {
-            CheckSwitchStates();
-            HandleCrouchMovement();
+            ctx.targetFov = ctx.normalFov;
+            ctx.currentBobIntensity = 0;
+            ctx.currentBobSpeed = 0;
+            ctx.targetTilt = 0;
 
             if (ctx.enableSmoothCrouch)
             {
@@ -37,23 +39,29 @@ namespace EasyPeasyFirstPersonController
                 );
             }
 
-            ctx.targetCameraY = ctx.crouchingCameraHeight;
+            HandleCrouchMovement();
+            CheckSwitchStates();
         }
 
         public override void ExitState()
         {
-
+            // Ensure height returns
+            if (!ctx.enableSmoothCrouch)
+            {
+                ctx.characterController.height = ctx.standingCharacterControllerHeight;
+                ctx.characterController.center = ctx.standingCharacterControllerCenter;
+            }
         }
 
         public override void CheckSwitchStates()
         {
-            if (!ctx.input.crouch && !ctx.HasCeiling())
+            if (ctx.input.jump && ctx.isGrounded && !ctx.HasCeiling())
+            {
+                SwitchState(factory.Jumping());
+            }
+            else if (!ctx.input.crouch)
             {
                 SwitchState(factory.Grounded());
-            }
-            else if (!ctx.isGrounded)
-            {
-                SwitchState(factory.Fall());
             }
         }
 
@@ -64,15 +72,12 @@ namespace EasyPeasyFirstPersonController
             targetMove = Vector3.ClampMagnitude(targetMove, 1f);
 
             Vector3 targetVelocity = targetMove * ctx.crouchSpeed;
-            float accelRate = (input.sqrMagnitude > 0.01f) ? ctx.groundAcceleration : ctx.groundDeceleration;
 
-            ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, accelRate * Time.deltaTime);
+            float accel = 30f;
+            ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, accel * Time.deltaTime);
 
             Vector3 finalVelocity = ctx.currentVelocity;
-            
-            if (ctx.isGrounded) finalVelocity.y = -10f;
-            else finalVelocity.y = 0f;
-            
+            finalVelocity.y = -5f;
             ctx.characterController.Move(finalVelocity * Time.deltaTime);
         }
     }

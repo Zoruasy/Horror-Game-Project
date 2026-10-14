@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ShowWithEye
   - HideWithEye
+  - Ground
   layers:
   - Default
   - TransparentFX
