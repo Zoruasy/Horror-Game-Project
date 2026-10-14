@@ -14,5 +14,5 @@ AssetOrigin:
   productId: 317073
   packageName: Easy Peasy First Person Controller
   packageVersion: 1.3
-  assetPath: Assets/EasyPeasyFirstPersonController/Scripts/States/PlayerCrouchingState.cs
+  assetPath: Assets/Scripts/Player/Scripts/States/PlayerCrouchingState.cs
   uploadId: 978510
