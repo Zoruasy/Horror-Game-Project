@@ -2,7 +2,7 @@ using UnityEngine;
 
 public abstract class Interactable : MonoBehaviour
 {
-    [SerializeField] protected string prompt = "Interagir";
+    [SerializeField] protected string prompt = "Interact";
 
     public virtual string GetPrompt(GameObject interactor) => prompt;
 

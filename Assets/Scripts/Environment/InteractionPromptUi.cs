@@ -6,7 +6,6 @@ public class InteractionPromptUI : MonoBehaviour
 {
     [SerializeField] GameObject root;
     [SerializeField] TMP_Text label;
-    [SerializeField] InputActionReference interactAction;
 
     [Header("Apparence")]
     [SerializeField] Color availableColor = Color.white;
@@ -17,7 +16,7 @@ public class InteractionPromptUI : MonoBehaviour
 
     void Awake() => Hide();
 
-    public void Show(string prompt, bool canInteract)
+    public void Show(string prompt, string key, bool canInteract)
     {
         if (!root.activeSelf) root.SetActive(true);
 
@@ -25,15 +24,7 @@ public class InteractionPromptUI : MonoBehaviour
         lastPrompt = prompt;
         lastCanInteract = canInteract;
 
-        if (canInteract && interactAction)
-        {
-            string key = interactAction.action.GetBindingDisplayString();
-            label.text = $"[{key}] {prompt}";
-        }
-        else
-        {
-            label.text = prompt;
-        }
+        label.text = canInteract && !string.IsNullOrEmpty(key) ? $"[{key}] {prompt}" : prompt;
 
         label.color = canInteract ? availableColor : unavailableColor;
     }
