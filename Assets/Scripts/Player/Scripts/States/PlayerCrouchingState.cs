@@ -9,22 +9,34 @@ namespace CharacterController
 
         public override void EnterState()
         {
-            // immediate crouch
-            if (!ctx.enableSmoothCrouch)
+            // Visuals
+            ctx.targetCameraY = ctx.crouchingCameraHeight;
+            ctx.targetFov = ctx.normalFov;
+            ctx.currentBobIntensity = 0f;
+            ctx.currentBobSpeed = 0f;
+            ctx.targetTilt = 0f;
+
+            // Immediate physical crouch if smoothing disabled
+            if (!ctx.enableSmoothCrouch && ctx.characterController != null)
             {
                 ctx.characterController.height = ctx.crouchingCharacterControllerHeight;
-                ctx.characterController.center = new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0);
+                ctx.characterController.center = new Vector3(0f, ctx.crouchingCharacterControllerHeight / 2f, 0f);
+
+                if (ctx.cameraParent != null)
+                    ctx.cameraParent.localPosition = new Vector3(ctx.cameraParent.localPosition.x, ctx.crouchingCameraHeight, ctx.cameraParent.localPosition.z);
             }
         }
 
         public override void UpdateState()
         {
+            // Keep visuals steady while crouching
             ctx.targetFov = ctx.normalFov;
-            ctx.currentBobIntensity = 0;
-            ctx.currentBobSpeed = 0;
-            ctx.targetTilt = 0;
+            ctx.currentBobIntensity = 0f;
+            ctx.currentBobSpeed = 0f;
+            ctx.targetTilt = 0f;
 
-            if (ctx.enableSmoothCrouch)
+            // Smooth height transition (if enabled)
+            if (ctx.enableSmoothCrouch && ctx.characterController != null)
             {
                 ctx.characterController.height = Mathf.MoveTowards(
                     ctx.characterController.height,
@@ -34,7 +46,7 @@ namespace CharacterController
 
                 ctx.characterController.center = Vector3.MoveTowards(
                     ctx.characterController.center,
-                    new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0),
+                    new Vector3(0f, ctx.crouchingCharacterControllerHeight / 2f, 0f),
                     Time.deltaTime * (ctx.crouchTransitionSpeed / 2f)
                 );
             }
@@ -45,11 +57,17 @@ namespace CharacterController
 
         public override void ExitState()
         {
-            // Ensure height returns
-            if (!ctx.enableSmoothCrouch)
+            // Restore camera target height
+            ctx.targetCameraY = ctx.standingCameraHeight;
+
+            // Immediate physical stand if smoothing disabled
+            if (!ctx.enableSmoothCrouch && ctx.characterController != null)
             {
                 ctx.characterController.height = ctx.standingCharacterControllerHeight;
                 ctx.characterController.center = ctx.standingCharacterControllerCenter;
+
+                if (ctx.cameraParent != null)
+                    ctx.cameraParent.localPosition = new Vector3(ctx.cameraParent.localPosition.x, ctx.standingCameraHeight, ctx.cameraParent.localPosition.z);
             }
         }
 
@@ -61,6 +79,7 @@ namespace CharacterController
             }
             else if (!ctx.input.crouch)
             {
+                // leave crouch when crouch input released (hold-to-crouch)
                 SwitchState(factory.Grounded());
             }
         }

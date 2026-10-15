@@ -15,6 +15,7 @@ namespace CharacterController
         public float gravity = 9.81f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+       
 
         [Header("Movement Polish")]
         public float groundAcceleration = 50f;

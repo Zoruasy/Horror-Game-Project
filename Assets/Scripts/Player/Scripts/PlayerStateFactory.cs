@@ -9,6 +9,7 @@ namespace CharacterController
             context = currentContext;
         }
 
+
         public PlayerBaseState Grounded() => new PlayerGroundedState(context, this);
         public PlayerBaseState Jumping() => new PlayerJumpingState(context, this);
         public PlayerBaseState Crouching() => new PlayerCrouchingState(context, this);
