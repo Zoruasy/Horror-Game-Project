@@ -18,7 +18,7 @@ public class HealthBarUI : MonoBehaviour
         eye.OnEyeToggled += ShowHide;
         health.OnHealthChanged += UpdateBar;
 
-        ShowHide(eye.EyeIsIn);
+        ShowHide(eye.EyeIn);
         UpdateBar(health.Normalized);
     }
 

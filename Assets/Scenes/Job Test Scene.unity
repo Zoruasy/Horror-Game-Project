@@ -534,7 +534,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7025222dc83d2409102fdd22327f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
-  eyeIsIn: 1
+  defaultEyeIn: 1
+  switchDuration: 4
+  cooldownDuration: 4
 --- !u!4 &602663969
 Transform:
   m_ObjectHideFlags: 0
@@ -1021,7 +1023,7 @@ GameObject:
   - component: {fileID: 1551185777}
   - component: {fileID: 1551185778}
   m_Layer: 2
-  m_Name: EyeFlashlight
+  m_Name: EyeFlashlight - unused
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1286,6 +1288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2aea208f6ad05e4999ca14cd61be611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisibilityController
+  eye: {fileID: 602663968}
 --- !u!4 &2079212723
 Transform:
   m_ObjectHideFlags: 0

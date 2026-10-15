@@ -8,7 +8,7 @@ public class EyeLight : MonoBehaviour
     private void OnEnable()
     {
         eye.OnEyeToggled += Apply;
-        Apply(eye.EyeIsIn);
+        Apply(eye.EyeIn);
     }
 
     private void OnDisable() => eye.OnEyeToggled -= Apply;
