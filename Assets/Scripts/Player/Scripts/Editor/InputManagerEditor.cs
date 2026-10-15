@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace EasyPeasyFirstPersonController.EditorScripts
+namespace CharacterController.EditorScripts
 {
     [CustomEditor(typeof(InputManager))]
     public class InputManagerEditor : Editor

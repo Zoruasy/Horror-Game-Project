@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 
@@ -29,15 +29,6 @@ namespace EasyPeasyFirstPersonController
             {
                 SwitchState(factory.Grounded());
             }
-            else if (ctx.CheckLedge(out _))
-            {
-                SwitchState(factory.LedgeGrab());
-            }
-            else if (ctx.isInWater)
-            {
-                SwitchState(factory.Swimming());
-            }
-
         }
 
         private void ApplyGravity()

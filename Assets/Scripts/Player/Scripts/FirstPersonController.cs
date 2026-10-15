@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
@@ -13,8 +13,6 @@ namespace EasyPeasyFirstPersonController
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
         public float gravity = 9.81f;
-        public float slideDuration = 0.7f;
-        public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
 
@@ -26,9 +24,6 @@ namespace EasyPeasyFirstPersonController
         [Header("Advanced Mechanics")]
         public bool enableSmoothCrouch = true;
         public float crouchTransitionSpeed = 10f;
-        public bool enableSlopeSliding = true;
-        public float slideUphillFriction = 3f;
-        public float slideSteerControl = 4f;
 
         [Header("References")]
         public Transform playerCamera;
@@ -37,7 +32,7 @@ namespace EasyPeasyFirstPersonController
         public LayerMask groundMask;
 
         [HideInInspector] public CharacterController characterController;
-        [HideInInspector] public IInputManager input;
+        [HideInInspector] public InputManager input;
         [HideInInspector] public Vector3 moveDirection;
         [HideInInspector] public bool isGrounded;
 
@@ -55,7 +50,6 @@ namespace EasyPeasyFirstPersonController
         [Header("Visual Settings")]
         public float normalFov = 60f;
         public float sprintFov = 75f;
-        public float slideFovBoost = 5f;
         public float fovChangeSpeed = 8f;
         public float bobAmount = 0.03f;
         public float bobSpeed = 12f;
@@ -81,21 +75,6 @@ namespace EasyPeasyFirstPersonController
         [HideInInspector] public float standingCharacterControllerHeight = 1.8f;
         [HideInInspector] public Vector3 standingCharacterControllerCenter = new Vector3(0, 0.9f, 0);
         [HideInInspector] public float targetCameraY;
-
-        [Header("Ledge Settings")]
-        public LayerMask ledgeLayer;
-        public float ledgeDetectionDistance = 1f;
-        public float climbDuration = 0.6f;
-        public float climbHeightArc = 0.4f;
-        public float climbTiltAmount = -7f;
-
-        [Header("Swimming Settings")]
-        public float swimSpeed = 4f;
-        public float swimSprintSpeed = 6f;
-        public float waterDrag = 2f;
-        public LayerMask waterMask;
-        [HideInInspector] public bool isInWater;
-        [HideInInspector] public float currentLedgeCooldown;
 
         [Header("Visual Preferences")]
         public bool useFovKick = true;
@@ -125,7 +104,7 @@ namespace EasyPeasyFirstPersonController
             characterController = GetComponent<CharacterController>();
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
-            input = GetComponent<IInputManager>();
+            input = GetComponent<InputManager>();
             states = new PlayerStateFactory(this);
 
             currentState = states.Grounded();
@@ -134,9 +113,6 @@ namespace EasyPeasyFirstPersonController
 
         private void Update()
         {
-            if (currentLedgeCooldown > 0)
-                currentLedgeCooldown -= Time.deltaTime;
-
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
 
             // Detect right mouse hold so we can lock cursor and allow looking + moving while RMB is held.
@@ -258,46 +234,5 @@ namespace EasyPeasyFirstPersonController
 
             return Physics.SphereCast(origin, radius, Vector3.up, out _, checkDistance, groundMask, QueryTriggerInteraction.Ignore);
         }
-        public bool CheckLedge(out Vector3 climbPosition)
-        {
-            climbPosition = Vector3.zero;
-            if (currentLedgeCooldown > 0) return false;
-
-            RaycastHit wallHit;
-            Vector3 wallOrigin = transform.position + Vector3.up * 1.5f;
-
-            if (Physics.Raycast(wallOrigin, transform.forward, out wallHit, ledgeDetectionDistance, ledgeLayer, QueryTriggerInteraction.Ignore))
-            {
-                Vector3 ledgeOrigin = wallOrigin + Vector3.up * 0.6f + transform.forward * 0.2f;
-                RaycastHit ledgeHit;
-
-                if (!Physics.Raycast(ledgeOrigin, transform.forward, 0.5f, groundMask))
-                {
-                    if (Physics.Raycast(ledgeOrigin + transform.forward * 0.4f, Vector3.down, out ledgeHit, 1f, groundMask))
-                    {
-                        climbPosition = ledgeHit.point + Vector3.up * 1f;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (((1 << other.gameObject.layer) & waterMask) != 0)
-            {
-                isInWater = true;
-            }
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (((1 << other.gameObject.layer) & waterMask) != 0)
-            {
-                isInWater = false;
-            }
-        }
-
     }
 }
