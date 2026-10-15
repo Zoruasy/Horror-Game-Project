@@ -45,12 +45,12 @@ public class enemyChase : MonoBehaviour
     //     Debug.DrawRay(eyePoint.position, Vector3() * directionToPlayer.magnitude, Color.red);
     // }
 
-    bool CanSeePlayer()
+    bool CanSeePlayer() //for chasing 
     {
         if (player == null || eyePoint == null) 
             return false;
 
-        var controller = player.GetComponent<UnityEngine.CharacterController>();//get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
+        var controller = player.GetComponent<UnityEngine.CharacterController>(); //get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
         Vector3 target = controller != null ? controller.bounds.center : player.position;
         Vector3 directionToPlayer = target - eyePoint.position;
 
