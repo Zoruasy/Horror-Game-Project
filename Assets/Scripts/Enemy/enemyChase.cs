@@ -50,7 +50,9 @@ public class enemyChase : MonoBehaviour
         if (player == null || eyePoint == null) 
             return false;
 
-        Vector3 directionToPlayer = player.position - eyePoint.position; //just always know the distance between player and enemy
+        var controller = player.GetComponent<UnityEngine.CharacterController>();//get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
+        Vector3 target = controller != null ? controller.bounds.center : player.position;
+        Vector3 directionToPlayer = target - eyePoint.position;
 
         
         if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //is the dist between player and enemy bigger? stop.
