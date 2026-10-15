@@ -43,9 +43,9 @@ public class DoorSlide : Interactable
 
     IEnumerator MoveTo(Vector3 target)
     {
-        while (Vector3.Angle(hinge.localPosition, target) > 0.01f)
+        while (Vector3.Distance(hinge.localPosition, target) > 0.001f)
         {
-            hinge.localPosition = Vector3.MoveTowards(hinge.position, target, metersPerSecond * Time.deltaTime);
+            hinge.localPosition = Vector3.MoveTowards(hinge.localPosition, target, metersPerSecond * Time.deltaTime);
             yield return null;
         }
         hinge.localPosition = target;
