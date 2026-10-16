@@ -7,6 +7,9 @@ namespace CharacterController
     {
         private const float minHeightEpsilon = 0.01f;
 
+        // Tracks whether the crouch button was previously held
+        private bool wasCrouchPressed;
+
         public PlayerCrouchingState(
             FirstPersonController currentContext,
             PlayerStateFactory playerStateFactory
@@ -16,7 +19,10 @@ namespace CharacterController
 
         public override void EnterState()
         {
-            // Lower the camera to crouching height
+            // Remember the current button state
+            wasCrouchPressed = ctx.input.crouch;
+
+            // Lower the camera
             ctx.targetCameraY = ctx.crouchingCameraHeight;
 
             // Instantly crouch if smooth crouching is disabled
@@ -57,17 +63,17 @@ namespace CharacterController
                 SetCapsuleHeight(newHeight);
             }
 
-            // Handle player movement while crouching
+            // Handle movement
             HandleCrouchMovement();
 
-            // Check whether the player can stand up
+            // Check for another crouch button press
             CheckSwitchStates();
         }
 
         public override void ExitState()
         {
-            // Instantly restore standing height if smooth crouching is disabled
-            if (!ctx.enableSmoothCrouch && !ctx.HasCeiling())
+            // Restore standing height when smooth crouch is disabled
+            if (!ctx.enableSmoothCrouch)
             {
                 ctx.characterController.height =
                     ctx.standingCharacterControllerHeight;
@@ -76,36 +82,43 @@ namespace CharacterController
                     ctx.standingCharacterControllerCenter;
             }
 
-            // When smooth crouching is enabled, GroundedState
-            // handles restoring the capsule to standing height
+            // GroundedState handles smooth standing transitions
         }
 
         public override void CheckSwitchStates()
         {
-            // Stand up when crouch is released and there is enough space
-            if (!ctx.input.crouch && !ctx.HasCeiling())
+            bool crouchPressed = ctx.input.crouch;
+
+            // Detect a new button press
+            bool justPressed =
+                crouchPressed && !wasCrouchPressed;
+
+            // Update the previous button state
+            wasCrouchPressed = crouchPressed;
+
+            // Toggle back to standing on the next press
+            if (justPressed && !ctx.HasCeiling())
             {
                 SwitchState(factory.Grounded());
                 return;
             }
 
-            // Do not switch to FallState while crouching
-            // This prevents unwanted state transitions
+            // Remain crouched when the button is released
         }
 
         private void SetCapsuleHeight(float height)
         {
-            // Prevent the capsule from becoming smaller than its diameter
+            // Prevent invalid capsule heights
             float minHeight =
                 ctx.characterController.radius * 2f
                 + minHeightEpsilon;
 
             height = Mathf.Max(height, minHeight);
 
-            // Update the capsule height
+            // Update capsule height
             ctx.characterController.height = height;
 
-            // Adjust the capsule center to keep its bottom grounded
+            // Keep the bottom of the capsule in place
             Vector3 standingCenter =
                 ctx.standingCharacterControllerCenter;
 
@@ -123,7 +136,7 @@ namespace CharacterController
 
         private void HandleCrouchMovement()
         {
-            // Get movement input
+            // Read movement input
             Vector2 input = ctx.input.moveInput;
 
             // Calculate movement direction
@@ -137,11 +150,11 @@ namespace CharacterController
                 1f
             );
 
-            // Calculate target crouching velocity
+            // Calculate crouching velocity
             Vector3 targetVelocity =
                 targetMove * ctx.crouchSpeed;
 
-            // Apply acceleration or deceleration
+            // Apply acceleration and deceleration
             float accelRate =
                 input.sqrMagnitude > 0.01f
                     ? ctx.groundAcceleration
@@ -153,13 +166,12 @@ namespace CharacterController
                 accelRate * Time.deltaTime
             );
 
-            // Apply final movement velocity
+            // Apply movement
             Vector3 finalVelocity = ctx.currentVelocity;
 
-            // Apply downward force to maintain ground contact
+            // Keep the character grounded
             finalVelocity.y = -5f;
 
-            // Move the character controller
             ctx.characterController.Move(
                 finalVelocity * Time.deltaTime
             );
