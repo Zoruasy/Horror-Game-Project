@@ -16,10 +16,10 @@ namespace CharacterController
 
         public override void EnterState()
         {
-            // Camera naar crouchhoogte
+            // Lower the camera to crouching height
             ctx.targetCameraY = ctx.crouchingCameraHeight;
 
-            // Direct crouchen als smooth crouch uitstaat
+            // Instantly crouch if smooth crouching is disabled
             if (!ctx.enableSmoothCrouch)
             {
                 SetCapsuleHeight(
@@ -30,16 +30,16 @@ namespace CharacterController
 
         public override void UpdateState()
         {
-            // Camera laag houden
+            // Keep the camera at crouching height
             ctx.targetCameraY = ctx.crouchingCameraHeight;
 
-            // Visuele instellingen
+            // Reset visual effects while crouching
             ctx.targetFov = ctx.normalFov;
             ctx.currentBobIntensity = 0f;
             ctx.currentBobSpeed = 0f;
             ctx.targetTilt = 0f;
 
-            // Smooth crouching
+            // Smoothly decrease the capsule height
             if (ctx.enableSmoothCrouch)
             {
                 float targetHeight = Mathf.Max(
@@ -57,16 +57,16 @@ namespace CharacterController
                 SetCapsuleHeight(newHeight);
             }
 
-            // Speler bewegen
+            // Handle player movement while crouching
             HandleCrouchMovement();
 
-            // Controleren of speler mag opstaan
+            // Check whether the player can stand up
             CheckSwitchStates();
         }
 
         public override void ExitState()
         {
-            // Direct opstaan als smooth crouch uitstaat
+            // Instantly restore standing height if smooth crouching is disabled
             if (!ctx.enableSmoothCrouch && !ctx.HasCeiling())
             {
                 ctx.characterController.height =
@@ -76,38 +76,36 @@ namespace CharacterController
                     ctx.standingCharacterControllerCenter;
             }
 
-            // Bij smooth crouch regelt GroundedState
-            // het teruggaan naar de normale hoogte
+            // When smooth crouching is enabled, GroundedState
+            // handles restoring the capsule to standing height
         }
 
         public override void CheckSwitchStates()
         {
-            // Ctrl loslaten = opstaan
-            // Alleen als er geen plafond boven je zit
+            // Stand up when crouch is released and there is enough space
             if (!ctx.input.crouch && !ctx.HasCeiling())
             {
                 SwitchState(factory.Grounded());
                 return;
             }
 
-            // Niet naar FallState wisselen tijdens crouchen
-            // Dit voorkomt de ongewenste state switch
+            // Do not switch to FallState while crouching
+            // This prevents unwanted state transitions
         }
 
         private void SetCapsuleHeight(float height)
         {
-            // Capsule mag niet kleiner zijn dan diameter
+            // Prevent the capsule from becoming smaller than its diameter
             float minHeight =
                 ctx.characterController.radius * 2f
                 + minHeightEpsilon;
 
             height = Mathf.Max(height, minHeight);
 
-            // Capsulehoogte aanpassen
+            // Update the capsule height
             ctx.characterController.height = height;
 
-            // Capsulecenter aanpassen
-            // Hierdoor blijft de onderkant op dezelfde plek
+            // Adjust the capsule center to keep its bottom grounded
             Vector3 standingCenter =
                 ctx.standingCharacterControllerCenter;
 
@@ -125,25 +123,25 @@ namespace CharacterController
 
         private void HandleCrouchMovement()
         {
-            // Input ophalen
+            // Get movement input
             Vector2 input = ctx.input.moveInput;
 
-            // Bewegingsrichting berekenen
+            // Calculate movement direction
             Vector3 targetMove =
                 ctx.transform.right * input.x +
                 ctx.transform.forward * input.y;
 
-            // Diagonaal niet sneller lopen
+            // Prevent faster diagonal movement
             targetMove = Vector3.ClampMagnitude(
                 targetMove,
                 1f
             );
 
-            // Crouch snelheid
+            // Calculate target crouching velocity
             Vector3 targetVelocity =
                 targetMove * ctx.crouchSpeed;
 
-            // Acceleratie en deceleratie
+            // Apply acceleration or deceleration
             float accelRate =
                 input.sqrMagnitude > 0.01f
                     ? ctx.groundAcceleration
@@ -155,12 +153,13 @@ namespace CharacterController
                 accelRate * Time.deltaTime
             );
 
-            // Beweging toepassen
+            // Apply final movement velocity
             Vector3 finalVelocity = ctx.currentVelocity;
 
-            // Speler tegen de grond houden
+            // Apply downward force to maintain ground contact
             finalVelocity.y = -5f;
 
+            // Move the character controller
             ctx.characterController.Move(
                 finalVelocity * Time.deltaTime
             );
