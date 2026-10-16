@@ -18,7 +18,7 @@ public class enemyChase : MonoBehaviour
 
     [Header("Detection")]
     public LayerMask playerDetectMask;
-    
+
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
@@ -38,16 +38,6 @@ public class enemyChase : MonoBehaviour
     {
 
 
-        // if (CanSeePlayer())
-        // {
-        //     Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
-        //     navMeshAgent.isStopped = false;
-        //     navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-        // }
-        // else
-        // {
-           
-        // }
 
 
     }
@@ -55,68 +45,94 @@ public class enemyChase : MonoBehaviour
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        
-        navMeshAgent.stoppingDistance = 0.5f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
-        
-patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
 
-    StartCoroutine(Patrolling());
+        navMeshAgent.stoppingDistance = 0.5f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
+
+        patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
+
+        StartCoroutine(Patrolling());
 
 
 
     }
 
-     IEnumerator Patrolling()
+
+
+
+
+
+
+    IEnumerator Patrolling()
     {
-        for (int i = 0; i < patrolPointsArray.Length;)
+
+        if (isChasingPlayer())
         {
-            yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
-            patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
-           
+            // yield break; //stop patrolling if chasing player
+            // navMeshAgent.isStopped = false; to pause the enemy
+
+            Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
+            yield return new WaitForSeconds(0.1f); //update speed
+            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
 
 
-            if (patrolPointsArray[i] != null) 
+        }
+        else
+        {
+
+
+
+
+            for (int i = 0; i < patrolPointsArray.Length;)
             {
-                Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
-                navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
- 
-                if(navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
+                yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
+                patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
+
+
+
+                if (patrolPointsArray[i] != null)
                 {
-                    //  yield return new WaitUntil(() => true);
-                     i++;
-        
+                    Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
+                    navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
+
+                    if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
+                    {
+                        //  yield return new WaitUntil(() => true);
+                        i++;
+                        if (i >= patrolPointsArray.Length)
+                        {
+                            i = 0; //loop back to the first point
+                        }
+
+                    }
+                    else
+                    {
+
+
+                    }
+
                 }
-                else
-                {
-                   
-                    
-                }
-                
             }
         }
     }
 
-    // void myRaycast()
-    // {
-    //     Debug.DrawRay(eyePoint.position, Vector3() * directionToPlayer.magnitude, Color.red);
-    // }
 
-    bool CanSeePlayer() //for chasing 
+
+    bool isChasingPlayer() //for chasing 
     {
-        if (player == null || eyePoint == null) 
+        if (player == null || eyePoint == null)
             return false;
 
         var controller = player.GetComponent<UnityEngine.CharacterController>(); //get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
         Vector3 target = controller != null ? controller.bounds.center : player.position;
         Vector3 directionToPlayer = target - eyePoint.position;
 
-        
+
         if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //is the dist between player and enemy bigger? stop.
         {
             return false;
         }
 
-        
+
         float angle = Vector3.Angle(eyePoint.forward, directionToPlayer); //measures the angle between eyepoint and player!
 
         if (angle > viewAngle / 2f) //if the angle is bigger than the view angle, stop.
