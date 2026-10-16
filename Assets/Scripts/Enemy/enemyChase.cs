@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,7 +22,8 @@ public class enemyChase : MonoBehaviour
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
-    private Transform[] patrolPointsArray;
+
+    private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
 
 
 
@@ -34,38 +36,62 @@ public class enemyChase : MonoBehaviour
 
     void Update()
     {
-        if (CanSeePlayer())
-        {
-            Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
-            navMeshAgent.isStopped = false;
-            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-        }
-        else
-        {
-            navMeshAgent.isStopped = true;
-        }
+
+
+        // if (CanSeePlayer())
+        // {
+        //     Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
+        //     navMeshAgent.isStopped = false;
+        //     navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+        // }
+        // else
+        // {
+           
+        // }
+
+
     }
 
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-        patrolPointsArray = GetComponentsInChildren<Transform>();
-        int patrolPointCount = patrolPointsArray.Length;
+        
+        navMeshAgent.stoppingDistance = 0.5f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
+        
+patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
 
-    patrolling();
+    StartCoroutine(Patrolling());
 
 
 
     }
 
-    private void patrolling()
+     IEnumerator Patrolling()
     {
-        for (int i = 0; i < patrolPointsArray.Length; i++)
+        for (int i = 0; i < patrolPointsArray.Length;)
         {
+            yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
+            patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
+           
+
+
             if (patrolPointsArray[i] != null) 
             {
-                Debug.Log("Patrolling to point: " + patrolPointsArray[i].name);
-                navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point?
+                Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
+                navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
+ 
+                if(navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
+                {
+                    //  yield return new WaitUntil(() => true);
+                     i++;
+        
+                }
+                else
+                {
+                   
+                    
+                }
+                
             }
         }
     }
