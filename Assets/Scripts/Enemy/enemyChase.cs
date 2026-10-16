@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,9 +19,11 @@ public class enemyChase : MonoBehaviour
 
     [Header("Detection")]
     public LayerMask playerDetectMask;
+    [SerializeField] private float keepSuspicionTimer = 2f;
     [SerializeField] private float timeBeforeAggressive = 2f;
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float aggressiveMoveSpeed = 3f;
+    
 
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
@@ -28,6 +31,7 @@ public class enemyChase : MonoBehaviour
 
     private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
     private bool keepsSuspiciousForABit = false;
+    
 
 
 
@@ -86,7 +90,7 @@ public class enemyChase : MonoBehaviour
 
 
 
-                if (isSuspicious() || keepsSuspiciousForABit) //sees a player, is suspicious
+                if (isSuspicious()) //sees a player, is suspicious
                 {
                     Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
 
@@ -94,33 +98,24 @@ public class enemyChase : MonoBehaviour
 
 
 
-
-                   
-
-                    if (isSuspicious())  //time before the enemy becomes AGGRESSIVE and starts chasing the player
+                    timeBeforeAggressive -= Time.deltaTime;
+                    if (timeBeforeAggressive <= 0f) // SPOTTED THE PLAYER, IS AGGRESSIVE NOW.
                     {
-                        timeBeforeAggressive -= Time.deltaTime;
-                        if (timeBeforeAggressive <= 0f)
-                        {
-                            Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU AND I WILL KILL YOU");
-                            navMeshAgent.speed = aggressiveMoveSpeed;
-                            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-                        }
-                        else
-                        {
-                            
-                        }
+                        Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU AND I WILL KILL YOU");
+                        navMeshAgent.speed = aggressiveMoveSpeed;
+                        navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
                     }
 
 
 
+                    if (keepsSuspiciousForABit)
+                    {
+                        
+                        keepSuspicionTimer -= Time.deltaTime;
 
+                    }
 
-
-
-
-
-                    if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
+                    if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                     {
                         keepsSuspiciousForABit = false;
 

@@ -557,6 +557,9 @@ MonoBehaviour:
   playerDetectMask:
     serializedVersion: 2
     m_Bits: 64
+  timeBeforeAggressive: 2
+  passiveMoveSpeed: 3
+  aggressiveMoveSpeed: 8
   patrolPoints: {fileID: 1442304958}
 --- !u!195 &741472329
 NavMeshAgent:
