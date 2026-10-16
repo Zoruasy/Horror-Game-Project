@@ -18,13 +18,16 @@ public class enemyChase : MonoBehaviour
 
     [Header("Detection")]
     public LayerMask playerDetectMask;
+    [SerializeField] private float timeBeforeAggressive = 2f;
+    [SerializeField] private float passiveMoveSpeed = 1f;
+    [SerializeField] private float aggressiveMoveSpeed = 3f;
 
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
 
     private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
-
+    private bool keepsSuspiciousForABit = false;
 
 
 
@@ -46,7 +49,7 @@ public class enemyChase : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
 
-        navMeshAgent.stoppingDistance = 0.5f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
+        navMeshAgent.stoppingDistance = 1f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
 
         patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
 
@@ -74,18 +77,57 @@ public class enemyChase : MonoBehaviour
         {
             yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
+            navMeshAgent.speed = passiveMoveSpeed;
 
 
-            if (patrolPointsArray[i] != null)
+
+            if (patrolPointsArray[i] != null) //just a check
             {
 
 
 
-                if (isChasingPlayer())
+                if (isSuspicious() || keepsSuspiciousForABit) //sees a player, is suspicious
                 {
                     Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
+
+                    navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z)); // walk towards last seen player locaiton
+
+
+
+
                    
-                    navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+
+                    if (isSuspicious())  //time before the enemy becomes AGGRESSIVE and starts chasing the player
+                    {
+                        timeBeforeAggressive -= Time.deltaTime;
+                        if (timeBeforeAggressive <= 0f)
+                        {
+                            Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU AND I WILL KILL YOU");
+                            navMeshAgent.speed = aggressiveMoveSpeed;
+                            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+
+
+
+
+
+
+
+
+
+                    if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
+                    {
+                        keepsSuspiciousForABit = false;
+
+                    }
+
+
+
                 }
 
                 else
@@ -115,7 +157,7 @@ public class enemyChase : MonoBehaviour
 
 
 
-    bool isChasingPlayer() //for chasing 
+    bool isSuspicious() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
     {
         if (player == null || eyePoint == null)
             return false;
