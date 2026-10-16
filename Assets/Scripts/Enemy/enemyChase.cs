@@ -92,57 +92,53 @@ public class enemyChase : MonoBehaviour
             {
 
 
-
                 if (isSuspicious() || keepsSuspiciousForABit) //sees a player, is suspicious
                 {
                     Debug.Log("I SEE YOU");
-
-
-
-
-                    if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0) //lose suspicion
+                    keepsSuspiciousForABit = true;
+                    navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                    if (isSuspicious())//if still spotting the player for a period of time
                     {
-                        keepsSuspiciousForABit = false;
-
+                        Debug.Log("aggro" + timeBeforeAlerted);
+                        timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
+                        if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
+                        {
+                            Debug.Log("I WILL KILL YOU");
+                            navMeshAgent.speed = alertedMoveSpeed;
+                            keepSuspicionTimer = keepSuspicionTimerInit;
+                            // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                        }
                     }
-                    else //while still suspicious
+                    else
                     {
-                        keepsSuspiciousForABit = true;
-                        if (isSuspicious())//if still spotting the player
+
+                        if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0) //lose suspicion
                         {
-                            Debug.Log("aggro" + timeBeforeAlerted);
-                            timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
-                            if (timeBeforeAlerted <= 0) // IS AGGRESSIVE NOW.
-                            {
-                                Debug.Log("I WILL KILL YOU");
-                                navMeshAgent.speed = alertedMoveSpeed;
-                                navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-                            }
+                            keepsSuspiciousForABit = false;
 
                         }
-                        else
+                        else //while still suspicious
                         {
+                            keepsSuspiciousForABit = true;
 
-                            keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
-                                                                  // walk towards last seen player locaiton
-                            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                            keepSuspicionTimer -= 0.1f; //slowely lose suspicion
+                                                        // walk towards last seen player locaiton
+                                                        // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+
+
 
                         }
-
-
-
-
-
-
-
-
-
-
                     }
 
                 }
                 else
                 {
+                    //reset the timers
+                    keepSuspicionTimer = keepSuspicionTimerInit;
+                    timeBeforeAlerted = timeBeforeAlertedInit;
+                    // Debug.Log("RESETTIMERS");
+
+
                     // Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
                     navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
 
@@ -153,9 +149,7 @@ public class enemyChase : MonoBehaviour
                         if (i >= patrolPointsArray.Length)
                         {
                             i = 0; //loop back to the first point
-                            //reset the timers
-                            keepSuspicionTimer = keepSuspicionTimerInit;
-                            timeBeforeAlerted = timeBeforeAlertedInit;
+
                         }
 
                     }

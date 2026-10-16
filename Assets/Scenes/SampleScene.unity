@@ -552,15 +552,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemyChase
   player: {fileID: 975530307}
   eyePoint: {fileID: 1075994161}
-  viewDistance: 100
+  viewDistance: 5
   viewAngle: 90
   playerDetectMask:
     serializedVersion: 2
     m_Bits: 64
-  keepSuspicionTimerInit: 4
+  keepSuspicionTimerInit: 6
   timeBeforeAlertedInit: 2
   passiveMoveSpeed: 3
-  alertedMoveSpeed: 5
+  alertedMoveSpeed: 9
   patrolPoints: {fileID: 1442304958}
 --- !u!195 &741472329
 NavMeshAgent:
@@ -973,7 +973,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: walkSpeed
-      value: 4
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445546, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1183,8 +1183,8 @@ Transform:
   m_GameObject: {fileID: 1175804188}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -12.7055, y: -0.42, z: -10.5196}
-  m_LocalScale: {x: 3.684164, y: 1, z: 4.0148945}
+  m_LocalPosition: {x: -12.7055, y: -0.42, z: -25.61}
+  m_LocalScale: {x: 3.684164, y: 1, z: 7.0477457}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
