@@ -1,4 +1,4 @@
-namespace CharacterController
+namespace EasyPeasyFirstPersonController
 {
     public abstract class PlayerBaseState
     {

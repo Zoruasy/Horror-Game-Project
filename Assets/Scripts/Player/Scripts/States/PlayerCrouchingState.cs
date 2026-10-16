@@ -1,4 +1,4 @@
-namespace CharacterController
+namespace EasyPeasyFirstPersonController
 {
     using UnityEngine;
 
@@ -9,20 +9,18 @@ namespace CharacterController
 
         public override void EnterState()
         {
-            // immediate crouch
             if (!ctx.enableSmoothCrouch)
             {
-                ctx.characterController.height = ctx.crouchingCharacterControllerHeight;
-                ctx.characterController.center = new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0);
+                float crouchHeight = ctx.crouchingCharacterControllerHeight;
+                ctx.characterController.height = crouchHeight;
+                ctx.characterController.center = new Vector3(0, crouchHeight / 2f, 0);
             }
         }
 
         public override void UpdateState()
         {
-            ctx.targetFov = ctx.normalFov;
-            ctx.currentBobIntensity = 0;
-            ctx.currentBobSpeed = 0;
-            ctx.targetTilt = 0;
+            CheckSwitchStates();
+            HandleCrouchMovement();
 
             if (ctx.enableSmoothCrouch)
             {
@@ -39,29 +37,23 @@ namespace CharacterController
                 );
             }
 
-            HandleCrouchMovement();
-            CheckSwitchStates();
+            ctx.targetCameraY = ctx.crouchingCameraHeight;
         }
 
         public override void ExitState()
         {
-            // Ensure height returns
-            if (!ctx.enableSmoothCrouch)
-            {
-                ctx.characterController.height = ctx.standingCharacterControllerHeight;
-                ctx.characterController.center = ctx.standingCharacterControllerCenter;
-            }
+
         }
 
         public override void CheckSwitchStates()
         {
-            if (ctx.input.jump && ctx.isGrounded && !ctx.HasCeiling())
-            {
-                SwitchState(factory.Jumping());
-            }
-            else if (!ctx.input.crouch)
+            if (!ctx.input.crouch && !ctx.HasCeiling())
             {
                 SwitchState(factory.Grounded());
+            }
+            else if (!ctx.isGrounded)
+            {
+                SwitchState(factory.Fall());
             }
         }
 
@@ -72,12 +64,15 @@ namespace CharacterController
             targetMove = Vector3.ClampMagnitude(targetMove, 1f);
 
             Vector3 targetVelocity = targetMove * ctx.crouchSpeed;
+            float accelRate = (input.sqrMagnitude > 0.01f) ? ctx.groundAcceleration : ctx.groundDeceleration;
 
-            float accel = 30f;
-            ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, accel * Time.deltaTime);
+            ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, accelRate * Time.deltaTime);
 
             Vector3 finalVelocity = ctx.currentVelocity;
-            finalVelocity.y = -5f;
+            
+            if (ctx.isGrounded) finalVelocity.y = -10f;
+            else finalVelocity.y = 0f;
+            
             ctx.characterController.Move(finalVelocity * Time.deltaTime);
         }
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CharacterController
+namespace EasyPeasyFirstPersonController
 {
     public interface IInputManager
     {

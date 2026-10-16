@@ -1,4 +1,4 @@
-namespace CharacterController
+namespace EasyPeasyFirstPersonController
 {
     using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
