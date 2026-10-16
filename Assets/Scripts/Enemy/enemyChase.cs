@@ -20,6 +20,17 @@ public class enemyChase : MonoBehaviour
     
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
+    [SerializeField] private Transform patrolPoints;
+    private Transform[] patrolPointsArray;
+
+
+
+
+
+
+
+
+
 
     void Update()
     {
@@ -38,6 +49,25 @@ public class enemyChase : MonoBehaviour
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        patrolPointsArray = GetComponentsInChildren<Transform>();
+        int patrolPointCount = patrolPointsArray.Length;
+
+    patrolling();
+
+
+
+    }
+
+    private void patrolling()
+    {
+        for (int i = 0; i < patrolPointsArray.Length; i++)
+        {
+            if (patrolPointsArray[i] != null) 
+            {
+                Debug.Log("Patrolling to point: " + patrolPointsArray[i].name);
+                navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point?
+            }
+        }
     }
 
     // void myRaycast()
