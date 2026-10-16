@@ -50,7 +50,7 @@ public class enemyChase : MonoBehaviour
 
         patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
 
-        StartCoroutine(Patrolling());
+        StartCoroutine(enemyMovement());
 
 
 
@@ -62,34 +62,33 @@ public class enemyChase : MonoBehaviour
 
 
 
-    IEnumerator Patrolling()
+    IEnumerator enemyMovement()
     {
 
-        if (isChasingPlayer())
+
+
+        // yield break; //stop patrolling if chasing player
+        // navMeshAgent.isStopped = false; to pause the enemy
+
+        for (int i = 0; i < patrolPointsArray.Length;)
         {
-            // yield break; //stop patrolling if chasing player
-            // navMeshAgent.isStopped = false; to pause the enemy
-
-            Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
-            yield return new WaitForSeconds(0.1f); //update speed
-            navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+            yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
+            patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
 
 
-        }
-        else
-        {
-
-
-
-
-            for (int i = 0; i < patrolPointsArray.Length;)
+            if (patrolPointsArray[i] != null)
             {
-                yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
-                patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
 
 
 
-                if (patrolPointsArray[i] != null)
+                if (isChasingPlayer())
+                {
+                    Debug.Log("YURRRRRRRRRRRRRRRRP I SEE YOU");
+                   
+                    navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                }
+
+                else
                 {
                     Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
                     navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
@@ -104,15 +103,14 @@ public class enemyChase : MonoBehaviour
                         }
 
                     }
-                    else
-                    {
-
-
-                    }
-
                 }
+
+
+
+
             }
         }
+
     }
 
 
