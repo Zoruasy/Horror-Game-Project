@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 
@@ -76,6 +76,9 @@ namespace EasyPeasyFirstPersonController
         [HideInInspector] public Vector3 standingCharacterControllerCenter = new Vector3(0, 0.9f, 0);
         [HideInInspector] public float targetCameraY;
 
+        // cooldown voor ledge checks / climbs
+        [HideInInspector] public float currentLedgeCooldown;
+
         [Header("Ledge Settings")]
         public LayerMask ledgeLayer;
         public float ledgeDetectionDistance = 1f;
@@ -112,11 +115,20 @@ namespace EasyPeasyFirstPersonController
             characterController = GetComponent<CharacterController>();
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
+
+            // Try interface first, fall back to concrete type (silent)
             input = GetComponent<IInputManager>();
+            if (input == null)
+            {
+                var fallback = GetComponent<InputManager>();
+                if (fallback != null)
+                    input = fallback;
+            }
+
             states = new PlayerStateFactory(this);
 
             currentState = states.Grounded();
-            currentState.EnterState();
+            currentState?.EnterState();
         }
 
         private void Update()
@@ -126,13 +138,19 @@ namespace EasyPeasyFirstPersonController
 
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
 
-            currentState.UpdateState();
+            // Normal flow: states drive movement/crouch etc.
+            if (currentState != null)
+                currentState.UpdateState();
+
             HandleRotation();
             UpdateVisuals();
         }
 
         private void HandleRotation()
         {
+            // Rotation requires input; skip if missing
+            if (input == null) return;
+
             float mouseX = input.lookInput.x * mouseSensitivity;
             float mouseY = input.lookInput.y * mouseSensitivity;
 
@@ -225,7 +243,7 @@ namespace EasyPeasyFirstPersonController
         public bool CheckLedge(out Vector3 climbPosition)
         {
             climbPosition = Vector3.zero;
-            if (currentLedgeCooldown > 0) return false;
+           if (currentLedgeCooldown > 0) return false;
 
             RaycastHit wallHit;
             Vector3 wallOrigin = transform.position + Vector3.up * 1.5f;

@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     using UnityEngine;
 

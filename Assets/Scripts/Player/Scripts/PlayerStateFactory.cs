@@ -1,4 +1,4 @@
-namespace EasyPeasyFirstPersonController
+namespace CharacterController
 {
     public class PlayerStateFactory
     {
@@ -14,7 +14,7 @@ namespace EasyPeasyFirstPersonController
         public PlayerBaseState Sliding() => new PlayerSlidingState(context, this);
         public PlayerBaseState Crouching() => new PlayerCrouchingState(context, this);
         public PlayerBaseState Fall() => new PlayerFallState(context, this);
-        public PlayerBaseState LedgeGrab() => new PlayerLedgeGrabState(context, this);
-        public PlayerBaseState Swimming() => new PlayerSwimmingState(context, this);
-    }
+//        public PlayerBaseState LedgeGrab() => new PlayerLedgeGrabState(context, this);
+//        public PlayerBaseState Swimming() => new PlayerSwimmingState(context, this);
+   }
 }
