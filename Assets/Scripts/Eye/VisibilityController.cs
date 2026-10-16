@@ -3,21 +3,36 @@ using UnityEngine;
 
 public class VisibilityController : MonoBehaviour
 {
+    [SerializeField] private EyeController eye;
+
     private readonly List<Renderer> _renderersToHideWithEye = new List<Renderer>();
     private readonly List<Renderer> _renderersToShowWithEye = new List<Renderer>();
-    
+
+    private void OnEnable()
+    {
+        eye.OnEyeToggled += UpdateRenderersVisibilityForEye;
+    }
+
+    private void OnDisable()
+    {
+        eye.OnEyeToggled -= UpdateRenderersVisibilityForEye;
+    }
+
     private void Start()
     {
         Debug.Log("VisibilityController started");
-       UpdateRenderersLists();
+        UpdateRenderersLists();
         Debug.Log("Renderers to show with eye: " + _renderersToShowWithEye.Count);
         Debug.Log("Renderers to hide with eye: " + _renderersToHideWithEye.Count);
+        UpdateRenderersVisibilityForEye(eye.EyeIn);
     }
-
 
     public void UpdateRenderersLists()
     {
-        Renderer[] renderers = FindObjectsOfType<Renderer>();
+        _renderersToShowWithEye.Clear();
+        _renderersToHideWithEye.Clear();
+
+        Renderer[] renderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
         foreach (Renderer renderer in renderers)
         {
             if (renderer.gameObject.CompareTag("ShowWithEye"))
@@ -30,13 +45,7 @@ public class VisibilityController : MonoBehaviour
             }
         }
     }
-    
-private void Update()
-    {
 
-        /*UpdateRenderersVisibilityForEye(true);  // for testing, it simulates whether the player is wearing the eye or not.*/
-    }
-    
     private void UpdateRenderersVisibilityForEye(bool IsWearingEye)
     {
         if (_renderersToShowWithEye.Count > 0)
@@ -55,5 +64,4 @@ private void Update()
             }
         }
     }
-    
 }
