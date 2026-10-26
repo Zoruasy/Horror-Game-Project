@@ -116,7 +116,7 @@ public class enemyChase : MonoBehaviour
 
                     if (isSeeingPlayer())//if still spotting the player for a period of time
                     {
-                        Debug.Log("aggro" + timeBeforeAlerted);
+                        Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
                         timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
