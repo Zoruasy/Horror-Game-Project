@@ -86,18 +86,35 @@ public class enemyChase : MonoBehaviour
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
             navMeshAgent.speed = passiveMoveSpeed;
 
+            bool playerSpottedBool = true;
+            Vector3 spottedPlayerPosition = default; // just define it type shi
+
 
 
             if (patrolPointsArray[i] != null) //just a check
             {
 
 
-                if (isSuspicious() || keepsSuspiciousForABit) //sees a player, is suspicious
+                if (isSeeingPlayer() || keepsSuspiciousForABit) //sees a player, is suspicious
                 {
                     Debug.Log("I SEE YOU");
                     keepsSuspiciousForABit = true;
-                    navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-                    if (isSuspicious())//if still spotting the player for a period of time
+
+
+
+                    // run for only 1 time at the first time spotting a player
+                    if (playerSpottedBool)
+                    {
+                        spottedPlayerPosition = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z); //live update on player location
+                        playerSpottedBool = false;
+                    }
+                    navMeshAgent.SetDestination(spottedPlayerPosition); // walk to the set location
+
+
+
+
+
+                    if (isSeeingPlayer())//if still spotting the player for a period of time
                     {
                         Debug.Log("aggro" + timeBeforeAlerted);
                         timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
@@ -106,13 +123,16 @@ public class enemyChase : MonoBehaviour
                             Debug.Log("I WILL KILL YOU");
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
-                            // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                            //update live location of players location to walk to when seeing the player
+                            playerSpottedBool = true;
                         }
+
+
                     }
                     else
                     {
-
-                        if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0) //lose suspicion
+                        //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
+                        if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                         {
                             keepsSuspiciousForABit = false;
 
@@ -133,6 +153,8 @@ public class enemyChase : MonoBehaviour
                 }
                 else
                 {
+                    playerSpottedBool = true;
+
                     //reset the timers
                     keepSuspicionTimer = keepSuspicionTimerInit;
                     timeBeforeAlerted = timeBeforeAlertedInit;
@@ -165,7 +187,7 @@ public class enemyChase : MonoBehaviour
 
 
 
-    bool isSuspicious() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
+    bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
     {
         if (player == null || eyePoint == null)
             return false;
