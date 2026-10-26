@@ -29,7 +29,11 @@ namespace CharacterController
             {
                 SwitchState(factory.Grounded());
             }
+            //else if (ctx.CheckLedge(out _))
+            //{
+            //    SwitchState(factory.LedgeGrab());
         }
+        
 
         private void ApplyGravity()
         {
@@ -42,16 +46,15 @@ namespace CharacterController
             Vector2 input = ctx.input.moveInput;
             Vector3 targetMove = ctx.transform.right * input.x + ctx.transform.forward * input.y;
             targetMove = Vector3.ClampMagnitude(targetMove, 1f);
-            
+
             Vector3 targetVelocity = targetMove * ctx.walkSpeed;
             float airAccel = 5f;
-            
+
             ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, airAccel * Time.deltaTime);
-            
+
             Vector3 finalMove = ctx.currentVelocity;
-            finalMove.y = 0; 
-            
+            finalMove.y = 0;
+
             ctx.characterController.Move(finalMove * Time.deltaTime);
         }
-    }
-}
+    } }

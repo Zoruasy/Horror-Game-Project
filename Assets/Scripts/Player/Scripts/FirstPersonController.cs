@@ -1,9 +1,6 @@
 namespace CharacterController
 {
     using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-    using UnityEngine.InputSystem;
-#endif
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -13,6 +10,8 @@ namespace CharacterController
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
         public float gravity = 9.81f;
+        public float slideDuration = 0.7f;
+        public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
 
@@ -24,15 +23,18 @@ namespace CharacterController
         [Header("Advanced Mechanics")]
         public bool enableSmoothCrouch = true;
         public float crouchTransitionSpeed = 10f;
+        public bool enableSlopeSliding = true;
+        public float slideUphillFriction = 3f;
+        public float slideSteerControl = 4f;
 
         [Header("References")]
         public Transform playerCamera;
         public Transform cameraParent;
         public Transform groundCheck;
-        public LayerMask groundMask;
+        public LayerMask groundMask; // plafond
 
         [HideInInspector] public CharacterController characterController;
-        [HideInInspector] public InputManager input;
+        [HideInInspector] public IInputManager input;
         [HideInInspector] public Vector3 moveDirection;
         [HideInInspector] public bool isGrounded;
 
@@ -42,14 +44,12 @@ namespace CharacterController
         private float currentTilt;
         private float tiltVelocity;
 
-        // Track whether the right mouse button is currently held
-        private bool rmbHeld = false;
-
         public PlayerBaseState CurrentState { get => currentState; set => currentState = value; }
 
         [Header("Visual Settings")]
         public float normalFov = 60f;
         public float sprintFov = 75f;
+        public float slideFovBoost = 5f;
         public float fovChangeSpeed = 8f;
         public float bobAmount = 0.03f;
         public float bobSpeed = 12f;
@@ -76,6 +76,17 @@ namespace CharacterController
         [HideInInspector] public Vector3 standingCharacterControllerCenter = new Vector3(0, 0.9f, 0);
         [HideInInspector] public float targetCameraY;
 
+        // cooldown voor ledge checks / climbs
+        [HideInInspector] public float currentLedgeCooldown;
+
+        [Header("Ledge Settings")]
+        public LayerMask ledgeLayer;
+        public float ledgeDetectionDistance = 1f;
+        public float climbDuration = 0.6f;
+        public float climbHeightArc = 0.4f;
+        public float climbTiltAmount = -7f;
+
+      
         [Header("Visual Preferences")]
         public bool useFovKick = true;
         public bool useHeadBob = true;
@@ -104,46 +115,41 @@ namespace CharacterController
             characterController = GetComponent<CharacterController>();
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
-            input = GetComponent<InputManager>();
+
+            // Try interface first, fall back to concrete type (silent)
+            input = GetComponent<IInputManager>();
+            if (input == null)
+            {
+                var fallback = GetComponent<InputManager>();
+                if (fallback != null)
+                    input = fallback;
+            }
+
             states = new PlayerStateFactory(this);
 
             currentState = states.Grounded();
-            currentState.EnterState();
+            currentState?.EnterState();
         }
 
         private void Update()
         {
+            if (currentLedgeCooldown > 0)
+                currentLedgeCooldown -= Time.deltaTime;
+
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
 
-            // Detect right mouse hold so we can lock cursor and allow looking + moving while RMB is held.
-            bool rightMouseHeld;
-#if ENABLE_INPUT_SYSTEM
-            rightMouseHeld = Mouse.current != null && Mouse.current.rightButton.isPressed;
-#else
-            rightMouseHeld = Input.GetMouseButton(1);
-#endif
-            rmbHeld = rightMouseHeld;
+            // Normal flow: states drive movement/crouch etc.
+            if (currentState != null)
+                currentState.UpdateState();
 
-            if (rightMouseHeld)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
-            else
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-
-            currentState.UpdateState();
             HandleRotation();
             UpdateVisuals();
         }
 
         private void HandleRotation()
         {
-            // Don't attempt to rotate if input component is missing or RMB is not held
-            if (input == null || !rmbHeld) return;
+            // Rotation requires input; skip if missing
+            if (input == null) return;
 
             float mouseX = input.lookInput.x * mouseSensitivity;
             float mouseY = input.lookInput.y * mouseSensitivity;
@@ -234,5 +240,32 @@ namespace CharacterController
 
             return Physics.SphereCast(origin, radius, Vector3.up, out _, checkDistance, groundMask, QueryTriggerInteraction.Ignore);
         }
+        public bool CheckLedge(out Vector3 climbPosition)
+        {
+            climbPosition = Vector3.zero;
+           if (currentLedgeCooldown > 0) return false;
+
+            RaycastHit wallHit;
+            Vector3 wallOrigin = transform.position + Vector3.up * 1.5f;
+
+            if (Physics.Raycast(wallOrigin, transform.forward, out wallHit, ledgeDetectionDistance, ledgeLayer, QueryTriggerInteraction.Ignore))
+            {
+                Vector3 ledgeOrigin = wallOrigin + Vector3.up * 0.6f + transform.forward * 0.2f;
+                RaycastHit ledgeHit;
+
+                if (!Physics.Raycast(ledgeOrigin, transform.forward, 0.5f, groundMask))
+                {
+                    if (Physics.Raycast(ledgeOrigin + transform.forward * 0.4f, Vector3.down, out ledgeHit, 1f, groundMask))
+                    {
+                        climbPosition = ledgeHit.point + Vector3.up * 1f;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        
+
     }
 }
