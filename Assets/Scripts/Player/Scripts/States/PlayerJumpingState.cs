@@ -30,6 +30,10 @@ namespace CharacterController
             {
                 SwitchState(factory.Grounded());
             }
+            //else if (ctx.CheckLedge(out _))
+            //{
+            //    SwitchState(factory.LedgeGrab());
+            //}
         }
 
         private void HandleJump()
@@ -48,20 +52,20 @@ namespace CharacterController
             Vector2 input = ctx.input.moveInput;
             Vector3 targetMove = ctx.transform.right * input.x + ctx.transform.forward * input.y;
             targetMove = Vector3.ClampMagnitude(targetMove, 1f);
-            
+
             Vector3 targetVelocity = targetMove * ctx.walkSpeed;
-            
+
             // Allow some air control (acceleration is much lower in the air than on the ground)
             float airAccel = 5f;
-            
+
             // Smoothly move current velocity towards target. 
             // If we slide-jumped, currentVelocity will start very high (e.g., 12m/s) and slowly drop to walkSpeed (3m/s) mid-air.
             ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, airAccel * Time.deltaTime);
-            
+
             Vector3 finalMove = ctx.currentVelocity;
             // Y is handled by ApplyGravity
             finalMove.y = 0; 
-            
+
             ctx.characterController.Move(finalMove * Time.deltaTime);
         }
     }

@@ -1,84 +1,180 @@
+
 namespace CharacterController
 {
     using UnityEngine;
 
     public class PlayerCrouchingState : PlayerBaseState
     {
-        public PlayerCrouchingState(FirstPersonController currentContext, PlayerStateFactory playerStateFactory)
-            : base(currentContext, playerStateFactory) { }
+        private const float minHeightEpsilon = 0.01f;
+
+        // Tracks whether the crouch button was previously held
+        private bool wasCrouchPressed;
+
+        public PlayerCrouchingState(
+            FirstPersonController currentContext,
+            PlayerStateFactory playerStateFactory
+        ) : base(currentContext, playerStateFactory)
+        {
+        }
 
         public override void EnterState()
         {
-            // immediate crouch
+            // Remember the current button state
+            wasCrouchPressed = ctx.input.crouch;
+
+            // Lower the camera
+            ctx.targetCameraY = ctx.crouchingCameraHeight;
+
+            // Instantly crouch if smooth crouching is disabled
             if (!ctx.enableSmoothCrouch)
             {
-                ctx.characterController.height = ctx.crouchingCharacterControllerHeight;
-                ctx.characterController.center = new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0);
+                SetCapsuleHeight(
+                    ctx.crouchingCharacterControllerHeight
+                );
             }
         }
 
         public override void UpdateState()
         {
-            ctx.targetFov = ctx.normalFov;
-            ctx.currentBobIntensity = 0;
-            ctx.currentBobSpeed = 0;
-            ctx.targetTilt = 0;
+            // Keep the camera at crouching height
+            ctx.targetCameraY = ctx.crouchingCameraHeight;
 
+            // Reset visual effects while crouching
+            ctx.targetFov = ctx.normalFov;
+            ctx.currentBobIntensity = 0f;
+            ctx.currentBobSpeed = 0f;
+            ctx.targetTilt = 0f;
+
+            // Smoothly decrease the capsule height
             if (ctx.enableSmoothCrouch)
             {
-                ctx.characterController.height = Mathf.MoveTowards(
-                    ctx.characterController.height,
+                float targetHeight = Mathf.Max(
                     ctx.crouchingCharacterControllerHeight,
-                    Time.deltaTime * ctx.crouchTransitionSpeed
+                    ctx.characterController.radius * 2f
+                        + minHeightEpsilon
                 );
 
-                ctx.characterController.center = Vector3.MoveTowards(
-                    ctx.characterController.center,
-                    new Vector3(0, ctx.crouchingCharacterControllerHeight / 2f, 0),
-                    Time.deltaTime * (ctx.crouchTransitionSpeed / 2f)
+                float newHeight = Mathf.MoveTowards(
+                    ctx.characterController.height,
+                    targetHeight,
+                    ctx.crouchTransitionSpeed * Time.deltaTime
                 );
+
+                SetCapsuleHeight(newHeight);
             }
 
+            // Handle movement
             HandleCrouchMovement();
+
+            // Check for another crouch button press
             CheckSwitchStates();
         }
 
         public override void ExitState()
         {
-            // Ensure height returns
+            // Restore standing height when smooth crouch is disabled
             if (!ctx.enableSmoothCrouch)
             {
-                ctx.characterController.height = ctx.standingCharacterControllerHeight;
-                ctx.characterController.center = ctx.standingCharacterControllerCenter;
+                ctx.characterController.height =
+                    ctx.standingCharacterControllerHeight;
+
+                ctx.characterController.center =
+                    ctx.standingCharacterControllerCenter;
             }
+
+            // GroundedState handles smooth standing transitions
         }
 
         public override void CheckSwitchStates()
         {
-            if (ctx.input.jump && ctx.isGrounded && !ctx.HasCeiling())
-            {
-                SwitchState(factory.Jumping());
-            }
-            else if (!ctx.input.crouch)
+            bool crouchPressed = ctx.input.crouch;
+
+            // Detect a new button press
+            bool justPressed =
+                crouchPressed && !wasCrouchPressed;
+
+            // Update the previous button state
+            wasCrouchPressed = crouchPressed;
+
+            // Toggle back to standing on the next press
+            if (justPressed && !ctx.HasCeiling())
             {
                 SwitchState(factory.Grounded());
+                return;
             }
+
+            // Remain crouched when the button is released
+        }
+
+        private void SetCapsuleHeight(float height)
+        {
+            // Prevent invalid capsule heights
+            float minHeight =
+                ctx.characterController.radius * 2f
+                + minHeightEpsilon;
+
+            height = Mathf.Max(height, minHeight);
+
+            // Update capsule height
+            ctx.characterController.height = height;
+
+            // Keep the bottom of the capsule in place
+            Vector3 standingCenter =
+                ctx.standingCharacterControllerCenter;
+
+            float standingHeight =
+                ctx.standingCharacterControllerHeight;
+
+            ctx.characterController.center = new Vector3(
+                standingCenter.x,
+                standingCenter.y
+                    - standingHeight / 2f
+                    + height / 2f,
+                standingCenter.z
+            );
         }
 
         private void HandleCrouchMovement()
         {
+            // Read movement input
             Vector2 input = ctx.input.moveInput;
-            Vector3 targetMove = ctx.transform.right * input.x + ctx.transform.forward * input.y;
-            targetMove = Vector3.ClampMagnitude(targetMove, 1f);
 
-            Vector3 targetVelocity = targetMove * ctx.crouchSpeed;
+            // Calculate movement direction
+            Vector3 targetMove =
+                ctx.transform.right * input.x +
+                ctx.transform.forward * input.y;
 
-            float accel = 30f;
-            ctx.currentVelocity = Vector3.MoveTowards(ctx.currentVelocity, targetVelocity, accel * Time.deltaTime);
+            // Prevent faster diagonal movement
+            targetMove = Vector3.ClampMagnitude(
+                targetMove,
+                1f
+            );
 
+            // Calculate crouching velocity
+            Vector3 targetVelocity =
+                targetMove * ctx.crouchSpeed;
+
+            // Apply acceleration and deceleration
+            float accelRate =
+                input.sqrMagnitude > 0.01f
+                    ? ctx.groundAcceleration
+                    : ctx.groundDeceleration;
+
+            ctx.currentVelocity = Vector3.MoveTowards(
+                ctx.currentVelocity,
+                targetVelocity,
+                accelRate * Time.deltaTime
+            );
+
+            // Apply movement
             Vector3 finalVelocity = ctx.currentVelocity;
+
+            // Keep the character grounded
             finalVelocity.y = -5f;
-            ctx.characterController.Move(finalVelocity * Time.deltaTime);
+
+            ctx.characterController.Move(
+                finalVelocity * Time.deltaTime
+            );
         }
     }
 }
