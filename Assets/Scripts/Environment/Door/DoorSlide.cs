@@ -7,6 +7,10 @@ public class DoorSlide : Interactable
     [SerializeField] Vector3 openMove = new(1.2f, 0, 0);
     [SerializeField] float metersPerSecond = 10f;
 
+    [Header("Hold")]
+    [SerializeField] bool holded;
+    [SerializeField] float holdedTime = 3.0f;
+
     [Header("Lock")]
     [SerializeField] bool locked;
     [SerializeField] string lockedPrompt = "locked";
@@ -50,5 +54,10 @@ public class DoorSlide : Interactable
         }
         hinge.localPosition = target;
         animation = null;
+    }
+
+    public override float GetHoldedTime()
+    {
+        return holdedTime;
     }
 }

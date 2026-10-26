@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8759734924533164651}
   - component: {fileID: 4736535284826481978}
   - component: {fileID: 8206759923437984334}
+  - component: {fileID: 6159990380519094561}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -272,7 +273,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 185
+  m_VersionIndex: 188
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -381,6 +382,24 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &6159990380519094561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3289967070579599611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05aa577f920288385878a9117a6cfc3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorSlide
+  prompt: Interact
+  hinge: {fileID: 3001120625886589490}
+  openMove: {x: 1.2, y: 0, z: 0}
+  metersPerSecond: 4
+  locked: 0
+  lockedPrompt: locked
 --- !u!1 &5858850447362967387
 GameObject:
   m_ObjectHideFlags: 0
@@ -427,7 +446,6 @@ GameObject:
   - component: {fileID: 4582816324551814396}
   - component: {fileID: 7139058224952640541}
   - component: {fileID: 7869697493790763834}
-  - component: {fileID: 6761882027664132536}
   m_Layer: 0
   m_Name: DoorSlide
   m_TagString: Untagged
@@ -993,21 +1011,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &6761882027664132536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9211411295593816492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05aa577f920288385878a9117a6cfc3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DoorSlide
-  prompt: Interact
-  hinge: {fileID: 3001120625886589490}
-  openMove: {x: 1.2, y: 0, z: 0}
-  metersPerSecond: 4
-  locked: 0
-  lockedPrompt: locked

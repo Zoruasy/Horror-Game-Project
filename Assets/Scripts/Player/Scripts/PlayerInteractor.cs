@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +19,10 @@ public class PlayerInteractor : MonoBehaviour
     Collider lastCollider;
     Interactable lastColliderInteractable;
 
+    private float tempsActuel = 0f;
+    private bool isHolded = false;
+    private bool holdSucces = false;
+
     public Interactable Current => current;
 
     void Awake()
@@ -30,14 +35,18 @@ public class PlayerInteractor : MonoBehaviour
         if (interactAction)
         {
             interactAction.action.Enable();
-            interactAction.action.performed += OnInteract;
+            interactAction.action.started += OnInteract;
+            interactAction.action.canceled += ResetTime;
         }
     }
 
     void OnDisable()
     {
         if (interactAction)
-            interactAction.action.performed -= OnInteract;
+        {
+            interactAction.action.started -= OnInteract;
+            interactAction.action.canceled += ResetTime;
+        }
         SetCurrent(null);
     }
 
@@ -49,6 +58,18 @@ public class PlayerInteractor : MonoBehaviour
         {
             string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+        }
+
+        if (current && current.CanInteract(gameObject) && isHolded && !holdSucces)
+        {
+            tempsActuel += Time.deltaTime;
+
+            // float progression = tempsActuel / current.GetHoldedTime();
+
+            if (tempsActuel >= current.GetHoldedTime())
+            {
+                current.Interact(gameObject);
+            }
         }
     }
 
@@ -97,8 +118,21 @@ public class PlayerInteractor : MonoBehaviour
 
     void OnInteract(InputAction.CallbackContext ctx)
     {
+        Debug.Log("Interact");
         if (current && current.CanInteract(gameObject))
-            current.Interact(gameObject);
+        {
+            isHolded = true;
+            tempsActuel = 0f;
+            holdSucces = false;
+        }
+    }
+
+    void ResetTime(InputAction.CallbackContext ctx)
+    {
+        Debug.Log("Cancel");
+        isHolded = false;
+        tempsActuel = 0f;
+        holdSucces = false;
     }
 
 #if UNITY_EDITOR
