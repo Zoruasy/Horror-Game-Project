@@ -25,7 +25,7 @@ public class EyeController : MonoBehaviour
         // E only works if not in a vision
         if (CanActivate &&
             Keyboard.current != null &&
-            Keyboard.current.eKey.wasPressedThisFrame)
+            Keyboard.current.fKey.wasPressedThisFrame)
         {
             switchRoutine = StartCoroutine(TemporarySwitch());
         }
