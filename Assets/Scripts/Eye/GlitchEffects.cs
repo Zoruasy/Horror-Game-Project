@@ -11,13 +11,6 @@ public class GlitchEffects : MonoBehaviour
     private void Update()
     {
         float screen = 0f;
-        
-        if (Time.frameCount % 30 == 0)
-        {
-            Debug.Log($"Flash:{RealityObject.FlashActive} Objects:{RealityObject.All.Count}");
-            foreach (var o in RealityObject.All)
-                Debug.Log($"{o.name} triggers:{o.TriggersGlitch} dist:{Vector3.Distance(transform.position, o.transform.position):F1} radius:{o.GlitchRadius}");
-        }
 
         foreach (var obj in RealityObject.All)
         {
