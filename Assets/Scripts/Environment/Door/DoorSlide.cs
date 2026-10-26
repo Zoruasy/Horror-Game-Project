@@ -8,8 +8,8 @@ public class DoorSlide : Interactable
     [SerializeField] float metersPerSecond = 10f;
 
     [Header("Hold")]
-    [SerializeField] bool holded;
-    [SerializeField] float holdedTime = 3.0f;
+    [SerializeField] bool requireHold;
+    [SerializeField] float holdTime = 3.0f;
 
     [Header("Lock")]
     [SerializeField] bool locked;
@@ -56,8 +56,8 @@ public class DoorSlide : Interactable
         animation = null;
     }
 
-    public override float GetHoldedTime()
+    public override float GetHoldTime()
     {
-        return holdedTime;
+        return requireHold ? holdTime : 0f;
     }
 }

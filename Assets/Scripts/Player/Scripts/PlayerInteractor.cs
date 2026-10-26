@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,9 +18,8 @@ public class PlayerInteractor : MonoBehaviour
     Collider lastCollider;
     Interactable lastColliderInteractable;
 
-    private float tempsActuel = 0f;
-    private bool isHolded = false;
-    private bool holdSucces = false;
+    float holdTimer;
+    bool isHolding;
 
     public Interactable Current => current;
 
@@ -36,7 +34,7 @@ public class PlayerInteractor : MonoBehaviour
         {
             interactAction.action.Enable();
             interactAction.action.started += OnInteract;
-            interactAction.action.canceled += ResetTime;
+            interactAction.action.canceled += CancelInteract;
         }
     }
 
@@ -45,7 +43,7 @@ public class PlayerInteractor : MonoBehaviour
         if (interactAction)
         {
             interactAction.action.started -= OnInteract;
-            interactAction.action.canceled += ResetTime;
+            interactAction.action.canceled -= CancelInteract;
         }
         SetCurrent(null);
     }
@@ -60,16 +58,22 @@ public class PlayerInteractor : MonoBehaviour
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
         }
 
-        if (current && current.CanInteract(gameObject) && isHolded && !holdSucces)
+        if (!isHolding || !current) return;
+
+        if (!current.CanInteract(gameObject))
         {
-            tempsActuel += Time.deltaTime;
+            holdTimer = 0f;
+            return;
+        }
 
-            // float progression = tempsActuel / current.GetHoldedTime();
+        holdTimer += Time.deltaTime;
 
-            if (tempsActuel >= current.GetHoldedTime())
-            {
-                current.Interact(gameObject);
-            }
+        // float holdProgress = holdTimer / current.GetHoldTime();
+
+        if (holdTimer >= current.GetHoldTime())
+        {
+            isHolding = false;
+            current.Interact(gameObject);
         }
     }
 
@@ -109,6 +113,8 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (target == current) return;
 
+        holdTimer = 0f;
+
         if (current) current.OnLoseFocus();
         current = target;
         if (current) current.OnFocus();
@@ -118,21 +124,17 @@ public class PlayerInteractor : MonoBehaviour
 
     void OnInteract(InputAction.CallbackContext ctx)
     {
-        Debug.Log("Interact");
         if (current && current.CanInteract(gameObject))
         {
-            isHolded = true;
-            tempsActuel = 0f;
-            holdSucces = false;
+            isHolding = true;
+            holdTimer = 0f;
         }
     }
 
-    void ResetTime(InputAction.CallbackContext ctx)
+    void CancelInteract(InputAction.CallbackContext ctx)
     {
-        Debug.Log("Cancel");
-        isHolded = false;
-        tempsActuel = 0f;
-        holdSucces = false;
+        isHolding = false;
+        holdTimer = 0f;
     }
 
 #if UNITY_EDITOR

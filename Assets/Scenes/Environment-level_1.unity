@@ -725,7 +725,7 @@ PrefabInstance:
       objectReference: {fileID: 187426135}
     - target: {fileID: 3369436910031845079, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_VersionIndex
-      value: 209
+      value: 212
       objectReference: {fileID: 0}
     - target: {fileID: 3369436910031845079, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Colors.Array.size
@@ -893,7 +893,7 @@ PrefabInstance:
       objectReference: {fileID: 2052800186}
     - target: {fileID: 8803666995375806485, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_VersionIndex
-      value: 3934
+      value: 3937
       objectReference: {fileID: 0}
     - target: {fileID: 8803666995375806485, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Tangents.Array.data[0].x
@@ -9158,7 +9158,7 @@ PrefabInstance:
       objectReference: {fileID: 191225344}
     - target: {fileID: 3369436910031845079, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_VersionIndex
-      value: 209
+      value: 212
       objectReference: {fileID: 0}
     - target: {fileID: 3369436910031845079, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Colors.Array.size
@@ -9308,6 +9308,10 @@ PrefabInstance:
       propertyPath: m_UnmodifiedMeshVersion
       value: 200
       objectReference: {fileID: 0}
+    - target: {fileID: 6159990380519094561, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
+      propertyPath: requireHold
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7139058224952640541, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -9330,7 +9334,7 @@ PrefabInstance:
       objectReference: {fileID: 1527498444}
     - target: {fileID: 8803666995375806485, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_VersionIndex
-      value: 3934
+      value: 3937
       objectReference: {fileID: 0}
     - target: {fileID: 8803666995375806485, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Tangents.Array.data[0].x

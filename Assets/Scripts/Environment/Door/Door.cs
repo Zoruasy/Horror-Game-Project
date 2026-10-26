@@ -7,6 +7,10 @@ public class Door : Interactable
     [SerializeField] float openAngle = 90f;
     [SerializeField] float degreesPerSecond = 180f;
 
+    [Header("Hold")]
+    [SerializeField] bool requireHold;
+    [SerializeField] float holdTime = 3.0f;
+
     [Header("Lock")]
     [SerializeField] bool locked;
     [SerializeField] string lockedPrompt = "locked";
@@ -51,5 +55,10 @@ public class Door : Interactable
         }
         hinge.localRotation = target;
         animation = null;
+    }
+
+    public override float GetHoldTime()
+    {
+        return requireHold ? holdTime : 0f;
     }
 }
