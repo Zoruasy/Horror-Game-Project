@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CharacterController.EditorScripts
 {
-    [CustomEditor(typeof(InputManager))]
+    [CustomEditor(typeof(CharacterController.InputManager))]
     public class InputManagerEditor : Editor
     {
         public override void OnInspectorGUI()
