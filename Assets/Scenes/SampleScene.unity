@@ -131,13 +131,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 29004671}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d1420bffd98de4478bbd184600cad80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeLight
-  eye: {fileID: 0}
-  eyeLight: {fileID: 0}
+  eye: {fileID: 769962225}
+  eyeLight: {fileID: 1985172756}
 --- !u!114 &29004678
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1074,10 +1074,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 769962227}
-  - component: {fileID: 769962226}
   - component: {fileID: 769962225}
   - component: {fileID: 769962224}
-  - component: {fileID: 769962223}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1085,20 +1083,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &769962223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 769962222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d1420bffd98de4478bbd184600cad80, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EyeLight
-  eye: {fileID: 769962225}
-  eyeLight: {fileID: 1985172756}
 --- !u!114 &769962224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1127,19 +1111,6 @@ MonoBehaviour:
   defaultEyeIn: 1
   switchDuration: 4
   cooldownDuration: 4
---- !u!114 &769962226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 769962222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e503c6c686846f541b7474bb89457463, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 100
 --- !u!4 &769962227
 Transform:
   m_ObjectHideFlags: 0
@@ -2982,7 +2953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2aea208f6ad05e4999ca14cd61be611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisibilityController
-  eye: {fileID: 0}
+  eye: {fileID: 769962225}
 --- !u!4 &2079212723
 Transform:
   m_ObjectHideFlags: 0
