@@ -29,11 +29,12 @@ namespace CharacterController
             {
                 SwitchState(factory.Grounded());
             }
-            //else if (ctx.CheckLedge(out _))
-            //{
-            //    SwitchState(factory.LedgeGrab());
+            else if (ctx.CheckLedge(out _))
+            {
+                SwitchState(factory.LedgeGrab());
+            }
         }
-        
+
 
         private void ApplyGravity()
         {

@@ -8,6 +8,7 @@ TagManager:
   - HideWithEye
   - Ground
   - DetectionSphere
+  - Climbable
   layers:
   - Default
   - TransparentFX
