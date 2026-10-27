@@ -3,10 +3,10 @@ using UnityEngine.UI;
 
 public class UIGlitchOverlay : MonoBehaviour
 {
-    [SerializeField] private GlitchEffects glitch;   // sleep de Player hierin
-    [SerializeField] private Image overlay;          // GlitchOverlay
+    [SerializeField] private GlitchEffects glitch; // Player goes in here
+    [SerializeField] private Image overlay; // GlitchOverlay
     [Range(0f, 1f)]
-    [SerializeField] private float maxAlpha = 0.5f;  // 50% doorzichtig
+    [SerializeField] private float maxAlpha = 0.5f; // 50% opacity
     [SerializeField] private float flickerSpeed = 12f;
 
     private float nextFlickerTime;
@@ -22,7 +22,7 @@ public class UIGlitchOverlay : MonoBehaviour
             return;
         }
 
-        // Nieuwe flikkerwaarde in blokjes van tijd, zodat het hakkelig oogt
+        // flashing glitch effect
         if (Time.time >= nextFlickerTime)
         {
             flicker = Random.Range(0.2f, 1f);

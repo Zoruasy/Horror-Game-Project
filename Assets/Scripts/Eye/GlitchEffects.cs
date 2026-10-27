@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class GlitchEffects : MonoBehaviour
 {
-    [SerializeField] private EyeController eye;               // sleep de Player hierin
-    [SerializeField] private Material screenGlitchMaterial;   // mag leeg blijven
+    [SerializeField] private EyeController eye; // sleep de Player hierin
+    [SerializeField] private Material screenGlitchMaterial; // mag leeg blijven
     [SerializeField] private float smoothing = 6f;
 
     public float Intensity { get; private set; }
