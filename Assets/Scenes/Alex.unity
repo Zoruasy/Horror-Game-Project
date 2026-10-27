@@ -1068,7 +1068,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2163863e55b5ba43b99c49a6e0c3182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemyChase
-  player: {fileID: 769962227}
+  player: {fileID: 29004679}
   eyePoint: {fileID: 1075994161}
   viewDistance: 5
   viewAngle: 172.3
@@ -1442,7 +1442,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7025222dc83d2409102fdd22327f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
-  defaultEyeIn: 1
+  defaultEyeIn: 0
   switchDuration: 4
   cooldownDuration: 4
 --- !u!4 &769962227
