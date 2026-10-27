@@ -23,6 +23,8 @@ public class PlayerInteractor : MonoBehaviour
 
     public Interactable Current => current;
 
+    public float HoldRemaining => isHolding && current ? Mathf.Max(0f, current.GetHoldTime() - holdTimer) : 0f;
+
     void Awake()
     {
         if (!cam) cam = Camera.main;
@@ -58,6 +60,13 @@ public class PlayerInteractor : MonoBehaviour
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
         }
 
+        UpdateHold();
+
+        if (promptUI) promptUI.SetHoldRemaining(HoldRemaining);
+    }
+
+    void UpdateHold()
+    {
         if (!isHolding || !current) return;
 
         if (!current.CanInteract(gameObject))
@@ -67,8 +76,6 @@ public class PlayerInteractor : MonoBehaviour
         }
 
         holdTimer += Time.deltaTime;
-
-        // float holdProgress = holdTimer / current.GetHoldTime();
 
         if (holdTimer >= current.GetHoldTime())
         {
