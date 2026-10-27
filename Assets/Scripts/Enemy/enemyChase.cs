@@ -97,7 +97,7 @@ public class enemyChase : MonoBehaviour
 
                 if (isSeeingPlayer() || keepsSuspiciousForABit) //sees a player, is suspicious
                 {
-                    Debug.Log("I SEE YOU");
+                    // Debug.Log("I SEE YOU");
                     keepsSuspiciousForABit = true;
 
 
@@ -109,14 +109,14 @@ public class enemyChase : MonoBehaviour
                         playerSpottedBool = false;
                     }
                     navMeshAgent.SetDestination(spottedPlayerPosition); // walk to the set location
-
+                    Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
 
 
 
 
                     if (isSeeingPlayer())//if still spotting the player for a period of time
                     {
-                        Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
+
                         timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {

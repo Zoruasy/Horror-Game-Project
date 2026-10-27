@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 9156347144040445545}
   - component: {fileID: 9156347144040445544}
   - component: {fileID: 825849739443659256}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: FirstPersonController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
