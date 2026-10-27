@@ -70,7 +70,13 @@ namespace CharacterController
 
         public override void CheckSwitchStates()
         {
-            CheckAndSwitchState();
+           
+            // Klimmen vanaf de grond met E
+            if (ctx.input.climbing && ctx.CheckLedge(out _))
+            {
+                SwitchState(factory.LedgeGrab());
+                return;
+            }
         }
 
         private bool CheckAndSwitchState()

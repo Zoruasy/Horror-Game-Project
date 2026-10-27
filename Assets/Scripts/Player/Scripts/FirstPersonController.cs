@@ -133,6 +133,19 @@ namespace CharacterController
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Debug.Log("E is ingedrukt!");
+
+                if (CheckLedge(out Vector3 climbPos))
+                {
+                    Debug.Log("Climbable gevonden!");
+                }
+                else
+                {
+                    Debug.Log("Geen beklimbare rand gevonden!");
+                }
+            }
             if (currentLedgeCooldown > 0)
                 currentLedgeCooldown -= Time.deltaTime;
 
