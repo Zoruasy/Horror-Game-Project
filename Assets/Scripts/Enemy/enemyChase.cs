@@ -11,13 +11,6 @@ public class enemyChase : MonoBehaviour
     [Header("Target")]
     public Transform player;
     public Transform eyePoint;
-    [SerializeField] private Transform respawnPoint;
-
-    [Header("Vision Light")]
-    [SerializeField] private Light visionLight;
-    [SerializeField] private Color normalVisionColor = Color.white;
-    [SerializeField] private Color spottedVisionColor = Color.yellow;
-    [SerializeField] private Color aggroVisionColor = Color.red;
 
     [Header("Vision Settings")]
     public float viewDistance = 10f;
@@ -41,9 +34,6 @@ public class enemyChase : MonoBehaviour
     float keepSuspicionTimer = 2f;
     float timeBeforeAlerted = 2f;
 
-    bool isAggro = false;
-    bool isSuspicious = false;
-
 
 
 
@@ -54,57 +44,7 @@ public class enemyChase : MonoBehaviour
 
     void Update()
     {
-        TryKillPlayerAtCloseRange();
 
-        if (visionLight == null)
-            return;
-
-        if (isAggro)
-            visionLight.color = aggroVisionColor;
-        else if (keepsSuspiciousForABit)
-            visionLight.color = spottedVisionColor;
-        else
-            visionLight.color = normalVisionColor;
-    }
-
-    private void TryKillPlayerAtCloseRange()
-    {
-        if (player == null || eyePoint == null)
-            return;
-
-        int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
-        if (Physics.Raycast(
-                eyePoint.position,
-                eyePoint.forward,
-                out RaycastHit hit,
-                0.5f,
-                sightMask,
-                QueryTriggerInteraction.Ignore) &&
-            (hit.transform == player || hit.transform.IsChildOf(player)) &&
-            (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
-        {
-            if (respawnPoint == null)
-            {
-                Debug.LogError("Enemy respawn point is not assigned.", this);
-                return;
-            }
-
-            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-            if (characterController != null)
-                characterController.enabled = false;
-
-            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-            if (characterController != null)
-                characterController.enabled = true;
-
-            isAggro = false;
-            keepsSuspiciousForABit = false;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-            timeBeforeAlerted = timeBeforeAlertedInit;
-            navMeshAgent.speed = passiveMoveSpeed;
-            navMeshAgent.ResetPath();
-        }
     }
 
 
@@ -138,50 +78,51 @@ public class enemyChase : MonoBehaviour
         // yield break; //stop patrolling if chasing player
         // navMeshAgent.isStopped = false; to pause the enemy
 
-        Vector3 lastSeenPlayerPosition = default;
-        bool hasLastSeenPlayerPosition = false;
-
         for (int i = 0; i < patrolPointsArray.Length;)
         {
             yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
             navMeshAgent.speed = passiveMoveSpeed;
 
-            bool seesPlayer = isSeeingPlayer();
-            if (seesPlayer || isAggro)
-            {
-                lastSeenPlayerPosition = player.position;
-                hasLastSeenPlayerPosition = true;
-            }
+            bool playerSpottedBool = true;
+            Vector3 spottedPlayerPosition = default; // just define it type shi
+
+
 
             if (patrolPointsArray[i] != null) //just a check
             {
 
 
-                if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
+                if (isSeeingPlayer() || keepsSuspiciousForABit) //sees a player, is suspicious
                 {
                     // Debug.Log("I SEE YOU");
                     keepsSuspiciousForABit = true;
 
 
-                    navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen player location
+
+                    // run for only 1 time at the first time spotting a player
+                    if (playerSpottedBool)
+                    {
+                        spottedPlayerPosition = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z); //live update on player location
+                        playerSpottedBool = false;
+                    }
+                    navMeshAgent.SetDestination(spottedPlayerPosition); // walk to the set location
                     Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
 
 
 
 
-                    if (seesPlayer)//if still spotting the player for a period of time
+                    if (isSeeingPlayer())//if still spotting the player for a period of time
                     {
-
-
 
                         timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
                             Debug.Log("I WILL KILL YOU");
-                            isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
+                            //update live location of players location to walk to when seeing the player
+                            playerSpottedBool = true;
                         }
 
 
@@ -189,12 +130,7 @@ public class enemyChase : MonoBehaviour
                     else
                     {
                         //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
-                        if (isAggro)
-                        {
-                            keepsSuspiciousForABit = true;
-                            keepSuspicionTimer = keepSuspicionTimerInit;
-                        }
-                        else if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
+                        if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                         {
                             keepsSuspiciousForABit = false;
 
@@ -215,7 +151,7 @@ public class enemyChase : MonoBehaviour
                 }
                 else
                 {
-                    isAggro = false;
+                    playerSpottedBool = true;
 
                     //reset the timers
                     keepSuspicionTimer = keepSuspicionTimerInit;
@@ -253,12 +189,7 @@ public class enemyChase : MonoBehaviour
 
     }
 
-    
-    public void KillEnemy()
-    {
-        Destroy(gameObject);
-        Debug.Log("Enemy killed");
-    }
+
 
     bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
     {
@@ -283,18 +214,16 @@ public class enemyChase : MonoBehaviour
             return false;
         }
 
-        int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
+        //check the layer for the player and if there is an obj in between the player and the enemy
         if (Physics.Raycast(
                 eyePoint.position,
                 directionToPlayer.normalized,
                 out RaycastHit hit,
                 directionToPlayer.magnitude,
-                sightMask,
+                playerDetectMask,
                 QueryTriggerInteraction.Ignore))
         {
-            bool hitPlayer = hit.transform == player.transform || hit.transform.IsChildOf(player);
-            bool isOnPlayerLayer = (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0;
-            return hitPlayer && isOnPlayerLayer;
+            return hit.transform == player.transform || hit.transform.IsChildOf(player);
         }
 
         return false;
