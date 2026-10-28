@@ -133,6 +133,19 @@ namespace CharacterController
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Debug.Log("E is ingedrukt!");
+
+                if (CheckLedge(out Vector3 climbPos))
+                {
+                    Debug.Log("Climbable gevonden!");
+                }
+                else
+                {
+                    Debug.Log("Geen beklimbare rand gevonden!");
+                }
+            }
             if (currentLedgeCooldown > 0)
                 currentLedgeCooldown -= Time.deltaTime;
 
@@ -243,27 +256,63 @@ namespace CharacterController
         public bool CheckLedge(out Vector3 climbPosition)
         {
             climbPosition = Vector3.zero;
-           if (currentLedgeCooldown > 0) return false;
 
-            RaycastHit wallHit;
-            Vector3 wallOrigin = transform.position + Vector3.up * 1.5f;
+            if (currentLedgeCooldown > 0f)
+                return false;
 
-            if (Physics.Raycast(wallOrigin, transform.forward, out wallHit, ledgeDetectionDistance, ledgeLayer, QueryTriggerInteraction.Ignore))
+            float radius = characterController.radius;
+
+            Vector3 wallOrigin =
+                transform.position + Vector3.up * 1.5f;
+
+            if (!Physics.Raycast(
+                wallOrigin,
+                transform.forward,
+                out RaycastHit wallHit,
+                ledgeDetectionDistance,
+                ~0,
+                QueryTriggerInteraction.Ignore))
             {
-                Vector3 ledgeOrigin = wallOrigin + Vector3.up * 0.6f + transform.forward * 0.2f;
-                RaycastHit ledgeHit;
-
-                if (!Physics.Raycast(ledgeOrigin, transform.forward, 0.5f, groundMask))
-                {
-                    if (Physics.Raycast(ledgeOrigin + transform.forward * 0.4f, Vector3.down, out ledgeHit, 1f, groundMask))
-                    {
-                        climbPosition = ledgeHit.point + Vector3.up * 1f;
-                        return true;
-                    }
-                }
+                return false;
             }
-            return false;
-        }
+
+            // Alleen objecten met de Climbable tag
+            if (!wallHit.collider.CompareTag("Climbable"))
+                return false;
+
+            // Zoek de bovenkant van het platform
+            Vector3 topOrigin =
+                wallHit.point
+                + transform.forward * (radius + 0.15f)
+                + Vector3.up * 1.2f;
+
+            if (!Physics.Raycast(
+                topOrigin,
+                Vector3.down,
+                out RaycastHit topHit,
+                2f,
+                ~0,
+                QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            // Alleen klimmen op dezelfde Climbable collider
+            if (topHit.collider != wallHit.collider)
+                return false;
+
+            // Alleen redelijk vlakke bovenkanten
+            if (Vector3.Angle(topHit.normal, Vector3.up) > 45f)
+                return false;
+
+            climbPosition =
+                topHit.point
+                + transform.forward * (radius + 0.1f);
+
+            return true;
+        
+    }
+       
 
         
 

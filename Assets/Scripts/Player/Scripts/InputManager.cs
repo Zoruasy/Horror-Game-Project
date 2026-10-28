@@ -50,6 +50,18 @@ namespace CharacterController
 #endif
             }
         }
+        public bool climbing
+        {
+            get
+            {
+#if ENABLE_INPUT_SYSTEM
+                return Keyboard.current != null &&
+                       Keyboard.current.eKey.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.E);
+#endif
+            }
+        }
 
         public bool sprint
         {

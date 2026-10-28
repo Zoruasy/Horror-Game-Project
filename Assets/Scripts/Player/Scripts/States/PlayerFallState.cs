@@ -26,14 +26,20 @@ namespace CharacterController
         public override void CheckSwitchStates()
         {
             if (ctx.isGrounded && ctx.moveDirection.y <= 0)
+
             {
                 SwitchState(factory.Grounded());
+                    return;
             }
-            //else if (ctx.CheckLedge(out _))
-            //{
-            //    SwitchState(factory.LedgeGrab());
+
+            // only can climb with e 
+
+            else if (ctx.CheckLedge(out _))
+            {
+                SwitchState(factory.LedgeGrab());
+            }
         }
-        
+
 
         private void ApplyGravity()
         {
