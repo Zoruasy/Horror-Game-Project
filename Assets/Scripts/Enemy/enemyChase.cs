@@ -45,10 +45,8 @@ public class enemyChase : MonoBehaviour
     void Update()
     {
 
-
-
-
     }
+
 
     private void Start()
     {
@@ -167,6 +165,10 @@ public class enemyChase : MonoBehaviour
                     if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
                     {
                         //  yield return new WaitUntil(() => true);
+                        //wait here a little, like 1 sec
+                        navMeshAgent.isStopped = true;
+                        yield return new WaitForSeconds(1f);
+                        navMeshAgent.isStopped = false;
                         i++;
                         if (i >= patrolPointsArray.Length)
                         {
