@@ -185,7 +185,12 @@ public class enemyChase : MonoBehaviour
 
     }
 
-
+    
+    public void KillEnemy()
+    {
+        Destroy(gameObject);
+        Debug.Log("Enemy killed");
+    }
 
     bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
     {

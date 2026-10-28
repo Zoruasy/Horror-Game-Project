@@ -1,6 +1,7 @@
 namespace CharacterController
 {
     using UnityEngine;
+    using UnityEngine.InputSystem;
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -14,6 +15,12 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+        
+        [Header("Attack Settings")]
+        public LayerMask attackMask = ~0;
+        public float attackRange = 1f;
+        public float attackCooldown = 0.5f;
+        private float nextAttackTime;
 
         [Header("Movement Polish")]
         public float groundAcceleration = 50f;
@@ -144,6 +151,10 @@ namespace CharacterController
 
             HandleRotation();
             UpdateVisuals();
+            
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+                Attack();
+            
         }
 
         private void HandleRotation()
@@ -240,6 +251,26 @@ namespace CharacterController
 
             return Physics.SphereCast(origin, radius, Vector3.up, out _, checkDistance, groundMask, QueryTriggerInteraction.Ignore);
         }
+        
+        public void Attack()
+        {
+            if (Time.time < nextAttackTime) return;
+            nextAttackTime = Time.time + attackCooldown;
+
+            Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+
+            if (Physics.Raycast(ray, out RaycastHit hit, attackRange, attackMask, QueryTriggerInteraction.Ignore))
+            {
+                enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
+                if (enemy != null)
+                {
+                    enemy.KillEnemy();
+                }
+            }
+
+            Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
+        }
+        
         public bool CheckLedge(out Vector3 climbPosition)
         {
             climbPosition = Vector3.zero;
