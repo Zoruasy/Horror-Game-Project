@@ -8943,6 +8943,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ff3b415d81f659438d6131aedec087b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponPickup
+  prompt: Interact
 --- !u!136 &813025684
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9033,7 +9034,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -15.905, y: 0.739, z: 1.417}
-  m_LocalScale: {x: 0.3, y: 0.6, z: 0.3}
+  m_LocalScale: {x: 0.3, y: 0.75138, z: 0.38238004}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -25712,6 +25713,14 @@ PrefabInstance:
       propertyPath: walkSpeed
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: attackRange
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: WeaponAvailableUIText
+      value: 
+      objectReference: {fileID: 1642413661}
     - target: {fileID: 9156347144040445546, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.49865
