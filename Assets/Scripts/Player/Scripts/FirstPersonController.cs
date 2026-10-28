@@ -1,3 +1,5 @@
+using TMPro;
+
 namespace CharacterController
 {
     using UnityEngine;
@@ -41,6 +43,7 @@ namespace CharacterController
         public Transform cameraParent;
         public Transform groundCheck;
         public LayerMask groundMask; // plafond
+        public TMP_Text WeaponAvailableUIText;
 
         [HideInInspector] public CharacterController characterController;
         [HideInInspector] public IInputManager input;
@@ -138,6 +141,7 @@ namespace CharacterController
 
             currentState = states.Grounded();
             currentState?.EnterState();
+            RefreshWeaponUi();
         }
 
         private void Update()
@@ -278,6 +282,7 @@ namespace CharacterController
                     {
                         enemy.KillEnemy();
                         hasWeapon = false;
+                        RefreshWeaponUi();
                     }
                     else
                     {
@@ -293,6 +298,15 @@ namespace CharacterController
         {
             hasWeapon = true;
             Debug.Log("Wapen opgepakt");
+            RefreshWeaponUi();
+        }
+        
+        private void RefreshWeaponUi()
+        {
+            if (WeaponAvailableUIText != null)
+            {
+                WeaponAvailableUIText.text = hasWeapon ? "Weapon: Equipped" : "Weapon: Not Equipped";
+            }
         }
         
         public bool CheckLedge(out Vector3 climbPosition)
