@@ -13869,7 +13869,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ff631e29ecc7e4a80a8f71c059ec30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIGlitchOverlay
-  glitch: {fileID: 0}
+  glitch: {fileID: 2104777748}
   overlay: {fileID: 191631889}
   maxAlpha: 0.5
   flickerSpeed: 12
@@ -25093,7 +25093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2aea208f6ad05e4999ca14cd61be611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisibilityController
-  eye: {fileID: 0}
+  eye: {fileID: 1001191484}
 --- !u!4 &2079212723
 Transform:
   m_ObjectHideFlags: 0
@@ -25361,6 +25361,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: 4
       addedObject: {fileID: 2104777743}
+    - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2104777748}
   m_SourcePrefab: {fileID: 100100000, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
 --- !u!1 &2104777740 stripped
 GameObject:
@@ -25401,6 +25404,21 @@ MonoBehaviour:
   crouchingRadius: 4
   sprintingRadius: 15
   transitionSpeed: 8
+--- !u!114 &2104777748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104777740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ced20858dbafdf428d327dbd055ce20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitchEffects
+  eye: {fileID: 1001191484}
+  screenGlitchMaterial: {fileID: 0}
+  smoothing: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
