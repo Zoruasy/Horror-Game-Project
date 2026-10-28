@@ -7913,11 +7913,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemyChase
   player: {fileID: 29004679}
   eyePoint: {fileID: 1075994161}
+<<<<<<< HEAD
   respawnPoint: {fileID: 0}
   visionLight: {fileID: 0}
   normalVisionColor: {r: 1, g: 1, b: 1, a: 1}
   spottedVisionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
+=======
+>>>>>>> DaanPlayerAttackFeat
   viewDistance: 10
   viewAngle: 90
   playerDetectMask:
