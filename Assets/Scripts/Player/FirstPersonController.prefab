@@ -149,6 +149,8 @@ GameObject:
   - component: {fileID: 9156347144040445545}
   - component: {fileID: 9156347144040445544}
   - component: {fileID: 825849739443659256}
+  - component: {fileID: 3327507325589859458}
+  - component: {fileID: 3775464793137032759}
   m_Layer: 6
   m_Name: FirstPersonController
   m_TagString: Untagged
@@ -283,6 +285,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 245deb3b698c6de4d80fdc6bcd905053, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3327507325589859458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9156347144040445547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae0d8bd38e4599f9cf9799f05b3870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  cam: {fileID: 9156347143994207883}
+  interactAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  promptUI: {fileID: 0}
+  range: 2.5
+  assistRadius: 0.15
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  triggers: 1
+--- !u!114 &3775464793137032759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9156347144040445547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 662b534b050128542939a422d75b9ca3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
 --- !u!1 &9156347144365898844
 GameObject:
   m_ObjectHideFlags: 0

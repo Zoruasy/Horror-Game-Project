@@ -25167,6 +25167,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1001191485}
     m_Modifications:
+    - target: {fileID: 3327507325589859458, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: promptUI
+      value: 
+      objectReference: {fileID: 1747700370}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: walkSpeed
       value: 4
@@ -25227,7 +25231,7 @@ PrefabInstance:
       addedObject: {fileID: 740620826}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
-      insertIndex: -1
+      insertIndex: 4
       addedObject: {fileID: 2104777743}
   m_SourcePrefab: {fileID: 100100000, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
 --- !u!1 &2104777740 stripped
