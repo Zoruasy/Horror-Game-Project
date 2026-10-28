@@ -21,6 +21,8 @@ namespace CharacterController
         public float attackRange = 1f;
         public float attackCooldown = 0.5f;
         private float nextAttackTime;
+        public float backstabThreshold = 0.3f;
+        [HideInInspector] public bool hasWeapon = false;
 
         [Header("Movement Polish")]
         public float groundAcceleration = 50f;
@@ -264,11 +266,33 @@ namespace CharacterController
                 enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
                 if (enemy != null)
                 {
-                    enemy.KillEnemy();
+                    // Alleen horizontaal vergelijken, anders telt omhoog/omlaag kijken mee
+                    Vector3 myForward = transform.forward;
+                    Vector3 enemyForward = enemy.transform.forward;
+                    myForward.y = 0f;
+                    enemyForward.y = 0f;
+
+                    float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
+
+                    if (dot >= backstabThreshold && hasWeapon == true)
+                    {
+                        enemy.KillEnemy();
+                        hasWeapon = false;
+                    }
+                    else
+                    {
+                        Debug.Log("Geen backstab, dot = " + dot);
+                    }
                 }
             }
 
             Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
+        }
+        
+        public void PickUpWeapon()
+        {
+            hasWeapon = true;
+            Debug.Log("Wapen opgepakt");
         }
         
         public bool CheckLedge(out Vector3 climbPosition)
