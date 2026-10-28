@@ -6843,6 +6843,37 @@ Transform:
   - {fileID: 1946047905}
   m_Father: {fileID: 214197578}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &583122930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 583122931}
+  m_Layer: 0
+  m_Name: spawn1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &583122931
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583122930}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.21, z: -0.82}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 921168057}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &592395061
 GameObject:
   m_ObjectHideFlags: 0
@@ -7749,12 +7780,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::enemyChase
   player: {fileID: 2104777742}
   eyePoint: {fileID: 1075994161}
-  viewDistance: 10
+  respawnPoint: {fileID: 583122931}
+  visionLight: {fileID: 970675016}
+  normalVisionColor: {r: 1, g: 1, b: 1, a: 1}
+  spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
+  aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
+  viewDistance: 20
   viewAngle: 90
   playerDetectMask:
     serializedVersion: 2
     m_Bits: 64
-  keepSuspicionTimerInit: 2
+  keepSuspicionTimerInit: 8
   timeBeforeAlertedInit: 2
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
@@ -7768,11 +7804,11 @@ NavMeshAgent:
   m_GameObject: {fileID: 741472327}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5000001
+  m_Radius: 2
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 240
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -9737,6 +9773,38 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &921168056
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 921168057}
+  m_Layer: 0
+  m_Name: respawnLocations
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &921168057
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921168056}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.47539, y: -0, z: -1.10011}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 583122931}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &923713236
 GameObject:
   m_ObjectHideFlags: 0
@@ -10576,7 +10644,7 @@ GameObject:
   - component: {fileID: 970675015}
   m_Layer: 7
   m_Name: VisionLight
-  m_TagString: Untagged
+  m_TagString: HideWithEye
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10635,7 +10703,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 0
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 30
   m_Range: 50
   m_SpotAngle: 100
@@ -11798,7 +11866,7 @@ Transform:
   m_GameObject: {fileID: 1075994160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.97}
+  m_LocalPosition: {x: 0, y: 0.299, z: 0.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13869,7 +13937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ff631e29ecc7e4a80a8f71c059ec30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIGlitchOverlay
-  glitch: {fileID: 0}
+  glitch: {fileID: 2104777748}
   overlay: {fileID: 191631889}
   maxAlpha: 0.5
   flickerSpeed: 12
@@ -13915,11 +13983,11 @@ MonoBehaviour:
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
   m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
+  m_OverrideTileSize: 1
   m_TileSize: 256
-  m_OverrideVoxelSize: 0
+  m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
-  m_MinRegionArea: 1
+  m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: adda8d4844be1e54d842883fe8872b12, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1483885050
@@ -25093,7 +25161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2aea208f6ad05e4999ca14cd61be611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisibilityController
-  eye: {fileID: 0}
+  eye: {fileID: 1001191484}
 --- !u!4 &2079212723
 Transform:
   m_ObjectHideFlags: 0
@@ -25361,6 +25429,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: 4
       addedObject: {fileID: 2104777743}
+    - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2104777748}
   m_SourcePrefab: {fileID: 100100000, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
 --- !u!1 &2104777740 stripped
 GameObject:
@@ -25401,6 +25472,21 @@ MonoBehaviour:
   crouchingRadius: 4
   sprintingRadius: 15
   transitionSpeed: 8
+--- !u!114 &2104777748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104777740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ced20858dbafdf428d327dbd055ce20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitchEffects
+  eye: {fileID: 1001191484}
+  screenGlitchMaterial: {fileID: 0}
+  smoothing: 6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -25416,3 +25502,4 @@ SceneRoots:
   - {fileID: 214197578}
   - {fileID: 149082376}
   - {fileID: 1001191485}
+  - {fileID: 921168057}
