@@ -14100,12 +14100,17 @@ Transform:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_LocalPosition: {x: -0.2838, y: -0, z: 2.6082}
   m_LocalScale: {x: 0.9773, y: 1, z: 0.7392}
 =======
   m_LocalPosition: {x: 0.0317, y: -0, z: 2.677}
   m_LocalScale: {x: 1.0025, y: 1, z: 0.7323}
 >>>>>>> 109ef99a52b61e3b0cc15a0ee6f23d68bc52ac04
+=======
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+>>>>>>> parent of 109ef99 (update room)
 =======
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -16210,12 +16215,17 @@ Transform:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_LocalPosition: {x: -12.75, y: 1.8819, z: -2.3114}
   m_LocalScale: {x: 1, y: 0.9409, z: 0.4623}
 =======
   m_LocalPosition: {x: -12.75, y: 1.9822, z: -2.4073}
   m_LocalScale: {x: 1, y: 0.99111724, z: 0.48146355}
 >>>>>>> 109ef99a52b61e3b0cc15a0ee6f23d68bc52ac04
+=======
+  m_LocalPosition: {x: -12.75, y: 2, z: -5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+>>>>>>> parent of 109ef99 (update room)
 =======
   m_LocalPosition: {x: -12.75, y: 2, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -17794,10 +17804,14 @@ Transform:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_LocalPosition: {x: 0, y: 2, z: -4.61}
 =======
   m_LocalPosition: {x: 0, y: 2, z: -4.56}
 >>>>>>> 109ef99a52b61e3b0cc15a0ee6f23d68bc52ac04
+=======
+  m_LocalPosition: {x: 0, y: 2, z: -10.25}
+>>>>>>> parent of 109ef99 (update room)
 =======
   m_LocalPosition: {x: 0, y: 2, z: -10.25}
 >>>>>>> parent of 109ef99 (update room)
