@@ -166,9 +166,11 @@ public class enemyChase : MonoBehaviour
                     {
                         //  yield return new WaitUntil(() => true);
                         //wait here a little, like 1 sec
+                         transform.rotation = patrolPointsArray[i].rotation;
                         navMeshAgent.isStopped = true;
                         yield return new WaitForSeconds(1f);
                         navMeshAgent.isStopped = false;
+                        
                         i++;
                         if (i >= patrolPointsArray.Length)
                         {
