@@ -23349,7 +23349,7 @@ PrefabInstance:
       objectReference: {fileID: 757106442}
     - target: {fileID: 6159990380519094561, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: metersPerSecond
-      value: 0.2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7139058224952640541, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
       propertyPath: m_Mesh
