@@ -2529,6 +2529,39 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1138043325}
   m_SourcePrefab: {fileID: 100100000, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
+--- !u!1 &149082375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 149082376}
+  m_Layer: 0
+  m_Name: patrolPoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &149082376
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149082375}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.45895, y: 2.1539, z: -5.65}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 724297551}
+  - {fileID: 340770579}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &191442032
 GameObject:
   m_ObjectHideFlags: 0
@@ -4444,6 +4477,37 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &340770578
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 340770579}
+  m_Layer: 0
+  m_Name: point2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &340770579
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340770578}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.0022763726, z: -0, w: 0.99999744}
+  m_LocalPosition: {x: 5.74, y: -1.27, z: 2.34}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 149082376}
+  m_LocalEulerAnglesHint: {x: 0, y: -0.261, z: 0}
 --- !u!1 &351554294
 GameObject:
   m_ObjectHideFlags: 0
@@ -7645,6 +7709,37 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &724297550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 724297551}
+  m_Layer: 0
+  m_Name: point1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &724297551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724297550}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.020639224, z: -0, w: 0.999787}
+  m_LocalPosition: {x: 2.67, y: -1.26, z: 2.42}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 149082376}
+  m_LocalEulerAnglesHint: {x: 0, y: 2.365, z: 0}
 --- !u!1 &741472327
 GameObject:
   m_ObjectHideFlags: 0
@@ -7660,7 +7755,7 @@ GameObject:
   - component: {fileID: 741472329}
   - component: {fileID: 741472328}
   - component: {fileID: 741472334}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7679,13 +7774,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2163863e55b5ba43b99c49a6e0c3182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemyChase
-  player: {fileID: 0}
+  player: {fileID: 29004679}
   eyePoint: {fileID: 1075994161}
-  viewDistance: 100
+  viewDistance: 10
   viewAngle: 90
   playerDetectMask:
     serializedVersion: 2
     m_Bits: 64
+  keepSuspicionTimerInit: 2
+  timeBeforeAlertedInit: 2
+  passiveMoveSpeed: 1
+  alertedMoveSpeed: 3
+  patrolPoints: {fileID: 149082376}
 --- !u!195 &741472329
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -7797,7 +7897,7 @@ Transform:
   m_GameObject: {fileID: 741472327}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.59, y: 1.26, z: -0.14}
+  m_LocalPosition: {x: -0.18, y: 1.26, z: -3.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11581,7 +11681,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1075994161}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: eyePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13708,7 +13808,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 119
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -15018,7 +15118,7 @@ GameObject:
   - component: {fileID: 1483914388}
   - component: {fileID: 1483914387}
   - component: {fileID: 1483914386}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: yur
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -17404,7 +17504,7 @@ GameObject:
   - component: {fileID: 1866194168}
   - component: {fileID: 1866194167}
   - component: {fileID: 1866194166}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Glitchblock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25320,3 +25420,4 @@ SceneRoots:
   - {fileID: 916995169}
   - {fileID: 769962227}
   - {fileID: 214197578}
+  - {fileID: 149082376}
