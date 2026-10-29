@@ -8,9 +8,9 @@ public class EyeController : MonoBehaviour
     [Header("Eye always in")]
     [SerializeField] private bool defaultEyeIn = true;
     [Header("Vision duration")]
-    [SerializeField] private float switchDuration = 4f;
+    [SerializeField] private static float switchDuration = 3f;
     [Header("Vision Cooldown")]
-    [SerializeField] private float cooldownDuration = 4f;
+    private static float cooldownDuration = 2 * switchDuration;
 
     private bool visionActive;
     public bool EyeIn => visionActive ? !defaultEyeIn : defaultEyeIn;
@@ -22,7 +22,7 @@ public class EyeController : MonoBehaviour
 
     private void Update()
     {
-        // E only works if not in a vision
+        // F only works if not in a vision
         if (CanActivate &&
             Keyboard.current != null &&
             Keyboard.current.fKey.wasPressedThisFrame)
