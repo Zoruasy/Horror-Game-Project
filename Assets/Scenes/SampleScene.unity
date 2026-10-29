@@ -7218,13 +7218,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
+  realObjectRenderers:
   - {fileID: 741472331}
   - {fileID: 1483914387}
+  - {fileID: 1866194166}
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 1
   glitchRadius: 6
-  glitchRenderers:
+  glitchOverRealObjects:
   - {fileID: 1866194166}
 --- !u!114 &741472335
 MonoBehaviour:
@@ -7871,12 +7872,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
+  realObjectRenderers:
   - {fileID: 757106445}
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 1
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!1 &792074980
 GameObject:
   m_ObjectHideFlags: 0
@@ -8376,12 +8377,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
+  realObjectRenderers:
   - {fileID: 813025685}
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 1
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -8836,12 +8837,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 0
-  renderers:
+  realObjectRenderers:
   - {fileID: 916087678}
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 0
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!33 &916087677
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -12032,13 +12033,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
+  realObjectRenderers:
   - {fileID: 1286088755}
   - {fileID: 1138043322}
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 1
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!43 &1302371449
 Mesh:
   m_ObjectHideFlags: 0
