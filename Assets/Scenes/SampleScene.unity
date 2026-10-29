@@ -10975,8 +10975,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
   defaultEyeIn: 1
-  switchDuration: 4
-  cooldownDuration: 4
 --- !u!4 &1001191485
 Transform:
   m_ObjectHideFlags: 0
@@ -13714,7 +13712,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: adda8d4844be1e54d842883fe8872b12, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 190c5deca74f019419f647536edaccb4, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1483885050
 Transform:
