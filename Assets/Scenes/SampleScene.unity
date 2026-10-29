@@ -1438,8 +1438,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
   defaultEyeIn: 1
-  switchDuration: 4
-  cooldownDuration: 4
 --- !u!4 &769962227
 Transform:
   m_ObjectHideFlags: 0
