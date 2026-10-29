@@ -28,6 +28,7 @@ public class enemyChase : MonoBehaviour
     public LayerMask playerDetectMask;
     [SerializeField] private float keepSuspicionTimerInit = 2f;
     [SerializeField] private float timeBeforeAlertedInit = 2f;
+    [SerializeField] private float aggroTimerInit = 5f;
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
@@ -40,6 +41,7 @@ public class enemyChase : MonoBehaviour
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
     float timeBeforeAlerted = 2f;
+    float aggroTimer = 5f;
 
     bool isAggro = false;
     bool isSuspicious = false;
@@ -102,6 +104,7 @@ public class enemyChase : MonoBehaviour
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
             timeBeforeAlerted = timeBeforeAlertedInit;
+            aggroTimer = aggroTimerInit;
             navMeshAgent.speed = passiveMoveSpeed;
             navMeshAgent.ResetPath();
         }
@@ -119,6 +122,7 @@ public class enemyChase : MonoBehaviour
         StartCoroutine(enemyMovement());
         keepSuspicionTimer = keepSuspicionTimerInit;
         timeBeforeAlerted = timeBeforeAlertedInit;
+        aggroTimer = aggroTimerInit;
 
 
 
@@ -148,7 +152,7 @@ public class enemyChase : MonoBehaviour
             navMeshAgent.speed = passiveMoveSpeed;
 
             bool seesPlayer = isSeeingPlayer();
-            if (seesPlayer || isAggro)
+            if (seesPlayer)
             {
                 lastSeenPlayerPosition = player.position;
                 hasLastSeenPlayerPosition = true;
@@ -172,8 +176,7 @@ public class enemyChase : MonoBehaviour
 
                     if (seesPlayer)//if still spotting the player for a period of time
                     {
-
-
+                        aggroTimer = aggroTimerInit;
 
                         timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
@@ -189,6 +192,16 @@ public class enemyChase : MonoBehaviour
                     else
                     {
                         //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
+                        if (isAggro)
+                        {
+                            aggroTimer = Mathf.Max(0f, aggroTimer - 0.1f);
+                            if (aggroTimer <= 0f)
+                            {
+                                isAggro = false;
+                                navMeshAgent.speed = passiveMoveSpeed;
+                            }
+                        }
+
                         if (isAggro)
                         {
                             keepsSuspiciousForABit = true;
