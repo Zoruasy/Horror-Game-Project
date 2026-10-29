@@ -18,7 +18,12 @@ public class PlayerInteractor : MonoBehaviour
     Collider lastCollider;
     Interactable lastColliderInteractable;
 
+    float holdTimer;
+    bool isHolding;
+
     public Interactable Current => current;
+
+    public float HoldRemaining => isHolding && current ? Mathf.Max(0f, current.GetHoldTime() - holdTimer) : 0f;
 
     void Awake()
     {
@@ -30,14 +35,18 @@ public class PlayerInteractor : MonoBehaviour
         if (interactAction)
         {
             interactAction.action.Enable();
-            interactAction.action.performed += OnInteract;
+            interactAction.action.started += OnInteract;
+            interactAction.action.canceled += CancelInteract;
         }
     }
 
     void OnDisable()
     {
         if (interactAction)
-            interactAction.action.performed -= OnInteract;
+        {
+            interactAction.action.started -= OnInteract;
+            interactAction.action.canceled -= CancelInteract;
+        }
         SetCurrent(null);
     }
 
@@ -49,6 +58,29 @@ public class PlayerInteractor : MonoBehaviour
         {
             string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+        }
+
+        UpdateHold();
+
+        if (promptUI) promptUI.SetHoldRemaining(HoldRemaining);
+    }
+
+    void UpdateHold()
+    {
+        if (!isHolding || !current) return;
+
+        if (!current.CanInteract(gameObject))
+        {
+            holdTimer = 0f;
+            return;
+        }
+
+        holdTimer += Time.deltaTime;
+
+        if (holdTimer >= current.GetHoldTime())
+        {
+            isHolding = false;
+            current.Interact(gameObject);
         }
     }
 
@@ -88,6 +120,8 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (target == current) return;
 
+        holdTimer = 0f;
+
         if (current) current.OnLoseFocus();
         current = target;
         if (current) current.OnFocus();
@@ -98,7 +132,16 @@ public class PlayerInteractor : MonoBehaviour
     void OnInteract(InputAction.CallbackContext ctx)
     {
         if (current && current.CanInteract(gameObject))
-            current.Interact(gameObject);
+        {
+            isHolding = true;
+            holdTimer = 0f;
+        }
+    }
+
+    void CancelInteract(InputAction.CallbackContext ctx)
+    {
+        isHolding = false;
+        holdTimer = 0f;
     }
 
 #if UNITY_EDITOR

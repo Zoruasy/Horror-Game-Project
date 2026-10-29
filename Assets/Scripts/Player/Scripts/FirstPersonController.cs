@@ -1,6 +1,9 @@
+using TMPro;
+
 namespace CharacterController
 {
     using UnityEngine;
+    using UnityEngine.InputSystem;
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -14,6 +17,14 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+        
+        [Header("Attack Settings")]
+        public LayerMask attackMask = ~0;
+        public float attackRange = 1f;
+        public float attackCooldown = 0.5f;
+        private float nextAttackTime;
+        public float backstabThreshold = 0.3f;
+        [HideInInspector] public bool hasWeapon = false;
 
         [Header("Movement Polish")]
         public float groundAcceleration = 50f;
@@ -32,6 +43,7 @@ namespace CharacterController
         public Transform cameraParent;
         public Transform groundCheck;
         public LayerMask groundMask; // plafond
+        public TMP_Text WeaponAvailableUIText;
 
         [HideInInspector] public CharacterController characterController;
         [HideInInspector] public IInputManager input;
@@ -129,10 +141,24 @@ namespace CharacterController
 
             currentState = states.Grounded();
             currentState?.EnterState();
+            RefreshWeaponUi();
         }
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                Debug.Log("E is ingedrukt!");
+
+                if (CheckLedge(out Vector3 climbPos))
+                {
+                    Debug.Log("Climbable gevonden!");
+                }
+                else
+                {
+                    Debug.Log("Geen beklimbare rand gevonden!");
+                }
+            }
             if (currentLedgeCooldown > 0)
                 currentLedgeCooldown -= Time.deltaTime;
 
@@ -144,6 +170,10 @@ namespace CharacterController
 
             HandleRotation();
             UpdateVisuals();
+            
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+                Attack();
+            
         }
 
         private void HandleRotation()
@@ -240,30 +270,118 @@ namespace CharacterController
 
             return Physics.SphereCast(origin, radius, Vector3.up, out _, checkDistance, groundMask, QueryTriggerInteraction.Ignore);
         }
-        public bool CheckLedge(out Vector3 climbPosition)
+        
+        public void Attack()
         {
-            climbPosition = Vector3.zero;
-           if (currentLedgeCooldown > 0) return false;
+            if (Time.time < nextAttackTime) return;
+            nextAttackTime = Time.time + attackCooldown;
 
-            RaycastHit wallHit;
-            Vector3 wallOrigin = transform.position + Vector3.up * 1.5f;
+            Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-            if (Physics.Raycast(wallOrigin, transform.forward, out wallHit, ledgeDetectionDistance, ledgeLayer, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(ray, out RaycastHit hit, attackRange, attackMask, QueryTriggerInteraction.Ignore))
             {
-                Vector3 ledgeOrigin = wallOrigin + Vector3.up * 0.6f + transform.forward * 0.2f;
-                RaycastHit ledgeHit;
-
-                if (!Physics.Raycast(ledgeOrigin, transform.forward, 0.5f, groundMask))
+                enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
+                if (enemy != null)
                 {
-                    if (Physics.Raycast(ledgeOrigin + transform.forward * 0.4f, Vector3.down, out ledgeHit, 1f, groundMask))
+                    // Alleen horizontaal vergelijken, anders telt omhoog/omlaag kijken mee
+                    Vector3 myForward = transform.forward;
+                    Vector3 enemyForward = enemy.transform.forward;
+                    myForward.y = 0f;
+                    enemyForward.y = 0f;
+
+                    float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
+
+                    if (dot >= backstabThreshold && hasWeapon == true)
                     {
-                        climbPosition = ledgeHit.point + Vector3.up * 1f;
-                        return true;
+                        enemy.KillEnemy();
+                        hasWeapon = false;
+                        RefreshWeaponUi();
+                    }
+                    else
+                    {
+                        Debug.Log("Geen backstab, dot = " + dot);
                     }
                 }
             }
-            return false;
+
+            Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
         }
+        
+        public void PickUpWeapon()
+        {
+            hasWeapon = true;
+            Debug.Log("Wapen opgepakt");
+            RefreshWeaponUi();
+        }
+        
+        private void RefreshWeaponUi()
+        {
+            if (WeaponAvailableUIText != null)
+            {
+                WeaponAvailableUIText.text = hasWeapon ? "Weapon: Equipped" : "Weapon: Not Equipped";
+            }
+        }
+        
+        public bool CheckLedge(out Vector3 climbPosition)
+        {
+            climbPosition = Vector3.zero;
+
+            if (currentLedgeCooldown > 0f)
+                return false;
+
+            float radius = characterController.radius;
+
+            Vector3 wallOrigin =
+                transform.position + Vector3.up * 1.5f;
+
+            if (!Physics.Raycast(
+                wallOrigin,
+                transform.forward,
+                out RaycastHit wallHit,
+                ledgeDetectionDistance,
+                ~0,
+                QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            // Alleen objecten met de Climbable tag
+            if (!wallHit.collider.CompareTag("Climbable"))
+                return false;
+
+            // Zoek de bovenkant van het platform
+            Vector3 topOrigin =
+                wallHit.point
+                + transform.forward * (radius + 0.15f)
+                + Vector3.up * 1.2f;
+
+            if (!Physics.Raycast(
+                topOrigin,
+                Vector3.down,
+                out RaycastHit topHit,
+                2f,
+                ~0,
+                QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            // Alleen klimmen op dezelfde Climbable collider
+            if (topHit.collider != wallHit.collider)
+                return false;
+
+            // Alleen redelijk vlakke bovenkanten
+            if (Vector3.Angle(topHit.normal, Vector3.up) > 45f)
+                return false;
+
+            climbPosition =
+                topHit.point
+                + transform.forward * (radius + 0.1f);
+
+            return true;
+        
+    }
+       
 
         
 

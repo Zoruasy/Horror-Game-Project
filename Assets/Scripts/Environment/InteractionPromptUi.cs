@@ -13,6 +13,7 @@ public class InteractionPromptUI : MonoBehaviour
 
     string lastPrompt;
     bool lastCanInteract;
+    string baseText;
 
     void Awake() => Hide();
 
@@ -24,7 +25,8 @@ public class InteractionPromptUI : MonoBehaviour
         lastPrompt = prompt;
         lastCanInteract = canInteract;
 
-        label.text = canInteract && !string.IsNullOrEmpty(key) ? $"[{key}] {prompt}" : prompt;
+        baseText = canInteract && !string.IsNullOrEmpty(key) ? $"[{key}] {prompt}" : prompt;
+        label.text = baseText;
 
         label.color = canInteract ? availableColor : unavailableColor;
     }
@@ -33,5 +35,11 @@ public class InteractionPromptUI : MonoBehaviour
     {
         if (root && root.activeSelf) root.SetActive(false);
         lastPrompt = null;
+    }
+
+    public void SetHoldRemaining(float seconds)
+    {
+        if (!label || baseText == null) return;
+        label.text = seconds > 0f ? $"{baseText} ({seconds:0.0}s)" : baseText;
     }
 }

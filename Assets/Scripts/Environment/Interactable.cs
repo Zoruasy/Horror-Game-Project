@@ -14,4 +14,5 @@ public abstract class Interactable : MonoBehaviour
 
     public virtual void OnLoseFocus() { }
 
+    public virtual float GetHoldTime() => 0f;
 }
