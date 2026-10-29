@@ -13,18 +13,18 @@ public class RealityObject : MonoBehaviour
     public static bool FlashActive;   // set by VisibilityController
 
     [SerializeField] private RevealMode mode;
-    [SerializeField] private Renderer[] renderers; // the real visuals
+    [SerializeField] private Renderer[] realObjectRenderers; // the real visuals
     [SerializeField] private Collider[] collidersToToggle; // for example hidden passage: walkable during flash
 
     [Header("Glitch (when NOT in flash)")]
-    [SerializeField] private bool triggersGlitch;
+    [SerializeField] private bool triggersUIGlitch;
     [SerializeField] private float glitchRadius = 6f;
-    [SerializeField] private Renderer[] glitchRenderers; // shimmer shown over invisible enemies
+    [SerializeField] private Renderer[] glitchOverRealObjects; // shimmer shown over invisible enemies
 
-    public bool TriggersGlitch => triggersGlitch;
+    public bool TriggersGlitch => triggersUIGlitch;
     public float GlitchRadius => glitchRadius;
 
-    private void Reset() => renderers = GetComponentsInChildren<Renderer>();
+    private void Reset() => realObjectRenderers = GetComponentsInChildren<Renderer>();
 
     private void OnEnable() { All.Add(this); Apply(FlashActive); }
     private void OnDisable() { All.Remove(this); }
@@ -33,7 +33,7 @@ public class RealityObject : MonoBehaviour
     {
         bool visible = mode == RevealMode.VisibleOnlyInFlash ? flash : !flash;
 
-        foreach (var r in renderers) if (r) r.enabled = visible;
+        foreach (var r in realObjectRenderers) if (r) r.enabled = visible;
         foreach (var c in collidersToToggle) if (c) c.enabled = mode == RevealMode.VisibleOnlyInFlash ? flash : !flash;
         if (flash) SetGlitch(0f);
     }
@@ -41,7 +41,7 @@ public class RealityObject : MonoBehaviour
     // 0 = no glitch, 1 = strongest
     public void SetGlitch(float intensity)
     {
-        foreach (var g in glitchRenderers)
+        foreach (var g in glitchOverRealObjects)
         {
             if (!g) continue;
             g.enabled = intensity > 0.01f;
