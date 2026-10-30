@@ -6207,7 +6207,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -7225,6 +7225,7 @@ MonoBehaviour:
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   patrolPoints: {fileID: 149082376}
+  visionBox: {fileID: 588234467}
 --- !u!195 &741472329
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -36,8 +36,10 @@ public class enemyChase : MonoBehaviour
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
+    [SerializeField] private BoxCollider visionBox;
 
     private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
+    private readonly Collider[] visionBoxHits = new Collider[16];
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
     float timeBeforeAlerted = 2f;
@@ -115,6 +117,19 @@ public class enemyChase : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
 
+        if (visionBox == null)
+        {
+            BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
+            foreach (BoxCollider childBoxCollider in childBoxColliders)
+            {
+                if (childBoxCollider.isTrigger)
+                {
+                    visionBox = childBoxCollider;
+                    break;
+                }
+            }
+        }
+
         navMeshAgent.stoppingDistance = 1f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
 
         patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
@@ -147,11 +162,11 @@ public class enemyChase : MonoBehaviour
 
         for (int i = 0; i < patrolPointsArray.Length;)
         {
-            yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
+            yield return new WaitForSeconds(0.01f); //wait before moving to the next point.
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
             navMeshAgent.speed = passiveMoveSpeed;
 
-            bool seesPlayer = isSeeingPlayer();
+            bool seesPlayer = IsPlayerDetected;
             if (seesPlayer)
             {
                 lastSeenPlayerPosition = player.position;
@@ -178,7 +193,7 @@ public class enemyChase : MonoBehaviour
                     {
                         aggroTimer = aggroTimerInit;
 
-                        timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
+                        timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
                             Debug.Log("I WILL KILL YOU");
@@ -194,7 +209,7 @@ public class enemyChase : MonoBehaviour
                         //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
                         if (isAggro)
                         {
-                            aggroTimer = Mathf.Max(0f, aggroTimer - 0.1f);
+                            aggroTimer = Mathf.Max(0f, aggroTimer - Time.deltaTime);
                             if (aggroTimer <= 0f)
                             {
                                 isAggro = false;
@@ -216,7 +231,7 @@ public class enemyChase : MonoBehaviour
                         {
                             keepsSuspiciousForABit = true;
 
-                            keepSuspicionTimer -= 0.1f; //slowely lose suspicion
+                            keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
                                                         // walk towards last seen player locaiton
                                                         // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
 
@@ -288,6 +303,33 @@ public class enemyChase : MonoBehaviour
     {
         Destroy(gameObject);
         Debug.Log("Enemy killed");
+    }
+
+    public bool IsPlayerDetected => isSeeingPlayer() || isPlayerInVisionBox();
+
+    private bool isPlayerInVisionBox()
+    {
+        if (visionBox == null || !visionBox.enabled || player == null)
+            return false;
+
+        Vector3 halfExtents = Vector3.Scale(visionBox.size * 0.5f, visionBox.transform.lossyScale);
+        halfExtents = new Vector3(Mathf.Abs(halfExtents.x), Mathf.Abs(halfExtents.y), Mathf.Abs(halfExtents.z));
+        int hitCount = Physics.OverlapBoxNonAlloc(
+            visionBox.transform.TransformPoint(visionBox.center),
+            halfExtents,
+            visionBoxHits,
+            visionBox.transform.rotation,
+            playerDetectMask,
+            QueryTriggerInteraction.Collide);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            Transform hitTransform = visionBoxHits[i].transform;
+            if (hitTransform == player || hitTransform.IsChildOf(player))
+                return true;
+        }
+
+        return false;
     }
 
     bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
