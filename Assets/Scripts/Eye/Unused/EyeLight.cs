@@ -13,5 +13,6 @@ public class EyeLight : MonoBehaviour
 
     private void OnDisable() => eye.OnEyeToggled -= Apply;
 
-    private void Apply(bool eyeIsIn) => eyeLight.enabled = eyeIsIn;
+    // Light is only visible when the eye is OUT (during F vision)
+    private void Apply(bool eyeIsIn) => eyeLight.enabled = !eyeIsIn;
 }

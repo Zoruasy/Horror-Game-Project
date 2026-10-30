@@ -3,7 +3,7 @@ using CharacterController;
 
 public class WeaponPickup : Interactable
 {
-    public override string GetPrompt(GameObject interactor) => "pick up weapon";
+    public override string GetPrompt(GameObject interactor) => "pick up dagger to backstab";
 
     public override bool CanInteract(GameObject interactor)
     {

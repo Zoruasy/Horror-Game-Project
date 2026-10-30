@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Key : Interactable
 {
-    public override string GetPrompt(GameObject interactor) => "pick up";
+    public override string GetPrompt(GameObject interactor) => "pick up key";
 
     public override bool CanInteract(GameObject interactor) => interactor.GetComponentInParent<Inventory>();
 
