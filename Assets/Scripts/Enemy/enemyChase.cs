@@ -244,10 +244,27 @@ public class enemyChase : MonoBehaviour
                         //  yield return new WaitUntil(() => true);
                         //wait here a little, like 1 sec
 
+                        const float patrolPauseDuration = 2f;
+                        bool wasUpdatingRotation = navMeshAgent.updateRotation;
                         navMeshAgent.isStopped = true;
-                        yield return new WaitForSeconds(1f);
+                        navMeshAgent.updateRotation = false;
+
+                        Quaternion startRotation = transform.rotation;
+                        Quaternion targetRotation = patrolPointsArray[i].rotation;
+                        float elapsed = 0f;
+                        while (elapsed < patrolPauseDuration)
+                        {
+                            elapsed += Time.deltaTime;
+                            transform.rotation = Quaternion.Slerp(
+                                startRotation,
+                                targetRotation,
+                                Mathf.Clamp01(elapsed / patrolPauseDuration));
+                            yield return null;
+                        }
+
+                        transform.rotation = targetRotation;
+                        navMeshAgent.updateRotation = wasUpdatingRotation;
                         navMeshAgent.isStopped = false;
-                        transform.rotation = patrolPointsArray[i].rotation;
                         i++;
                         if (i >= patrolPointsArray.Length)
                         {
