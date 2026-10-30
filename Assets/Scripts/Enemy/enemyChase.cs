@@ -39,7 +39,8 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private BoxCollider visionBox;
 
     private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
-    private readonly Collider[] visionBoxHits = new Collider[16];
+    private Transform cachedPlayer;
+    private Collider[] playerColliders;
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
     float timeBeforeAlerted = 2f;
@@ -122,7 +123,16 @@ public class enemyChase : MonoBehaviour
             BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
             foreach (BoxCollider childBoxCollider in childBoxColliders)
             {
-                if (childBoxCollider.isTrigger)
+                if (childBoxCollider.name == "VisionCube")
+                {
+                    visionBox = childBoxCollider;
+                    break;
+                }
+            }
+
+            foreach (BoxCollider childBoxCollider in childBoxColliders)
+            {
+                if (visionBox == null && childBoxCollider.isTrigger)
                 {
                     visionBox = childBoxCollider;
                     break;
@@ -312,21 +322,22 @@ public class enemyChase : MonoBehaviour
         if (visionBox == null || !visionBox.enabled || player == null)
             return false;
 
-        Vector3 halfExtents = Vector3.Scale(visionBox.size * 0.5f, visionBox.transform.lossyScale);
-        halfExtents = new Vector3(Mathf.Abs(halfExtents.x), Mathf.Abs(halfExtents.y), Mathf.Abs(halfExtents.z));
-        int hitCount = Physics.OverlapBoxNonAlloc(
-            visionBox.transform.TransformPoint(visionBox.center),
-            halfExtents,
-            visionBoxHits,
-            visionBox.transform.rotation,
-            playerDetectMask,
-            QueryTriggerInteraction.Collide);
-
-        for (int i = 0; i < hitCount; i++)
+        if (cachedPlayer != player)
         {
-            Transform hitTransform = visionBoxHits[i].transform;
-            if (hitTransform == player || hitTransform.IsChildOf(player))
+            cachedPlayer = player;
+            playerColliders = player.GetComponentsInChildren<Collider>(true);
+        }
+
+        Bounds visionBoxBounds = visionBox.bounds;
+        foreach (Collider playerCollider in playerColliders)
+        {
+            if (playerCollider != null &&
+                playerCollider.enabled &&
+                playerCollider.gameObject.activeInHierarchy &&
+                visionBoxBounds.Intersects(playerCollider.bounds))
+            {
                 return true;
+            }
         }
 
         return false;
