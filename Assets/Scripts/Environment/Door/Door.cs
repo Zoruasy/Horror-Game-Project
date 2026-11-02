@@ -3,8 +3,16 @@ using UnityEngine;
 
 public class Door : Interactable
 {
-    [SerializeField] Transform hinge;
-    [SerializeField] float openAngle = 90f;
+    [System.Serializable]
+    class Leaf
+    {
+        public Transform hinge;
+        public float openAngle = 90f;
+        [HideInInspector] public Quaternion closedRotation;
+        [HideInInspector] public Quaternion openRotation;
+    }
+
+    [SerializeField] Leaf[] leaves;
     [SerializeField] float degreesPerSecond = 180f;
 
     [Header("Hold")]
@@ -17,15 +25,19 @@ public class Door : Interactable
     [SerializeField] Key requiredKey;
 
     bool isOpen;
-    Quaternion closedRotation;
-    Quaternion openRotation;
     new Coroutine animation;
 
     void Awake()
     {
-        if (!hinge) hinge = transform;
-        closedRotation = hinge.localRotation;
-        openRotation = closedRotation * Quaternion.Euler(0f, openAngle, 0f);
+        if (leaves == null || leaves.Length == 0)
+            leaves = new[] { new Leaf { hinge = transform } };
+
+        foreach (Leaf leaf in leaves)
+        {
+            if (!leaf.hinge) leaf.hinge = transform;
+            leaf.closedRotation = leaf.hinge.localRotation;
+            leaf.openRotation = leaf.closedRotation * Quaternion.Euler(0f, leaf.openAngle, 0f);
+        }
     }
 
     public override string GetPrompt(GameObject interactor)
@@ -47,7 +59,7 @@ public class Door : Interactable
 
         isOpen = !isOpen;
         if (animation != null) StopCoroutine(animation);
-        animation = StartCoroutine(RotateTo(isOpen ? openRotation : closedRotation));
+        animation = StartCoroutine(RotateAll(isOpen));
     }
 
     public void Unlock() => locked = false;
@@ -59,20 +71,30 @@ public class Door : Interactable
         return inventory && inventory.Has(requiredKey);
     }
 
-    IEnumerator RotateTo(Quaternion target)
+    IEnumerator RotateAll(bool open)
     {
-        while (Quaternion.Angle(hinge.localRotation, target) > 0.01f)
+        bool moving = true;
+        while (moving)
         {
-            hinge.localRotation = Quaternion.RotateTowards(
-                hinge.localRotation, target, degreesPerSecond * Time.deltaTime);
+            moving = false;
+            foreach (Leaf leaf in leaves)
+            {
+                Quaternion target = open ? leaf.openRotation : leaf.closedRotation;
+                if (Quaternion.Angle(leaf.hinge.localRotation, target) > 0.01f)
+                {
+                    leaf.hinge.localRotation = Quaternion.RotateTowards(
+                        leaf.hinge.localRotation, target, degreesPerSecond * Time.deltaTime);
+                    moving = true;
+                }
+            }
             yield return null;
         }
-        hinge.localRotation = target;
+
+        foreach (Leaf leaf in leaves)
+            leaf.hinge.localRotation = open ? leaf.openRotation : leaf.closedRotation;
+
         animation = null;
     }
 
-    public override float GetHoldTime()
-    {
-        return requireHold ? holdTime : 0f;
-    }
+    public override float GetHoldTime() => requireHold ? holdTime : 0f;
 }
