@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 
 namespace CharacterController
@@ -335,7 +336,7 @@ namespace CharacterController
             }
             else
             {
-            Debug.unityLogger.Log("parry is on cooldown");
+            Debug.Log("parry is on cooldown");
             }
         }
 
@@ -356,6 +357,31 @@ namespace CharacterController
             Debug.Log("Parry cooldown OVER");
             
         }
+
+        public void HitByEnemyAttack()
+        {
+            if (isParryWindowOpen == true)
+            {
+                triggerParry();
+            }
+            else
+            {
+                takeDamage();
+            }
+        }
+
+        private void takeDamage()
+        {
+           // will be the functionality of taking damagge 
+        }
+
+        private void triggerParry()
+        {
+            // stagger enemy functionality on the correct enemy that attacks you
+            Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
+        }
+        
+        
         
         public void PickUpWeapon()
         {
