@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class RestorePoint : Interactable
 {
-    void Reset() => GetComponent<Collider>().isTrigger = true;
+    public override string GetPrompt(GameObject interactor) => "Restor";
 
     public override void Interact(GameObject interactor)
     {

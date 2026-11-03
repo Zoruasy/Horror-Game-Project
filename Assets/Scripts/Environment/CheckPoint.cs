@@ -18,6 +18,8 @@ public class CheckPoint : Interactable
         Gizmos.DrawRay(point.position + Vector3.up * 0.9f, point.forward);
     }
 
+    public override string GetPrompt(GameObject interactor) => "Save";
+
     public override void Interact(GameObject interactor)
     {
         PlayerRespawn respawn = interactor.GetComponentInParent<PlayerRespawn>();
