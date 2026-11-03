@@ -34,7 +34,7 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
-    [SerializeField] private GameObject audioDetectionSphere;
+[SerializeField] private SphereCollider audioDetectionSphere;
 
 
 
@@ -54,12 +54,35 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
+    public bool isHearingPlayer = false; //audio detection for player using Sphere
+
     public enum PlayerMovementMode { Idle, Crouching, Walking, Sprinting } //enum instead of several bools, much simpeler
     public PlayerMovementMode playerMovementMode = PlayerMovementMode.Idle;
 
 
 
 
+
+
+
+
+    //player enum states, so the enemy can react to them. The player will call these functions when changing states, so the enemy knows what the player is doing.
+    public void playerIsSprinting()
+    {
+        playerMovementMode = PlayerMovementMode.Sprinting;
+    }
+    public void playerIsWalking()
+    {
+        playerMovementMode = PlayerMovementMode.Walking;
+    }
+    public void playerIsCrouching()
+    {
+        playerMovementMode = PlayerMovementMode.Crouching;
+    }
+    public void playerIsIdle()
+    {
+        playerMovementMode = PlayerMovementMode.Idle;
+    }
 
 
 
@@ -82,57 +105,58 @@ public class enemyChase : MonoBehaviour
             visionLight.color = normalVisionColor;
 
 
-        if (playerMovementMode == PlayerMovementMode.Sprinting)
+
+
+
+        if (isHearingPlayer)
         {
-
-            audioDetectionSphere.SetActive(true);
-            audioDetectionSphere.transform.localScale = Vector3.one * 20f;
-            Debug.Log("SPRINTING"); // Increase the scale to make the detection sphere larger
-
+            //ALL STATES OF THE PLAYER, IDLE, CROUCHING, WALKING, SPRINTING. THE ENEMY WILL REACT TO ALL OF THEM.
+            if (playerMovementMode == PlayerMovementMode.Sprinting)
+            {
+                audioDetectionSphere.radius = 10f;
+            }
+            else if (playerMovementMode == PlayerMovementMode.Walking)
+            {
+                audioDetectionSphere.radius = 5f;
+            }
+            else if (playerMovementMode == PlayerMovementMode.Crouching)
+            {
+                audioDetectionSphere.radius = 0f;
+            }
+            else
+            {
+                audioDetectionSphere.radius = 0f;
+            }
         }
-        else if (playerMovementMode == PlayerMovementMode.Walking)
+    }
+
+
+
+
+
+
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
         {
-
-            audioDetectionSphere.SetActive(true);
-            audioDetectionSphere.transform.localScale = Vector3.one * 10f;
-            Debug.Log("WALKING"); // Increase the scale to make the detection sphere larger
-
+            isHearingPlayer = true;
+            player = other.transform;
+            keepsSuspiciousForABit = true;
+            keepSuspicionTimer = keepSuspicionTimerInit;
         }
-        else if (playerMovementMode == PlayerMovementMode.Crouching)
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
         {
-
-            audioDetectionSphere.SetActive(false);
-            Debug.Log("CROUCHING"); // Increase the scale to make the detection sphere larger
-
+            isHearingPlayer = false;
+            keepsSuspiciousForABit = false;
         }
-        else
-        {
-
-            audioDetectionSphere.SetActive(false);
-            Debug.Log("IDLE"); // Increase the scale to make the detection sphere larger
-                               
-        }
-
-
     }
 
-
-    public void playerIsSprinting()
-    {
-        playerMovementMode = PlayerMovementMode.Sprinting;
-    }
-    public void playerIsWalking()
-    {
-        playerMovementMode = PlayerMovementMode.Walking;
-    }
-    public void playerIsCrouching()
-    {
-        playerMovementMode = PlayerMovementMode.Crouching;
-    }
-    public void playerIsIdle()
-    {
-        playerMovementMode = PlayerMovementMode.Idle;
-    }
 
 
 
@@ -215,7 +239,6 @@ public class enemyChase : MonoBehaviour
         keepSuspicionTimer = keepSuspicionTimerInit;
         timeBeforeAlerted = timeBeforeAlertedInit;
         aggroTimer = aggroTimerInit;
-
 
 
     }
