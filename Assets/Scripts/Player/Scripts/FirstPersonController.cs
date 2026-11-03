@@ -55,7 +55,6 @@ namespace CharacterController
 
         private PlayerBaseState currentState;
         private PlayerStateFactory states;
-        private enum EnemyMovementMode { Idle, Walking, Sprinting, Crouching }
         private bool hasGroundedState;
         private float xRotation = 0f;
         private float currentTilt;
@@ -195,7 +194,7 @@ namespace CharacterController
 
             if (justLanded)
             {
-                enemy.playerIsSprinting();
+                enemy.playerMovementMode = enemyChase.PlayerMovementMode.Sprinting;
                 return;
             }
 
@@ -203,36 +202,25 @@ namespace CharacterController
                 return;
 
             Vector2 movementInput = input.moveInput;
-            EnemyMovementMode mode = EnemyMovementMode.Idle;
+            enemyChase.PlayerMovementMode mode = enemyChase.PlayerMovementMode.Idle;
 
             if (currentState is PlayerCrouchingState)
             {
-                mode = EnemyMovementMode.Crouching;
+                mode = enemyChase.PlayerMovementMode.Crouching;
             }
             else if (currentState is PlayerSlidingState ||
                      (currentState is PlayerGroundedState &&
                       movementInput.sqrMagnitude > 0.01f &&
                       input.sprint && movementInput.y > 0f))
             {
-                mode = EnemyMovementMode.Sprinting;
+                mode = enemyChase.PlayerMovementMode.Sprinting;
             }
             else if (currentState is PlayerGroundedState && movementInput.sqrMagnitude > 0.01f)
             {
-                mode = EnemyMovementMode.Walking;
+                mode = enemyChase.PlayerMovementMode.Walking;
             }
 
-            switch (mode)
-            {
-                case EnemyMovementMode.Crouching:
-                    enemy.playerIsCrouching();
-                    break;
-                case EnemyMovementMode.Sprinting:
-                    enemy.playerIsSprinting();
-                    break;
-                case EnemyMovementMode.Walking:
-                    enemy.playerIsWalking();
-                    break;
-            }
+            enemy.playerMovementMode = mode;
         }
 
         private void HandleRotation()

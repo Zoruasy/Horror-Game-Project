@@ -54,6 +54,9 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
+    public enum PlayerMovementMode { Idle, Crouching, Walking, Sprinting } //enum instead of several bools, much simpeler
+    public PlayerMovementMode playerMovementMode = PlayerMovementMode.Idle;
+
 
 
 
@@ -77,42 +80,62 @@ public class enemyChase : MonoBehaviour
             visionLight.color = spottedVisionColor;
         else
             visionLight.color = normalVisionColor;
+
+
+        if (playerMovementMode == PlayerMovementMode.Sprinting)
+        {
+
+            audioDetectionSphere.SetActive(true);
+            audioDetectionSphere.transform.localScale = Vector3.one * 20f;
+            Debug.Log("SPRINTING"); // Increase the scale to make the detection sphere larger
+
+        }
+        else if (playerMovementMode == PlayerMovementMode.Walking)
+        {
+
+            audioDetectionSphere.SetActive(true);
+            audioDetectionSphere.transform.localScale = Vector3.one * 10f;
+            Debug.Log("WALKING"); // Increase the scale to make the detection sphere larger
+
+        }
+        else if (playerMovementMode == PlayerMovementMode.Crouching)
+        {
+
+            audioDetectionSphere.SetActive(false);
+            Debug.Log("CROUCHING"); // Increase the scale to make the detection sphere larger
+
+        }
+        else
+        {
+
+            audioDetectionSphere.SetActive(false);
+            Debug.Log("IDLE"); // Increase the scale to make the detection sphere larger
+                               
+        }
+
+
     }
 
 
     public void playerIsSprinting()
     {
-        if (audioDetectionSphere != null)
-        {
-            audioDetectionSphere.SetActive(true);
-            audioDetectionSphere.transform.localScale = Vector3.one * 20f;
-            Debug.Log("SPRINTING"); // Increase the scale to make the detection sphere larger
-        }
+        playerMovementMode = PlayerMovementMode.Sprinting;
     }
-        public void playerIsWalking()
+    public void playerIsWalking()
     {
-        if (audioDetectionSphere != null)
-        {
-            audioDetectionSphere.SetActive(true);
-            audioDetectionSphere.transform.localScale = Vector3.one * 10f;
-            Debug.Log("WALKING"); // Increase the scale to make the detection sphere larger
-        }
+        playerMovementMode = PlayerMovementMode.Walking;
     }
-            public void playerIsCrouching()
+    public void playerIsCrouching()
     {
-        if (audioDetectionSphere != null)
-        {
-            audioDetectionSphere.SetActive(false);
-            Debug.Log("CROUCHING"); // Increase the scale to make the detection sphere larger
-        }
+        playerMovementMode = PlayerMovementMode.Crouching;
     }
-
     public void playerIsIdle()
     {
-        if (audioDetectionSphere != null)
-            audioDetectionSphere.SetActive(false);
-            Debug.Log("IDLE"); // Increase the scale to make the detection sphere larger
+        playerMovementMode = PlayerMovementMode.Idle;
     }
+
+
+
 
     private void TryKillPlayerAtCloseRange()
     {
