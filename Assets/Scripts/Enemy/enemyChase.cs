@@ -39,6 +39,13 @@ public class enemyChase : MonoBehaviour
     private bool isStaggered;
     private Coroutine staggerCoroutine;
 
+    [Header("Enemy Attack")] 
+    private Coroutine attackVisualCoroutine;
+    [SerializeField] private GameObject enemyAttackVisual;
+    private bool isAttacking = false;
+    
+    
+
     private void StopEnemyMovementForStagger()
     {
         if (navMeshAgent == null)
@@ -99,6 +106,41 @@ public class enemyChase : MonoBehaviour
             visionLight.color = normalVisionColor;
     }
 
+    private void StartAttackVisual()
+    {
+        if ( isAttacking == false)
+        {
+            attackVisualCoroutine = StartCoroutine(AttackVisualSequence());
+        }
+
+    }
+
+    private IEnumerator AttackVisualSequence()
+    {
+        isAttacking = true;
+        enemyAttackVisual.SetActive(true);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.blue;
+        yield return new WaitForSeconds(0.7f);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.orange;
+        yield return new WaitForSeconds(0.3f);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.red;
+        
+        yield return new WaitForSeconds(0.03f);
+        firstPersonController.HitByEnemyAttack(this);
+        yield return new WaitForSeconds(0.03f);
+        
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.green;
+        yield return new WaitForSeconds(1.5f);
+        enemyAttackVisual.SetActive(false);
+
+        attackVisualCoroutine = null;
+        isAttacking = false;
+
+
+
+
+    }
+    
     private void TryKillPlayerAtCloseRange()
     {
         if (player == null || eyePoint == null)
@@ -115,7 +157,8 @@ public class enemyChase : MonoBehaviour
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
         { 
-            firstPersonController.HitByEnemyAttack(this);
+
+            StartAttackVisual();
             
 
         }
@@ -150,6 +193,7 @@ public class enemyChase : MonoBehaviour
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+
 
         if (visionBox == null)
         {
@@ -318,6 +362,7 @@ public class enemyChase : MonoBehaviour
     }
 
     public bool IsPlayerDetected => isSeeingPlayer() || isPlayerInVisionBox();
+    public bool IsStaggered => isStaggered;
 
     private bool isPlayerInVisionBox()
     {

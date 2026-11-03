@@ -309,7 +309,9 @@ namespace CharacterController
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
-                    if (dot >= backstabThreshold && hasWeapon && !enemy.IsPlayerDetected)
+                    if (dot >= backstabThreshold &&
+                        hasWeapon &&
+                        (!enemy.IsPlayerDetected || enemy.IsStaggered))
                     {
                         enemy.KillEnemy();
                         hasWeapon = false;
