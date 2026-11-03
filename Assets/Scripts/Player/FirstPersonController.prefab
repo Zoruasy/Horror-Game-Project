@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 3327507325589859458}
   - component: {fileID: 3775464793137032759}
   - component: {fileID: 3775464793137032760}
+  - component: {fileID: 3775464793137032761}
   m_Layer: 6
   m_Name: FirstPersonController
   m_TagString: Untagged
@@ -334,6 +335,18 @@ MonoBehaviour:
   id: 
   file: player
   saveActiveState: 0
+--- !u!114 &3775464793137032761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9156347144040445547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c35ad0a790de4806b3aff3ed982c0474, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
 --- !u!1 &9156347144365898844
 GameObject:
   m_ObjectHideFlags: 0

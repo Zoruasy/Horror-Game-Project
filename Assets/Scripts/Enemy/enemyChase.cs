@@ -95,7 +95,7 @@ public class enemyChase : MonoBehaviour
                 return;
             }
 
-            levelManager.ResetLevel();
+            SaveSystem.ResetLevel();
         }
     }
 

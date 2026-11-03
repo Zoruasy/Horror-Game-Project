@@ -47,6 +47,12 @@ public static class SaveSystem
         if (AutoRestore) RestoreScene(scene);
     }
 
+    static public void ResetLevel()
+    {
+        Scene activeScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(activeScene.buildIndex);
+    }
+
 
     // ---- Manage Save ----
 
