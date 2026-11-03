@@ -7262,6 +7262,7 @@ MonoBehaviour:
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   patrolPoints: {fileID: 149082376}
+  visionBox: {fileID: 0}
 --- !u!195 &741472329
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -7396,14 +7397,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
-  - {fileID: 741472331}
-  - {fileID: 1483914387}
+  realObjectRenderers: []
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 0
   glitchRadius: 6
-  glitchRenderers:
-  - {fileID: 1866194166}
+  glitchOverRealObjects: []
 --- !u!114 &741472335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8419,6 +8417,7 @@ GameObject:
   - component: {fileID: 813025685}
   - component: {fileID: 813025684}
   - component: {fileID: 813025683}
+  - component: {fileID: 813025688}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -8534,6 +8533,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &813025688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813025682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38bf197e106fcb5aab72166f60bfebfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
+  id: 94006f2b6e7249d9b92eccd31b1a542a
+  file: level_{scene}
+  saveActiveState: 1
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -8988,12 +9002,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 0
-  renderers:
-  - {fileID: 916087678}
+  realObjectRenderers: []
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 0
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!33 &916087677
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -11126,8 +11139,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
   defaultEyeIn: 1
-  switchDuration: 4
-  cooldownDuration: 4
+  switchDuration: 3
+  cooldownMultiplier: 2
 --- !u!4 &1001191485
 Transform:
   m_ObjectHideFlags: 0
@@ -11576,11 +11589,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3289967070579599611, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
   m_PrefabInstance: {fileID: 140513974}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &1138043322 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 8759734924533164651, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
-  m_PrefabInstance: {fileID: 140513974}
-  m_PrefabAsset: {fileID: 0}
 --- !u!208 &1138043325
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -11988,11 +11996,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5430503544637916972, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
   m_PrefabInstance: {fileID: 140513974}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &1286088755 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 4582816324551814396, guid: 5983680de450bc438b75033d5d9c19cc, type: 3}
-  m_PrefabInstance: {fileID: 140513974}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1286088758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12006,13 +12009,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RealityObject
   mode: 1
-  renderers:
-  - {fileID: 1286088755}
-  - {fileID: 1138043322}
+  realObjectRenderers: []
   collidersToToggle: []
-  triggersGlitch: 1
+  triggersUIGlitch: 0
   glitchRadius: 6
-  glitchRenderers: []
+  glitchOverRealObjects: []
 --- !u!43 &1302371449
 Mesh:
   m_ObjectHideFlags: 0
@@ -13687,7 +13688,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: adda8d4844be1e54d842883fe8872b12, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: d4cb8e79d41067c84b686ac4c92ba140, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1483885050
 Transform:
