@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class DoorSlide : Interactable
+public class DoorSlide : Interactable, ILockableDoor
 {
     [System.Serializable]
     class Leaf
@@ -20,15 +20,23 @@ public class DoorSlide : Interactable
     [SerializeField] float holdTime = 3.0f;
 
     [Header("Lock")]
-    [SerializeField] bool locked;
+    [SerializeField] LockType lockType = LockType.None;
+    [SerializeField] string requiredCode = "1234"; //only for codelocks
+    [SerializeField] Key requiredKey; //only for item locks
     [SerializeField] string lockedPrompt = "locked";
-    [SerializeField] Key requiredKey;
+
+    bool locked;
+
+    public string RequiredCode => requiredCode;
+    public bool IsLocked => locked;
 
     bool isOpen;
     new Coroutine animation;
 
     void Awake()
     {
+        locked = lockType != LockType.None;
+
         if (leaves == null || leaves.Length == 0)
             leaves = new[] { new Leaf { hinge = transform } };
 
@@ -42,17 +50,21 @@ public class DoorSlide : Interactable
 
     public override string GetPrompt(GameObject interactor)
     {
-        if (locked) return HasKey(interactor) ? "unlock" : lockedPrompt;
+        if (locked)
+        {
+            return lockType == LockType.Item && HasKey(interactor) ? "unlock" : lockedPrompt;
+        }
         return isOpen ? "close" : "open";
     }
 
-    public override bool CanInteract(GameObject interactor) => !locked || HasKey(interactor);
+    public override bool CanInteract(GameObject interactor) => !locked || (lockType == LockType.Item && HasKey(interactor));
 
     public override void Interact(GameObject interactor)
     {
         if (locked)
         {
-            if (!HasKey(interactor)) return;
+            // Codelocked doors can only be opened via code lock
+            if (lockType != LockType.Item || !HasKey(interactor)) return;
             interactor.GetComponentInParent<Inventory>().Consume(requiredKey);
             locked = false;
         }
