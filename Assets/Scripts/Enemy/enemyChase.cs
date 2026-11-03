@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Threading;
+using CharacterController;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,6 +13,7 @@ public class enemyChase : MonoBehaviour
     public Transform player;
     public Transform eyePoint;
     [SerializeField] private Transform respawnPoint;
+    public FirstPersonController firstPersonController;
 
     [Header("Vision Light")]
     [SerializeField] private Light visionLight;
@@ -36,6 +38,26 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float staggerTime = 5f;
     private bool isStaggered;
     private Coroutine staggerCoroutine;
+
+    private void StopEnemyMovementForStagger()
+    {
+        if (navMeshAgent == null)
+            return;
+
+        navMeshAgent.ResetPath();
+        navMeshAgent.velocity = Vector3.zero;
+        navMeshAgent.isStopped = true;
+        navMeshAgent.updateRotation = false;
+    }
+
+    private void ResumeEnemyMovementAfterStagger()
+    {
+        if (navMeshAgent == null)
+            return;
+
+        navMeshAgent.isStopped = false;
+        navMeshAgent.updateRotation = true;
+    }
 
 
     [Header("Navigation")]
@@ -92,32 +114,38 @@ public class enemyChase : MonoBehaviour
                 QueryTriggerInteraction.Ignore) &&
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
-        {
-            if (respawnPoint == null)
-            {
-                Debug.LogError("Enemy respawn point is not assigned.", this);
-                return;
-            }
+        { 
+            firstPersonController.HitByEnemyAttack(this);
+            
 
-            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-            if (characterController != null)
-                characterController.enabled = false;
-
-            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-            if (characterController != null)
-                characterController.enabled = true;
-
-            isAggro = false;
-            keepsSuspiciousForABit = false;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-            timeBeforeAlerted = timeBeforeAlertedInit;
-            aggroTimer = aggroTimerInit;
-            navMeshAgent.speed = passiveMoveSpeed;
-            navMeshAgent.ResetPath();
         }
     }
 
+    public void PlayerDies()
+    {
+        if (respawnPoint == null)
+        {
+            Debug.LogError("Enemy respawn point is not assigned.", this);
+            return;
+        }
+
+        UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
+        if (characterController != null)
+            characterController.enabled = false;
+
+        player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+
+        if (characterController != null)
+            characterController.enabled = true;
+
+        isAggro = false;
+        keepsSuspiciousForABit = false;
+        keepSuspicionTimer = keepSuspicionTimerInit;
+        timeBeforeAlerted = timeBeforeAlertedInit;
+        aggroTimer = aggroTimerInit;
+        navMeshAgent.speed = passiveMoveSpeed;
+        navMeshAgent.ResetPath();
+    }
 
     private void Start()
     {
@@ -166,19 +194,19 @@ public class enemyChase : MonoBehaviour
 
     IEnumerator enemyMovement()
     {
-
-
-
-        // yield break; //stop patrolling if chasing player
-        // navMeshAgent.isStopped = false; to pause the enemy
-
         Vector3 lastSeenPlayerPosition = default;
         bool hasLastSeenPlayerPosition = false;
 
         for (int i = 0; i < patrolPointsArray.Length;)
         {
-            yield return new WaitForSeconds(0.01f); //wait before moving to the next point.
-            patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
+            if (isStaggered)
+            {
+                yield return null;
+                continue;
+            }
+
+            yield return new WaitForSeconds(0.01f);
+            patrolPointsArray[i] = patrolPoints.GetChild(i);
             navMeshAgent.speed = passiveMoveSpeed;
 
             bool seesPlayer = IsPlayerDetected;
@@ -188,40 +216,27 @@ public class enemyChase : MonoBehaviour
                 hasLastSeenPlayerPosition = true;
             }
 
-            if (patrolPointsArray[i] != null) //just a check
+            if (patrolPointsArray[i] != null)
             {
-
-
-                if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
+                if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition)
                 {
-                    // Debug.Log("I SEE YOU");
                     keepsSuspiciousForABit = true;
+                    navMeshAgent.SetDestination(lastSeenPlayerPosition);
 
-
-                    navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen player location
-                    Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
-
-
-
-
-                    if (seesPlayer)//if still spotting the player for a period of time
+                    if (seesPlayer)
                     {
                         aggroTimer = aggroTimerInit;
-
-                        timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
-                        if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
+                        timeBeforeAlerted -= Time.deltaTime;
+                        if (timeBeforeAlerted <= 0)
                         {
                             Debug.Log("I WILL KILL YOU");
                             isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
                         }
-
-
                     }
                     else
                     {
-                        //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
                         if (isAggro)
                         {
                             aggroTimer = Mathf.Max(0f, aggroTimer - Time.deltaTime);
@@ -240,40 +255,23 @@ public class enemyChase : MonoBehaviour
                         else if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                         {
                             keepsSuspiciousForABit = false;
-
                         }
-                        else //while still suspicious
+                        else
                         {
                             keepsSuspiciousForABit = true;
-
-                            keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
-                                                        // walk towards last seen player locaiton
-                                                        // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-
-
-
+                            keepSuspicionTimer -= Time.deltaTime;
                         }
                     }
-
                 }
                 else
                 {
                     isAggro = false;
-
-                    //reset the timers
                     keepSuspicionTimer = keepSuspicionTimerInit;
                     timeBeforeAlerted = timeBeforeAlertedInit;
-                    // Debug.Log("RESETTIMERS");
-
-
-                    // Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
-                    navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
+                    navMeshAgent.SetDestination(patrolPointsArray[i].position);
 
                     if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
                     {
-                        //  yield return new WaitUntil(() => true);
-                        //wait here a little, like 1 sec
-
                         const float patrolPauseDuration = 2f;
                         bool wasUpdatingRotation = navMeshAgent.updateRotation;
                         navMeshAgent.isStopped = true;
@@ -284,6 +282,14 @@ public class enemyChase : MonoBehaviour
                         float elapsed = 0f;
                         while (elapsed < patrolPauseDuration)
                         {
+                            if (isStaggered)
+                            {
+                                navMeshAgent.updateRotation = wasUpdatingRotation;
+                                navMeshAgent.isStopped = false;
+                                yield return null;
+                                continue;
+                            }
+
                             elapsed += Time.deltaTime;
                             transform.rotation = Quaternion.Slerp(
                                 startRotation,
@@ -297,20 +303,11 @@ public class enemyChase : MonoBehaviour
                         navMeshAgent.isStopped = false;
                         i++;
                         if (i >= patrolPointsArray.Length)
-                        {
-                            i = 0; //loop back to the first point
-
-                        }
-
+                            i = 0;
                     }
                 }
-
-
-
-
             }
         }
-
     }
 
     
@@ -391,24 +388,24 @@ public class enemyChase : MonoBehaviour
 
     public void StaggerByPlayerParry()
     {
+        if (isStaggered)
+            return;
+
+        isStaggered = true;
+
         if (staggerCoroutine != null)
-        {
             StopCoroutine(staggerCoroutine);
-        }
+
+        StopEnemyMovementForStagger();
         staggerCoroutine = StartCoroutine(RecoverFromStagger());
     }
 
     private IEnumerator RecoverFromStagger()
     {
-        isStaggered = true;
-        navMeshAgent.isStopped = true;
-        navMeshAgent.updateRotation = false;
-
         yield return new WaitForSeconds(staggerTime);
 
         isStaggered = false;
-        navMeshAgent.isStopped = false;
-        navMeshAgent.updateRotation = true;
+        ResumeEnemyMovementAfterStagger();
         staggerCoroutine = null;
     }
     

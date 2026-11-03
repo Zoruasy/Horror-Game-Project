@@ -358,27 +358,24 @@ namespace CharacterController
             
         }
 
-        public void HitByEnemyAttack()
+        public void HitByEnemyAttack(enemyChase enemyThatHitsPlayer)
         {
             if (isParryWindowOpen == true)
             {
-                triggerParry();
+                triggerParry(enemyThatHitsPlayer);
             }
             else
             {
-                takeDamage();
+                enemyThatHitsPlayer.PlayerDies();
             }
         }
+        
 
-        private void takeDamage()
-        {
-           // will be the functionality of taking damagge 
-        }
-
-        private void triggerParry()
+        private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
+            enemyThatHitsPlayer.StaggerByPlayerParry();
         }
         
         

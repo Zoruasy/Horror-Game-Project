@@ -7320,6 +7320,7 @@ MonoBehaviour:
   player: {fileID: 2104777742}
   eyePoint: {fileID: 1075994161}
   respawnPoint: {fileID: 583122931}
+  firstPersonController: {fileID: 2104777741}
   visionLight: {fileID: 970675016}
   normalVisionColor: {r: 1, g: 1, b: 1, a: 1}
   spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
@@ -25444,7 +25445,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: parryWindowTime
-      value: 0.2
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: backstabThreshold
