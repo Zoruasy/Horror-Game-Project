@@ -32,6 +32,11 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
+    [Header("Parry")] 
+    [SerializeField] private float staggerTime = 5f;
+    private bool isStaggered;
+    private Coroutine staggerCoroutine;
+
 
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
@@ -382,4 +387,29 @@ public class enemyChase : MonoBehaviour
 
         return false;
     }
+
+
+    public void StaggerByPlayerParry()
+    {
+        if (staggerCoroutine != null)
+        {
+            StopCoroutine(staggerCoroutine);
+        }
+        staggerCoroutine = StartCoroutine(RecoverFromStagger());
+    }
+
+    private IEnumerator RecoverFromStagger()
+    {
+        isStaggered = true;
+        navMeshAgent.isStopped = true;
+        navMeshAgent.updateRotation = false;
+
+        yield return new WaitForSeconds(staggerTime);
+
+        isStaggered = false;
+        navMeshAgent.isStopped = false;
+        navMeshAgent.updateRotation = true;
+        staggerCoroutine = null;
+    }
+    
 }

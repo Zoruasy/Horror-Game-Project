@@ -4,11 +4,14 @@ namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
+    using System.Collections;
+    
+    
+    
 
     public partial class FirstPersonController : MonoBehaviour
     {
-        [Header("Settings")]
-        public float walkSpeed = 3f;
+        [Header("Settings")] public float walkSpeed = 3f;
         public float sprintSpeed = 5f;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
@@ -17,16 +20,22 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
-        
-        [Header("Attack Settings")]
-        public LayerMask attackMask = ~0;
+
+        [Header("Attack Settings")] public LayerMask attackMask = ~0;
         public float attackRange = 1f;
         public float attackCooldown = 0.5f;
         private float nextAttackTime;
         public float backstabThreshold = 0.3f;
         [HideInInspector] public bool hasWeapon = false;
 
-        [Header("Movement Polish")]
+        [Header("Parry Settings")] 
+        public float parryWindowTime = 0.3f;
+        [HideInInspector] private Coroutine parryCoroutine;
+        [HideInInspector] private bool isParryWindowOpen = false;
+        public float parryCooldown = 1f; // not used but can be used later
+        [HideInInspector] private bool isParryOnCooldown = false;
+
+        [Header("Movement polish")]
         public float groundAcceleration = 50f;
         public float groundDeceleration = 60f;
         [HideInInspector] public Vector3 currentVelocity;
@@ -136,7 +145,9 @@ namespace CharacterController
                 if (fallback != null)
                     input = fallback;
             }
+            
 
+        
             states = new PlayerStateFactory(this);
 
             currentState = states.Grounded();
@@ -171,8 +182,12 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
             
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) 
                 Attack();
+
+
+                
+                
             
         }
 
@@ -273,6 +288,7 @@ namespace CharacterController
         
         public void Attack()
         {
+            OpenParryWindow();
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
 
@@ -288,6 +304,7 @@ namespace CharacterController
                     Vector3 enemyForward = enemy.transform.forward;
                     myForward.y = 0f;
                     enemyForward.y = 0f;
+                    
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
@@ -305,6 +322,38 @@ namespace CharacterController
             }
 
             Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
+        }
+
+
+
+        private void OpenParryWindow()
+        {
+
+            if (isParryOnCooldown == false)
+            {
+                parryCoroutine = StartCoroutine(ParryWindow());
+            }
+            else
+            {
+            Debug.unityLogger.Log("parry is on cooldown");
+            }
+        }
+
+        private IEnumerator ParryWindow()
+        {
+            isParryOnCooldown = true;
+            isParryWindowOpen = true;
+            
+            Debug.Log("OpenParryWindow");
+            yield return new WaitForSeconds(parryWindowTime);
+            
+            isParryWindowOpen = false;
+            
+            yield return new WaitForSeconds(parryCooldown - parryWindowTime);
+            isParryOnCooldown = false;
+            parryCoroutine = null;
+            Debug.Log("Parry Window Closed");
+            
         }
         
         public void PickUpWeapon()
