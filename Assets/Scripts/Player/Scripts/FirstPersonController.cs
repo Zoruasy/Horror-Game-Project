@@ -4,6 +4,7 @@ namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
+    using UnityEngine.Rendering;
 
     public partial class FirstPersonController : MonoBehaviour
     {
@@ -24,7 +25,8 @@ namespace CharacterController
         public float attackCooldown = 0.5f;
         private float nextAttackTime;
         public float backstabThreshold = 0.3f;
-        [HideInInspector] public bool hasWeapon = false;
+        private Inventory inventory;
+        public bool HasWeapon => inventory && inventory.Has<WeaponPickup>();
 
         [Header("Movement Polish")]
         public float groundAcceleration = 50f;
@@ -125,6 +127,7 @@ namespace CharacterController
             Cursor.visible = false;
 
             characterController = GetComponent<CharacterController>();
+            inventory = GetComponent<Inventory>();
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
 
@@ -291,11 +294,10 @@ namespace CharacterController
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
-                    if (dot >= backstabThreshold && hasWeapon && !enemy.IsPlayerDetected)
+                    if (dot >= backstabThreshold && HasWeapon && !enemy.IsPlayerDetected)
                     {
                         enemy.KillEnemy();
-                        hasWeapon = false;
-                        RefreshWeaponUi();
+                        inventory.Consume(inventory.Get<WeaponPickup>());
                     }
                     else
                     {
@@ -306,19 +308,22 @@ namespace CharacterController
 
             Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
         }
-        
-        public void PickUpWeapon()
+
+        private void OnEnable()
         {
-            hasWeapon = true;
-            Debug.Log("Wapen opgepakt");
-            RefreshWeaponUi();
+            if (inventory) inventory.Changed += RefreshWeaponUi;
         }
-        
+
+        private void OnDisable()
+        {
+            if (inventory) inventory.Changed -= RefreshWeaponUi;
+        }
+
         private void RefreshWeaponUi()
         {
             if (WeaponAvailableUIText != null)
             {
-                WeaponAvailableUIText.text = hasWeapon ? "Weapon: Equipped" : "Weapon: Not Equipped";
+                WeaponAvailableUIText.text = HasWeapon ? "Weapon: Equipped" : "Weapon: Not Equipped";
             }
         }
         

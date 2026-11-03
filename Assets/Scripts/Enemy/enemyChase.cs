@@ -49,6 +49,7 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
+    private LevelManager levelManager;
 
 
 
@@ -88,28 +89,13 @@ public class enemyChase : MonoBehaviour
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
         {
-            if (respawnPoint == null)
+            if (levelManager == null)
             {
-                Debug.LogError("Enemy respawn point is not assigned.", this);
+                Debug.LogError("No LevelManager in scene, can't reset level.", this);
                 return;
             }
 
-            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-            if (characterController != null)
-                characterController.enabled = false;
-
-            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-            if (characterController != null)
-                characterController.enabled = true;
-
-            isAggro = false;
-            keepsSuspiciousForABit = false;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-            timeBeforeAlerted = timeBeforeAlertedInit;
-            aggroTimer = aggroTimerInit;
-            navMeshAgent.speed = passiveMoveSpeed;
-            navMeshAgent.ResetPath();
+            SaveSystem.ResetLevel();
         }
     }
 
@@ -118,6 +104,8 @@ public class enemyChase : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
 
+        if (levelManager == null)
+            levelManager = FindFirstObjectByType<LevelManager>();
         if (visionBox == null)
         {
             BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
