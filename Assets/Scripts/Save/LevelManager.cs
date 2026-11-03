@@ -15,5 +15,10 @@ public class LevelManager : MonoBehaviour
         {
             ResetLevel();
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            SaveSystem.Save();
+        }
     }
 }
