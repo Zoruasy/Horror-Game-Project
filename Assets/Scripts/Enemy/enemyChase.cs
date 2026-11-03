@@ -36,8 +36,11 @@ public class enemyChase : MonoBehaviour
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
+    [SerializeField] private BoxCollider visionBox;
 
     private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
+    private Transform cachedPlayer;
+    private Collider[] playerColliders;
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
     float timeBeforeAlerted = 2f;
@@ -103,6 +106,27 @@ public class enemyChase : MonoBehaviour
 
         if (levelManager == null)
             levelManager = FindFirstObjectByType<LevelManager>();
+        if (visionBox == null)
+        {
+            BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
+            foreach (BoxCollider childBoxCollider in childBoxColliders)
+            {
+                if (childBoxCollider.name == "VisionCube")
+                {
+                    visionBox = childBoxCollider;
+                    break;
+                }
+            }
+
+            foreach (BoxCollider childBoxCollider in childBoxColliders)
+            {
+                if (visionBox == null && childBoxCollider.isTrigger)
+                {
+                    visionBox = childBoxCollider;
+                    break;
+                }
+            }
+        }
 
         navMeshAgent.stoppingDistance = 1f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
 
@@ -136,11 +160,11 @@ public class enemyChase : MonoBehaviour
 
         for (int i = 0; i < patrolPointsArray.Length;)
         {
-            yield return new WaitForSeconds(0.1f); //wait before moving to the next point.
+            yield return new WaitForSeconds(0.01f); //wait before moving to the next point.
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
             navMeshAgent.speed = passiveMoveSpeed;
 
-            bool seesPlayer = isSeeingPlayer();
+            bool seesPlayer = IsPlayerDetected;
             if (seesPlayer)
             {
                 lastSeenPlayerPosition = player.position;
@@ -167,7 +191,7 @@ public class enemyChase : MonoBehaviour
                     {
                         aggroTimer = aggroTimerInit;
 
-                        timeBeforeAlerted -= 0.1f; //slowely becomes alerted (fully alerted at 0) while spotting player
+                        timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
                             Debug.Log("I WILL KILL YOU");
@@ -183,7 +207,7 @@ public class enemyChase : MonoBehaviour
                         //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
                         if (isAggro)
                         {
-                            aggroTimer = Mathf.Max(0f, aggroTimer - 0.1f);
+                            aggroTimer = Mathf.Max(0f, aggroTimer - Time.deltaTime);
                             if (aggroTimer <= 0f)
                             {
                                 isAggro = false;
@@ -205,7 +229,7 @@ public class enemyChase : MonoBehaviour
                         {
                             keepsSuspiciousForABit = true;
 
-                            keepSuspicionTimer -= 0.1f; //slowely lose suspicion
+                            keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
                                                         // walk towards last seen player locaiton
                                                         // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
 
@@ -233,10 +257,27 @@ public class enemyChase : MonoBehaviour
                         //  yield return new WaitUntil(() => true);
                         //wait here a little, like 1 sec
 
+                        const float patrolPauseDuration = 2f;
+                        bool wasUpdatingRotation = navMeshAgent.updateRotation;
                         navMeshAgent.isStopped = true;
-                        yield return new WaitForSeconds(1f);
+                        navMeshAgent.updateRotation = false;
+
+                        Quaternion startRotation = transform.rotation;
+                        Quaternion targetRotation = patrolPointsArray[i].rotation;
+                        float elapsed = 0f;
+                        while (elapsed < patrolPauseDuration)
+                        {
+                            elapsed += Time.deltaTime;
+                            transform.rotation = Quaternion.Slerp(
+                                startRotation,
+                                targetRotation,
+                                Mathf.Clamp01(elapsed / patrolPauseDuration));
+                            yield return null;
+                        }
+
+                        transform.rotation = targetRotation;
+                        navMeshAgent.updateRotation = wasUpdatingRotation;
                         navMeshAgent.isStopped = false;
-                        transform.rotation = patrolPointsArray[i].rotation;
                         i++;
                         if (i >= patrolPointsArray.Length)
                         {
@@ -260,6 +301,34 @@ public class enemyChase : MonoBehaviour
     {
         Destroy(gameObject);
         Debug.Log("Enemy killed");
+    }
+
+    public bool IsPlayerDetected => isSeeingPlayer() || isPlayerInVisionBox();
+
+    private bool isPlayerInVisionBox()
+    {
+        if (visionBox == null || !visionBox.enabled || player == null)
+            return false;
+
+        if (cachedPlayer != player)
+        {
+            cachedPlayer = player;
+            playerColliders = player.GetComponentsInChildren<Collider>(true);
+        }
+
+        Bounds visionBoxBounds = visionBox.bounds;
+        foreach (Collider playerCollider in playerColliders)
+        {
+            if (playerCollider != null &&
+                playerCollider.enabled &&
+                playerCollider.gameObject.activeInHierarchy &&
+                visionBoxBounds.Intersects(playerCollider.bounds))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall

@@ -7,22 +7,32 @@ public class EyeController : MonoBehaviour
 {
     [Header("Eye always in")]
     [SerializeField] private bool defaultEyeIn = true;
+
     [Header("Vision duration")]
-    [SerializeField] private static float switchDuration = 3f;
+    [SerializeField] private float switchDuration = 3f;
+
     [Header("Vision Cooldown")]
-    private static float cooldownDuration = 2 * switchDuration;
+    [SerializeField] private float cooldownMultiplier = 2f; // cooldown = 2 x flash
 
     private bool visionActive;
+
     public bool EyeIn => visionActive ? !defaultEyeIn : defaultEyeIn;
+    public bool VisionActive => visionActive;
     public bool IsOnCooldown { get; private set; }
     public bool CanActivate => switchRoutine == null && !IsOnCooldown;
+
+    public float SwitchDuration => switchDuration;
+    public float CooldownDuration => switchDuration * cooldownMultiplier;
+    public float VisionTimeLeft { get; private set; }
+    public float CooldownTimeLeft { get; private set; }
+
     public event Action<bool> OnEyeToggled;
 
     private Coroutine switchRoutine;
 
     private void Update()
     {
-        // F only works if not in a vision
+        // F only works if not in a vision or on cooldown
         if (CanActivate &&
             Keyboard.current != null &&
             Keyboard.current.fKey.wasPressedThisFrame)
@@ -31,19 +41,31 @@ public class EyeController : MonoBehaviour
         }
     }
 
-    //timer for real world vision
+    // timer for real world vision
     private IEnumerator TemporarySwitch()
     {
         // Vision Duration
         SetVision(true);
-        yield return new WaitForSeconds(switchDuration);
+        VisionTimeLeft = SwitchDuration;
+        while (VisionTimeLeft > 0f)
+        {
+            VisionTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        VisionTimeLeft = 0f;
 
         // Vision Cooldown
         SetVision(false);
         IsOnCooldown = true;
         switchRoutine = null;
 
-        yield return new WaitForSeconds(cooldownDuration);
+        CooldownTimeLeft = CooldownDuration;
+        while (CooldownTimeLeft > 0f)
+        {
+            CooldownTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        CooldownTimeLeft = 0f;
         IsOnCooldown = false;
     }
 
