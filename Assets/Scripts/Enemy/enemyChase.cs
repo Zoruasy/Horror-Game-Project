@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Threading;
 using Unity.Mathematics;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines.ExtrusionShapes;
+
 
 public class enemyChase : MonoBehaviour
 {
@@ -31,6 +33,9 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float aggroTimerInit = 5f;
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
+
+    [SerializeField] private GameObject audioDetectionSphere;
+
 
 
     [Header("Navigation")]
@@ -59,6 +64,8 @@ public class enemyChase : MonoBehaviour
 
     void Update()
     {
+
+
         TryKillPlayerAtCloseRange();
 
         if (visionLight == null)
@@ -70,6 +77,41 @@ public class enemyChase : MonoBehaviour
             visionLight.color = spottedVisionColor;
         else
             visionLight.color = normalVisionColor;
+    }
+
+
+    public void playerIsSprinting()
+    {
+        if (audioDetectionSphere != null)
+        {
+            audioDetectionSphere.SetActive(true);
+            audioDetectionSphere.transform.localScale = Vector3.one * 20f;
+            Debug.Log("SPRINTING"); // Increase the scale to make the detection sphere larger
+        }
+    }
+        public void playerIsWalking()
+    {
+        if (audioDetectionSphere != null)
+        {
+            audioDetectionSphere.SetActive(true);
+            audioDetectionSphere.transform.localScale = Vector3.one * 10f;
+            Debug.Log("WALKING"); // Increase the scale to make the detection sphere larger
+        }
+    }
+            public void playerIsCrouching()
+    {
+        if (audioDetectionSphere != null)
+        {
+            audioDetectionSphere.SetActive(false);
+            Debug.Log("CROUCHING"); // Increase the scale to make the detection sphere larger
+        }
+    }
+
+    public void playerIsIdle()
+    {
+        if (audioDetectionSphere != null)
+            audioDetectionSphere.SetActive(false);
+            Debug.Log("IDLE"); // Increase the scale to make the detection sphere larger
     }
 
     private void TryKillPlayerAtCloseRange()
@@ -116,6 +158,8 @@ public class enemyChase : MonoBehaviour
 
     private void Start()
     {
+
+
         navMeshAgent = GetComponent<NavMeshAgent>();
 
         if (visionBox == null)
@@ -194,7 +238,7 @@ public class enemyChase : MonoBehaviour
 
 
                     navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen player location
-                    Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
+                    // Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
 
 
 
@@ -206,7 +250,7 @@ public class enemyChase : MonoBehaviour
                         timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
-                            Debug.Log("I WILL KILL YOU");
+                            // Debug.Log("I WILL KILL YOU");
                             isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
@@ -242,8 +286,8 @@ public class enemyChase : MonoBehaviour
                             keepsSuspiciousForABit = true;
 
                             keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
-                                                        // walk towards last seen player locaiton
-                                                        // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
+                                                                  // walk towards last seen player locaiton
+                                                                  // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
 
 
 
@@ -294,21 +338,14 @@ public class enemyChase : MonoBehaviour
                         if (i >= patrolPointsArray.Length)
                         {
                             i = 0; //loop back to the first point
-
                         }
-
                     }
                 }
-
-
-
-
             }
         }
-
     }
 
-    
+
     public void KillEnemy()
     {
         Destroy(gameObject);
@@ -317,7 +354,7 @@ public class enemyChase : MonoBehaviour
 
     public bool IsPlayerDetected => isSeeingPlayer() || isPlayerInVisionBox();
 
-    private bool isPlayerInVisionBox()
+    private bool isPlayerInVisionBox() //detects if the player is in the (side) vision box
     {
         if (visionBox == null || !visionBox.enabled || player == null)
             return false;

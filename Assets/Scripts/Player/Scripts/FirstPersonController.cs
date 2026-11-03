@@ -17,6 +17,8 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+
+
         
         [Header("Attack Settings")]
         public LayerMask attackMask = ~0;
@@ -50,8 +52,11 @@ namespace CharacterController
         [HideInInspector] public Vector3 moveDirection;
         [HideInInspector] public bool isGrounded;
 
+
         private PlayerBaseState currentState;
         private PlayerStateFactory states;
+        private enum EnemyMovementMode { Idle, Walking, Sprinting, Crouching }
+        private bool hasGroundedState;
         private float xRotation = 0f;
         private float currentTilt;
         private float tiltVelocity;
@@ -108,6 +113,8 @@ namespace CharacterController
         [Header("Debug")]
         public bool currentStateDebug = true;
 
+        public enemyChase enemy; // Reference to the enemyChase script
+
         void OnGUI()
         {
             if (currentState != null && Application.isEditor && currentStateDebug)
@@ -162,11 +169,16 @@ namespace CharacterController
             if (currentLedgeCooldown > 0)
                 currentLedgeCooldown -= Time.deltaTime;
 
+            bool wasGrounded = isGrounded;
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
+            bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
+            hasGroundedState = true;
 
             // Normal flow: states drive movement/crouch etc.
             if (currentState != null)
                 currentState.UpdateState();
+
+            NotifyEnemyMovementMode(justLanded);
 
             HandleRotation();
             UpdateVisuals();
@@ -174,6 +186,53 @@ namespace CharacterController
             if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
                 Attack();
             
+        }
+
+        private void NotifyEnemyMovementMode(bool justLanded)
+        {
+            if (enemy == null)
+                return;
+
+            if (justLanded)
+            {
+                enemy.playerIsSprinting();
+                return;
+            }
+
+            if (input == null || currentState == null)
+                return;
+
+            Vector2 movementInput = input.moveInput;
+            EnemyMovementMode mode = EnemyMovementMode.Idle;
+
+            if (currentState is PlayerCrouchingState)
+            {
+                mode = EnemyMovementMode.Crouching;
+            }
+            else if (currentState is PlayerSlidingState ||
+                     (currentState is PlayerGroundedState &&
+                      movementInput.sqrMagnitude > 0.01f &&
+                      input.sprint && movementInput.y > 0f))
+            {
+                mode = EnemyMovementMode.Sprinting;
+            }
+            else if (currentState is PlayerGroundedState && movementInput.sqrMagnitude > 0.01f)
+            {
+                mode = EnemyMovementMode.Walking;
+            }
+
+            switch (mode)
+            {
+                case EnemyMovementMode.Crouching:
+                    enemy.playerIsCrouching();
+                    break;
+                case EnemyMovementMode.Sprinting:
+                    enemy.playerIsSprinting();
+                    break;
+                case EnemyMovementMode.Walking:
+                    enemy.playerIsWalking();
+                    break;
+            }
         }
 
         private void HandleRotation()

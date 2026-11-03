@@ -7334,6 +7334,7 @@ MonoBehaviour:
   aggroTimerInit: 3
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
+  audioDetectionSphere: {fileID: 1337819189}
   patrolPoints: {fileID: 149082376}
   visionBox: {fileID: 588234467}
 --- !u!195 &741472329
@@ -7457,6 +7458,7 @@ Transform:
   - {fileID: 970675014}
   - {fileID: 588234466}
   - {fileID: 873905406}
+  - {fileID: 1337819190}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &741472334
@@ -12148,6 +12150,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.055844, y: 4.272777, z: 4.13245}
   m_Center: {x: -0.5279213, y: -0.19342886, z: 0.5034407}
+--- !u!1 &1337819189
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1337819190}
+  - component: {fileID: 1337819191}
+  m_Layer: 7
+  m_Name: AudioDetectionSphere
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1337819190
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337819189}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 741472333}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!135 &1337819191
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1337819189}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 375
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 20
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1345219240
 GameObject:
   m_ObjectHideFlags: 0
@@ -25429,6 +25484,10 @@ PrefabInstance:
       propertyPath: promptUI
       value: 
       objectReference: {fileID: 1747700370}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: enemy
+      value: 
+      objectReference: {fileID: 741472328}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: walkSpeed
       value: 4
