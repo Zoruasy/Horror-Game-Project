@@ -346,13 +346,14 @@ namespace CharacterController
             
             Debug.Log("OpenParryWindow");
             yield return new WaitForSeconds(parryWindowTime);
+            Debug.Log("Parry Window Closed");
             
             isParryWindowOpen = false;
             
             yield return new WaitForSeconds(parryCooldown - parryWindowTime);
             isParryOnCooldown = false;
             parryCoroutine = null;
-            Debug.Log("Parry Window Closed");
+            Debug.Log("Parry cooldown OVER");
             
         }
         
