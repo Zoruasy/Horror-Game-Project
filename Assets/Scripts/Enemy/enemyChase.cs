@@ -121,10 +121,9 @@ SaveSystem.ResetLevel();
                 characterController.enabled = true;
 
             isAggro = false;
-            heardPlayer = false; // NIEUW
+            heardPlayer = false;
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
-            timeBeforeAlerted = timeBeforeAlertedInit;
             timeBeforeAggro = timeBeforeAggroInit;
             aggroTimer = aggroTimerInit;
             navMeshAgent.speed = passiveMoveSpeed;
