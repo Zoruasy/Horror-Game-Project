@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
-using System.Threading;
 using Unity.Mathematics;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Splines.ExtrusionShapes;
 
 
 public class enemyChase : MonoBehaviour
@@ -34,16 +31,13 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
-[SerializeField] private SphereCollider audioDetectionSphere;
-
-
 
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
     [SerializeField] private Transform patrolPoints;
     [SerializeField] private BoxCollider visionBox;
 
-    private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
+    private Transform[] patrolPointsArray; //will be filled in start
     private Transform cachedPlayer;
     private Collider[] playerColliders;
     private bool keepsSuspiciousForABit = false;
@@ -54,19 +48,16 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
-    public bool isHearingPlayer = false; //audio detection for player using Sphere
+    // NIEUW: hearing (wordt gezet door de DetectionSphere van de speler)
+    private bool heardPlayer = false;
+    private Vector3 lastHeardPlayerPosition;
 
     public enum PlayerMovementMode { Idle, Crouching, Walking, Sprinting } //enum instead of several bools, much simpeler
     public PlayerMovementMode playerMovementMode = PlayerMovementMode.Idle;
 
 
 
-
-
-
-
-
-    //player enum states, so the enemy can react to them. The player will call these functions when changing states, so the enemy knows what the player is doing.
+    //player enum states, so the enemy can react to them.
     public void playerIsSprinting()
     {
         playerMovementMode = PlayerMovementMode.Sprinting;
@@ -86,12 +77,23 @@ public class enemyChase : MonoBehaviour
 
 
 
+    
+    public void isHearingPlayer(Transform playerTransform)
+    {
+        player = playerTransform;
+
+        heardPlayer = true;
+        lastHeardPlayerPosition = playerTransform.position;
+
+
+        keepsSuspiciousForABit = true;
+        keepSuspicionTimer = keepSuspicionTimerInit;
+    }
+
 
 
     void Update()
     {
-
-
         TryKillPlayerAtCloseRange();
 
         if (visionLight == null)
@@ -103,61 +105,7 @@ public class enemyChase : MonoBehaviour
             visionLight.color = spottedVisionColor;
         else
             visionLight.color = normalVisionColor;
-
-
-
-
-
-        if (isHearingPlayer)
-        {
-            //ALL STATES OF THE PLAYER, IDLE, CROUCHING, WALKING, SPRINTING. THE ENEMY WILL REACT TO ALL OF THEM.
-            if (playerMovementMode == PlayerMovementMode.Sprinting)
-            {
-                audioDetectionSphere.radius = 10f;
-            }
-            else if (playerMovementMode == PlayerMovementMode.Walking)
-            {
-                audioDetectionSphere.radius = 5f;
-            }
-            else if (playerMovementMode == PlayerMovementMode.Crouching)
-            {
-                audioDetectionSphere.radius = 0f;
-            }
-            else
-            {
-                audioDetectionSphere.radius = 0f;
-            }
-        }
     }
-
-
-
-
-
-
-
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isHearingPlayer = true;
-            player = other.transform;
-            keepsSuspiciousForABit = true;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            isHearingPlayer = false;
-            keepsSuspiciousForABit = false;
-        }
-    }
-
-
 
 
 
@@ -193,6 +141,7 @@ public class enemyChase : MonoBehaviour
                 characterController.enabled = true;
 
             isAggro = false;
+            heardPlayer = false; // NIEUW
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
             timeBeforeAlerted = timeBeforeAlertedInit;
@@ -205,8 +154,6 @@ public class enemyChase : MonoBehaviour
 
     private void Start()
     {
-
-
         navMeshAgent = GetComponent<NavMeshAgent>();
 
         if (visionBox == null)
@@ -231,32 +178,20 @@ public class enemyChase : MonoBehaviour
             }
         }
 
-        navMeshAgent.stoppingDistance = 1f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
+        navMeshAgent.stoppingDistance = 1f; //so it doesn't get too close to the player OR the patrol points.
 
-        patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
+        patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use GetComponentsInChildren, because that also contains the parent.
 
         StartCoroutine(enemyMovement());
         keepSuspicionTimer = keepSuspicionTimerInit;
         timeBeforeAlerted = timeBeforeAlertedInit;
         aggroTimer = aggroTimerInit;
-
-
     }
-
-
-
-
 
 
 
     IEnumerator enemyMovement()
     {
-
-
-
-        // yield break; //stop patrolling if chasing player
-        // navMeshAgent.isStopped = false; to pause the enemy
-
         Vector3 lastSeenPlayerPosition = default;
         bool hasLastSeenPlayerPosition = false;
 
@@ -264,7 +199,12 @@ public class enemyChase : MonoBehaviour
         {
             yield return new WaitForSeconds(0.01f); //wait before moving to the next point.
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
-            navMeshAgent.speed = passiveMoveSpeed;
+
+            // GEWIJZIGD: als hij aggro is loopt hij snel, anders langzaam
+            if (isAggro)
+                navMeshAgent.speed = alertedMoveSpeed;
+            else
+                navMeshAgent.speed = passiveMoveSpeed;
 
             bool seesPlayer = IsPlayerDetected;
             if (seesPlayer)
@@ -273,40 +213,37 @@ public class enemyChase : MonoBehaviour
                 hasLastSeenPlayerPosition = true;
             }
 
+            // NIEUW: heeft hij de speler gehoord? Dan loopt hij naar die plek
+            if (heardPlayer)
+            {
+                lastSeenPlayerPosition = lastHeardPlayerPosition;
+                hasLastSeenPlayerPosition = true;
+                heardPlayer = false; // wordt volgende frame weer true als de speler nog in de sphere is
+            }
+
             if (patrolPointsArray[i] != null) //just a check
             {
-
-
                 if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
                 {
-                    // Debug.Log("I SEE YOU");
                     keepsSuspiciousForABit = true;
 
-
-                    navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen player location
-                    // Debug.Log("aggro" + timeBeforeAlerted + "sus" + keepSuspicionTimer);
-
-
-
+                    navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen/heard player location
 
                     if (seesPlayer)//if still spotting the player for a period of time
                     {
                         aggroTimer = aggroTimerInit;
 
-                        timeBeforeAlerted -= Time.deltaTime; //slowely becomes alerted (fully alerted at 0) while spotting player
+                        timeBeforeAlerted -= Time.deltaTime; //slowly becomes alerted (fully alerted at 0) while spotting player
                         if (timeBeforeAlerted <= 0) // IS ALERTED NOW.
                         {
-                            // Debug.Log("I WILL KILL YOU");
                             isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
                         }
-
-
                     }
                     else
                     {
-                        //lose suspicion when it has reached the location of the spotted player (when it only saw the player for a sec)
+                        //lose suspicion when it has reached the location of the spotted player
                         if (isAggro)
                         {
                             aggroTimer = Mathf.Max(0f, aggroTimer - Time.deltaTime);
@@ -325,21 +262,13 @@ public class enemyChase : MonoBehaviour
                         else if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                         {
                             keepsSuspiciousForABit = false;
-
                         }
                         else //while still suspicious
                         {
                             keepsSuspiciousForABit = true;
-
-                            keepSuspicionTimer -= Time.deltaTime; //slowely lose suspicion
-                                                                  // walk towards last seen player locaiton
-                                                                  // navMeshAgent.SetDestination(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z));
-
-
-
+                            keepSuspicionTimer -= Time.deltaTime; //slowly lose suspicion
                         }
                     }
-
                 }
                 else
                 {
@@ -348,17 +277,11 @@ public class enemyChase : MonoBehaviour
                     //reset the timers
                     keepSuspicionTimer = keepSuspicionTimerInit;
                     timeBeforeAlerted = timeBeforeAlertedInit;
-                    // Debug.Log("RESETTIMERS");
 
-
-                    // Debug.Log("Patrolling to point: " + patrolPointsArray[i].name + " with stopping distance: " + navMeshAgent.stoppingDistance + " and remaining distance: " + navMeshAgent.remainingDistance);
-                    navMeshAgent.SetDestination(patrolPointsArray[i].position); //when it reaches the point
+                    navMeshAgent.SetDestination(patrolPointsArray[i].position);
 
                     if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
                     {
-                        //  yield return new WaitUntil(() => true);
-                        //wait here a little, like 1 sec
-
                         const float patrolPauseDuration = 2f;
                         bool wasUpdatingRotation = navMeshAgent.updateRotation;
                         navMeshAgent.isStopped = true;
@@ -426,25 +349,23 @@ public class enemyChase : MonoBehaviour
         return false;
     }
 
-    bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
+    bool isSeeingPlayer()
     {
         if (player == null || eyePoint == null)
             return false;
 
-        var controller = player.GetComponent<UnityEngine.CharacterController>(); //get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
+        var controller = player.GetComponent<UnityEngine.CharacterController>(); //use the center of the player if there is a controller
         Vector3 target = controller != null ? controller.bounds.center : player.position;
         Vector3 directionToPlayer = target - eyePoint.position;
 
-
-        if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //is the dist between player and enemy bigger? stop.
+        if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //too far away? stop.
         {
             return false;
         }
 
+        float angle = Vector3.Angle(eyePoint.forward, directionToPlayer); //angle between eyepoint and player
 
-        float angle = Vector3.Angle(eyePoint.forward, directionToPlayer); //measures the angle between eyepoint and player!
-
-        if (angle > viewAngle / 2f) //if the angle is bigger than the view angle, stop.
+        if (angle > viewAngle / 2f) //outside the view angle? stop.
         {
             return false;
         }
