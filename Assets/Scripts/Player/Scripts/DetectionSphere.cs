@@ -17,6 +17,7 @@ namespace CharacterController
         [Header("Noise when landing")]
         [SerializeField] private float minLandingVelocity = 1f; // minimum fall speed that makes a landing audible
         [SerializeField] private float landingRadius = 15f;
+        [SerializeField] private float landingNoiseDuration = 1f; // how long the landing radius is held before it shrinks
 
         [Header("Enemy Detection")]
         public LayerMask enemyMask = ~0; //enemy layer
@@ -27,6 +28,7 @@ namespace CharacterController
         private float currentRadius;
         private bool wasGrounded = true;
         private float lastAirborneYVelocity;
+        private float landingNoiseTimer;
 
         private void Start()
         {
@@ -57,28 +59,37 @@ namespace CharacterController
             // Determine the target detection radius
             float targetRadius = idleRadius;
 
+            
+
             if (isCrouching)
             {
                 targetRadius = crouchingRadius;
-                Debug.Log("Crouching radius: " + targetRadius);
+                // Debug.Log("Crouching radius: " + targetRadius);
             }
             else if (isSprinting)
             {
                 targetRadius = sprintingRadius;
-                Debug.Log("Sprinting radius: " + targetRadius);
+                // Debug.Log("Sprinting radius: " + targetRadius);
             }
             else if (isWalking)
             {
                 targetRadius = walkingRadius;
-                Debug.Log("Walking radius: " + targetRadius);
+                // Debug.Log("Walking radius: " + targetRadius);
             }
             else
             {
                 // Not crouching, sprinting or walking: keeps the idleRadius default from above
-                Debug.Log("Idle radius: " + targetRadius);
+                // Debug.Log("Idle radius: " + targetRadius);
             }
 
             CheckForLanding();
+
+            // Hold the landing radius until the timer runs out, unless the current movement is louder
+            if (landingNoiseTimer > 0f)
+            {
+                landingNoiseTimer -= Time.deltaTime;
+                targetRadius = Mathf.Max(targetRadius, landingRadius);
+            }
 
             // Smoothly change the detection radius
             currentRadius = Mathf.MoveTowards(
@@ -96,8 +107,11 @@ namespace CharacterController
                 diameter
             );
 
-            // NIEUW: kijk welke enemies in de sphere zitten
+           
             CheckForEnemies();
+
+
+            Debug.Log(targetRadius);//has to be LAST
         }
 
         private void CheckForLanding()
@@ -109,8 +123,9 @@ namespace CharacterController
             }
             else if (!wasGrounded && -lastAirborneYVelocity > minLandingVelocity)
             {
-                // Jump straight to the landing radius; the smoothing then shrinks it back down
+                // Jump straight to the landing radius and keep it there for landingNoiseDuration
                 currentRadius = Mathf.Max(currentRadius, landingRadius);
+                landingNoiseTimer = landingNoiseDuration;
                 Debug.Log("Landing radius: " + currentRadius);
             }
 
@@ -119,22 +134,22 @@ namespace CharacterController
 
         private void CheckForEnemies()
         {
-            // Pak alle colliders die in de sphere zitten
+            
             Collider[] hits = Physics.OverlapSphere(
                 detectionSphere.position,
                 currentRadius,
                 enemyMask,
-                QueryTriggerInteraction.Ignore // negeer triggers, zoals de VisionCube van de enemy
+                QueryTriggerInteraction.Ignore
             );
 
             foreach (Collider hit in hits)
             {
-                // Zit er een enemyChase script op dit object (of op een parent)?
+                
                 enemyChase enemy = hit.GetComponentInParent<enemyChase>();
 
                 if (enemy != null)
                 {
-                    // Laat de enemy weten dat hij de speler hoort
+                    // this executes when the enemy detects the players sound
                     enemy.isHearingPlayer(player.transform);
                 }
             }

@@ -7330,13 +7330,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   keepSuspicionTimerInit: 8
-  timeBeforeAlertedInit: 2
+  timeBeforeAggroInit: 2
   aggroTimerInit: 3
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   patrolPoints: {fileID: 149082376}
   visionBox: {fileID: 588234467}
-  playerMovementMode: 0
 --- !u!195 &741472329
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -10988,7 +10987,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7025222dc83d2409102fdd22327f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
-  defaultEyeIn: 1
+  defaultEyeIn: 0
   switchDuration: 3
   cooldownMultiplier: 2
 --- !u!4 &1001191485
@@ -25555,8 +25554,9 @@ MonoBehaviour:
   walkingRadius: 10
   crouchingRadius: 0
   sprintingRadius: 15
-  minLandingVelocity: 1
+  minLandingVelocity: 0
   landingRadius: 15
+  landingNoiseDuration: 1
   enemyMask:
     serializedVersion: 2
     m_Bits: 128

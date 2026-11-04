@@ -177,7 +177,7 @@ namespace CharacterController
             if (currentState != null)
                 currentState.UpdateState();
 
-            NotifyEnemyMovementMode(justLanded);
+         
 
             HandleRotation();
             UpdateVisuals();
@@ -187,41 +187,7 @@ namespace CharacterController
             
         }
 
-        private void NotifyEnemyMovementMode(bool justLanded)
-        {
-            if (enemy == null)
-                return;
 
-            if (justLanded)
-            {
-                enemy.playerMovementMode = enemyChase.PlayerMovementMode.Sprinting;
-                return;
-            }
-
-            if (input == null || currentState == null)
-                return;
-
-            Vector2 movementInput = input.moveInput;
-            enemyChase.PlayerMovementMode mode = enemyChase.PlayerMovementMode.Idle;
-
-            if (currentState is PlayerCrouchingState)
-            {
-                mode = enemyChase.PlayerMovementMode.Crouching;
-            }
-            else if (currentState is PlayerSlidingState ||
-                     (currentState is PlayerGroundedState &&
-                      movementInput.sqrMagnitude > 0.01f &&
-                      input.sprint && movementInput.y > 0f))
-            {
-                mode = enemyChase.PlayerMovementMode.Sprinting;
-            }
-            else if (currentState is PlayerGroundedState && movementInput.sqrMagnitude > 0.01f)
-            {
-                mode = enemyChase.PlayerMovementMode.Walking;
-            }
-
-            enemy.playerMovementMode = mode;
-        }
 
         private void HandleRotation()
         {
