@@ -18,6 +18,8 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+
+
         
         [Header("Attack Settings")]
         public LayerMask attackMask = ~0;
@@ -52,8 +54,10 @@ namespace CharacterController
         [HideInInspector] public Vector3 moveDirection;
         [HideInInspector] public bool isGrounded;
 
+
         private PlayerBaseState currentState;
         private PlayerStateFactory states;
+        private bool hasGroundedState;
         private float xRotation = 0f;
         private float currentTilt;
         private float tiltVelocity;
@@ -110,6 +114,8 @@ namespace CharacterController
         [Header("Debug")]
         public bool currentStateDebug = true;
 
+        public enemyChase enemy; // Reference to the enemyChase script
+
         void OnGUI()
         {
             if (currentState != null && Application.isEditor && currentStateDebug)
@@ -165,11 +171,16 @@ namespace CharacterController
             if (currentLedgeCooldown > 0)
                 currentLedgeCooldown -= Time.deltaTime;
 
+            bool wasGrounded = isGrounded;
             isGrounded = characterController.isGrounded || Physics.CheckSphere(groundCheck.position, characterController.radius * 0.9f, groundMask, QueryTriggerInteraction.Ignore);
+            bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
+            hasGroundedState = true;
 
             // Normal flow: states drive movement/crouch etc.
             if (currentState != null)
                 currentState.UpdateState();
+
+         
 
             HandleRotation();
             UpdateVisuals();
@@ -178,6 +189,8 @@ namespace CharacterController
                 Attack();
             
         }
+
+
 
         private void HandleRotation()
         {
