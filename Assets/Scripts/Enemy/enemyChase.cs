@@ -110,6 +110,7 @@ public class enemyChase : MonoBehaviour
                 return;
             }
     SaveSystem.ResetLevel();
+SaveSystem.ResetLevel();
             UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
             if (characterController != null)
                 characterController.enabled = false;
@@ -120,9 +121,11 @@ public class enemyChase : MonoBehaviour
                 characterController.enabled = true;
 
             isAggro = false;
+            heardPlayer = false; // NIEUW
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
             timeBeforeAlerted = timeBeforeAlertedInit;
+            timeBeforeAggro = timeBeforeAggroInit;
             aggroTimer = aggroTimerInit;
             navMeshAgent.speed = passiveMoveSpeed;
             navMeshAgent.ResetPath();
