@@ -15,7 +15,7 @@ namespace CharacterController
 
         [Header("Stamina")]
         public float stamina = 3f;
-        public Image staminaBar;
+        public RectTransform staminaBar;
         private float normalSprintSpeed;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
@@ -197,9 +197,9 @@ namespace CharacterController
             sprintSpeed = stamina > 0f ? normalSprintSpeed : walkSpeed;
 
             if (staminaBar != null)
-                staminaBar.fillAmount = stamina / 3f;
+                staminaBar.anchorMax = new Vector2(stamina / 3f, 1f);
 
-            
+
             if (currentState != null)
                 currentState.UpdateState();
 
