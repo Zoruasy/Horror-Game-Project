@@ -124,7 +124,7 @@ SaveSystem.ResetLevel();
             heardPlayer = false; // NIEUW
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
-            timeBeforeAlerted = timeBeforeAlertedInit;
+          
             timeBeforeAggro = timeBeforeAggroInit;
             aggroTimer = aggroTimerInit;
             navMeshAgent.speed = passiveMoveSpeed;
