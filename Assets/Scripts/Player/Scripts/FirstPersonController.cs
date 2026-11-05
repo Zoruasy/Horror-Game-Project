@@ -24,6 +24,7 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
+        public bool CanSprint => stamina > 0f;
 
 
 
