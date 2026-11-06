@@ -124,10 +124,7 @@ SaveSystem.ResetLevel();
             heardPlayer = false;
             keepsSuspiciousForABit = false;
             keepSuspicionTimer = keepSuspicionTimerInit;
-<<<<<<< HEAD
-=======
-          
->>>>>>> staminamamama
+
             timeBeforeAggro = timeBeforeAggroInit;
             aggroTimer = aggroTimerInit;
             navMeshAgent.speed = passiveMoveSpeed;
