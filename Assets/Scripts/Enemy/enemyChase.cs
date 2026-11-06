@@ -120,14 +120,14 @@ public class enemyChase : MonoBehaviour
         isAttacking = true;
         enemyAttackVisual.SetActive(true);
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.blue;
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.4f);
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.orange;
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.4f);
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.red;
         
-        yield return new WaitForSeconds(0.03f);
+        yield return new WaitForSeconds(0.02f);
         firstPersonController.HitByEnemyAttack(this);
-        yield return new WaitForSeconds(0.03f);
+        yield return new WaitForSeconds(0.02f);
         
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.green;
         yield return new WaitForSeconds(1.5f);

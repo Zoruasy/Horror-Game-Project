@@ -36,6 +36,13 @@ namespace CharacterController
         public float parryCooldown = 1f; // not used but can be used later
         [HideInInspector] private bool isParryOnCooldown = false;
 
+        [Header("Parry Audio")]
+        [SerializeField] private AudioClip successfulParrySound;
+        [SerializeField, Range(0f, 1f)] private float successfulParryVolume = 0.8f;
+        [SerializeField] private AudioClip attackGruntSound;
+        [SerializeField] private AudioClip clothesRufflingSound;
+        [SerializeField] private AudioSource parryAudioSource;
+
         [Header("Movement polish")]
         public float groundAcceleration = 50f;
         public float groundDeceleration = 60f;
@@ -289,6 +296,7 @@ namespace CharacterController
         
         public void Attack()
         {
+
             OpenParryWindow();
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
@@ -311,7 +319,8 @@ namespace CharacterController
 
                     if (dot >= backstabThreshold &&
                         hasWeapon &&
-                        (!enemy.IsPlayerDetected || enemy.IsStaggered))
+                        !enemy.IsPlayerDetected &&
+                        !enemy.IsStaggered)
                     {
                         enemy.KillEnemy();
                         hasWeapon = false;
@@ -334,6 +343,8 @@ namespace CharacterController
 
             if (isParryOnCooldown == false)
             {
+                PlayPlayerSound(attackGruntSound);
+                PlayPlayerSound(clothesRufflingSound);
                 parryCoroutine = StartCoroutine(ParryWindow());
             }
             else
@@ -375,9 +386,20 @@ namespace CharacterController
 
         private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
+            PlayPlayerSound(successfulParrySound, successfulParryVolume);
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
             enemyThatHitsPlayer.StaggerByPlayerParry();
+        }
+
+        private void PlayPlayerSound(AudioClip clip, float volume = 1f)
+        {
+            if (clip == null) return;
+
+            if (parryAudioSource != null)
+                parryAudioSource.PlayOneShot(clip, volume);
+            else
+                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
         }
         
         
