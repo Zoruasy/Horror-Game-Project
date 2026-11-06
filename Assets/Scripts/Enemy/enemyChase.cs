@@ -12,7 +12,6 @@ public class enemyChase : MonoBehaviour
     [Header("Target")]
     public Transform player;
     public Transform eyePoint;
-    [SerializeField] private Transform respawnPoint;
     public FirstPersonController firstPersonController;
 
     [Header("Vision Light")]
@@ -89,7 +88,6 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
-    private LevelManager levelManager;
     private bool heardPlayer = false;
     private Vector3 lastHeardPlayerPosition;
 
@@ -180,62 +178,12 @@ public class enemyChase : MonoBehaviour
         {
 
             StartAttackVisual();
-
-
-            {
-                if (levelManager == null)
-                {
-                    Debug.LogError("No LevelManager in scene, can't reset level.", this);
-                    return;
-                }
-                SaveSystem.ResetLevel();
-                SaveSystem.ResetLevel();
-                UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-                if (characterController != null)
-                    characterController.enabled = false;
-
-                player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-                if (characterController != null)
-                    characterController.enabled = true;
-
-                isAggro = false;
-                heardPlayer = false;
-                keepsSuspiciousForABit = false;
-                keepSuspicionTimer = keepSuspicionTimerInit;
-
-                timeBeforeAggro = timeBeforeAggroInit;
-                aggroTimer = aggroTimerInit;
-                navMeshAgent.speed = passiveMoveSpeed;
-                navMeshAgent.ResetPath();
-            }
         }
     }
 
     public void PlayerDies()
     {
-        if (respawnPoint == null)
-        {
-            Debug.LogError("Enemy respawn point is not assigned.", this);
-            return;
-        }
-
-        UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-        if (characterController != null)
-            characterController.enabled = false;
-
-        player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-        if (characterController != null)
-            characterController.enabled = true;
-
-        isAggro = false;
-        keepsSuspiciousForABit = false;
-        keepSuspicionTimer = keepSuspicionTimerInit;
-        timeBeforeAggro = timeBeforeAggroInit;
-        aggroTimer = aggroTimerInit;
-        navMeshAgent.speed = passiveMoveSpeed;
-        navMeshAgent.ResetPath();
+        SaveSystem.ResetLevel();
     }
 
     private void Start()
@@ -243,8 +191,6 @@ public class enemyChase : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
 
 
-        if (levelManager == null)
-            levelManager = FindFirstObjectByType<LevelManager>();
         if (visionBox == null)
         {
             BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
