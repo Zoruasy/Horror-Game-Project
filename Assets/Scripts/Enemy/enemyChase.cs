@@ -5,7 +5,7 @@ using CharacterController;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Splines.ExtrusionShapes;
+
 
 public class enemyChase : MonoBehaviour
 {
@@ -29,7 +29,7 @@ public class enemyChase : MonoBehaviour
     [Header("Detection")]
     public LayerMask playerDetectMask;
     [SerializeField] private float keepSuspicionTimerInit = 2f;
-    [SerializeField] private float timeBeforeAlertedInit = 2f;
+    [SerializeField] private float timeBeforeAggroInit = 2f;
     [SerializeField] private float aggroTimerInit = 5f;
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
@@ -65,6 +65,12 @@ public class enemyChase : MonoBehaviour
         navMeshAgent.isStopped = false;
         navMeshAgent.updateRotation = true;
     }
+    [Header("Detection Points")]
+    [Tooltip("Parent object on the player whose children are the body points. Auto-found as a child of the player named 'DetectionPoints' if left empty.")]
+    [SerializeField] private Transform detectionPoints;
+    [Tooltip("When this many detection points (or more) are visible, the enemy instantly becomes aggro.")]
+    [SerializeField] private int pointsNeededForInstantAggro = 3;
+    private Transform detectionPointsOwner; //the player the detection points were looked up for
 
 
     [Header("Navigation")]
@@ -72,22 +78,37 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private Transform patrolPoints;
     [SerializeField] private BoxCollider visionBox;
 
-    private Transform[] patrolPointsArray; //will be filled in start, just like Daans mom
+    private Transform[] patrolPointsArray; //will be filled in start
     private Transform cachedPlayer;
     private Collider[] playerColliders;
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
-    float timeBeforeAlerted = 2f;
+    float timeBeforeAggro = 2f;
     float aggroTimer = 5f;
 
     bool isAggro = false;
     bool isSuspicious = false;
 
+    private LevelManager levelManager;
+    private bool heardPlayer = false;
+    private Vector3 lastHeardPlayerPosition;
 
 
 
 
 
+    //when detected form the sphere, this function is called by the sphere
+    public void isHearingPlayer(Transform playerTransform)
+    {
+        Debug.Log("HEARING HEARING HEARING");
+        player = playerTransform;
+
+        heardPlayer = true;
+        lastHeardPlayerPosition = playerTransform.position;
+
+
+
+    }
 
 
 
@@ -161,6 +182,32 @@ public class enemyChase : MonoBehaviour
             StartAttackVisual();
             
 
+        {
+            if (levelManager == null)
+            {
+                Debug.LogError("No LevelManager in scene, can't reset level.", this);
+                return;
+            }
+    SaveSystem.ResetLevel();
+SaveSystem.ResetLevel();
+            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
+            if (characterController != null)
+                characterController.enabled = false;
+
+            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+
+            if (characterController != null)
+                characterController.enabled = true;
+
+            isAggro = false;
+            heardPlayer = false;
+            keepsSuspiciousForABit = false;
+            keepSuspicionTimer = keepSuspicionTimerInit;
+
+            timeBeforeAggro = timeBeforeAggroInit;
+            aggroTimer = aggroTimerInit;
+            navMeshAgent.speed = passiveMoveSpeed;
+            navMeshAgent.ResetPath();
         }
     }
 
@@ -195,6 +242,8 @@ public class enemyChase : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
 
 
+        if (levelManager == null)
+            levelManager = FindFirstObjectByType<LevelManager>();
         if (visionBox == null)
         {
             BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
@@ -217,22 +266,15 @@ public class enemyChase : MonoBehaviour
             }
         }
 
-        navMeshAgent.stoppingDistance = 1f; //stopping distance for the navmesh agent, so it doesn't get too close to the player OR the patrol points.
+        navMeshAgent.stoppingDistance = 1f; //so it doesn't get too close to the player OR the patrol points.
 
-        patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use "= patrolPoints.GetComponentsInChildren<Transform>();" Because apparently this also contains the parent.
+        patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use GetComponentsInChildren, because that also contains the parent.
 
         StartCoroutine(enemyMovement());
         keepSuspicionTimer = keepSuspicionTimerInit;
-        timeBeforeAlerted = timeBeforeAlertedInit;
+        timeBeforeAggro = timeBeforeAggroInit;
         aggroTimer = aggroTimerInit;
-
-
-
     }
-
-
-
-
 
 
 
@@ -252,28 +294,64 @@ public class enemyChase : MonoBehaviour
             yield return new WaitForSeconds(0.01f);
             patrolPointsArray[i] = patrolPoints.GetChild(i);
             navMeshAgent.speed = passiveMoveSpeed;
+            yield return null; //run once per frame, so Time.deltaTime matches the time since the last run and the timers stay accurate
+            patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
 
-            bool seesPlayer = IsPlayerDetected;
+            // walk fast when aggro
+            if (isAggro)
+                navMeshAgent.speed = alertedMoveSpeed;
+            else
+                navMeshAgent.speed = passiveMoveSpeed;
+
+            int visiblePoints = countVisibleDetectionPoints();
+            bool seenInVisionBox = isPlayerInVisionBox() && hasLineOfSightToPlayer();
+            bool seesPlayer = visiblePoints > 0 || seenInVisionBox;
+
+            //enough of the body is visible (or the player is in the vision box) = instantly aggro, otherwise the normal suspicion route
+            bool instantAggro = seenInVisionBox || visiblePoints >= pointsNeededForInstantAggro;
+
             if (seesPlayer)
             {
                 lastSeenPlayerPosition = player.position;
                 hasLastSeenPlayerPosition = true;
             }
 
-            if (patrolPointsArray[i] != null)
+
+            if (heardPlayer)
             {
-                if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition)
+                lastSeenPlayerPosition = lastHeardPlayerPosition;
+                hasLastSeenPlayerPosition = true;
+                heardPlayer = false; //needs this to disable it again
+                keepsSuspiciousForABit = true;
+                keepSuspicionTimer = keepSuspicionTimerInit;
+            }
+
+
+            if (patrolPointsArray[i] != null) //just a check
+            {
+                if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
                 {
                     keepsSuspiciousForABit = true;
                     navMeshAgent.SetDestination(lastSeenPlayerPosition);
 
-                    if (seesPlayer)
+
+                    //if enough detection points are visible, or the player is in the vision box with a clear line of sight, INSTANTLY becomes AGGRO
+                    if (instantAggro)
+                    {
+                        timeBeforeAggro = 0;
+                        isAggro = true;
+                    }
+
+
+                    navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen/heard player location
+
+                    if (seesPlayer)//if still spotting the player for a period of time
                     {
                         aggroTimer = aggroTimerInit;
-                        timeBeforeAlerted -= Time.deltaTime;
-                        if (timeBeforeAlerted <= 0)
+
+                        timeBeforeAggro -= Time.deltaTime; //slowly becomes aggro (fully aggro at 0) while spotting player
+                        if (timeBeforeAggro <= 0) // IS AGGRO NOW.
                         {
-                            Debug.Log("I WILL KILL YOU");
                             isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
                             keepSuspicionTimer = keepSuspicionTimerInit;
@@ -281,6 +359,7 @@ public class enemyChase : MonoBehaviour
                     }
                     else
                     {
+                        //lose suspicion when it has reached the location of the spotted player
                         if (isAggro)
                         {
                             aggroTimer = Mathf.Max(0f, aggroTimer - Time.deltaTime);
@@ -289,12 +368,10 @@ public class enemyChase : MonoBehaviour
                                 isAggro = false;
                                 navMeshAgent.speed = passiveMoveSpeed;
                             }
-                        }
-
-                        if (isAggro)
-                        {
                             keepsSuspiciousForABit = true;
-                            keepSuspicionTimer = keepSuspicionTimerInit;
+                            keepSuspicionTimer = keepSuspicionTimerInit; //reset the sus timer so it stays sus when ending aggro
+
+
                         }
                         else if ((navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending) || keepSuspicionTimer <= 0)
                         {
@@ -303,7 +380,7 @@ public class enemyChase : MonoBehaviour
                         else
                         {
                             keepsSuspiciousForABit = true;
-                            keepSuspicionTimer -= Time.deltaTime;
+                            keepSuspicionTimer -= Time.deltaTime; //slowly lose suspicion
                         }
                     }
                 }
@@ -311,7 +388,8 @@ public class enemyChase : MonoBehaviour
                 {
                     isAggro = false;
                     keepSuspicionTimer = keepSuspicionTimerInit;
-                    timeBeforeAlerted = timeBeforeAlertedInit;
+                    timeBeforeAggro = timeBeforeAggroInit;
+
                     navMeshAgent.SetDestination(patrolPointsArray[i].position);
 
                     if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance && !navMeshAgent.pathPending)
@@ -347,24 +425,27 @@ public class enemyChase : MonoBehaviour
                         navMeshAgent.isStopped = false;
                         i++;
                         if (i >= patrolPointsArray.Length)
-                            i = 0;
+                        {
+                            i = 0; //loop back to the first point
+                        }
                     }
                 }
             }
         }
     }
 
-    
+
     public void KillEnemy()
     {
         Destroy(gameObject);
         Debug.Log("Enemy killed");
     }
 
-    public bool IsPlayerDetected => isSeeingPlayer() || isPlayerInVisionBox();
+    public bool IsPlayerDetected => isSeeingPlayer() || (isPlayerInVisionBox() && hasLineOfSightToPlayer());
     public bool IsStaggered => isStaggered;
 
-    private bool isPlayerInVisionBox()
+
+    private bool isPlayerInVisionBox() //detects if the player is in the (side) vision box
     {
         if (visionBox == null || !visionBox.enabled || player == null)
             return false;
@@ -390,28 +471,124 @@ public class enemyChase : MonoBehaviour
         return false;
     }
 
-    bool isSeeingPlayer() //for investigation. here u can add conditions like Hearing the players footsteps or hearing something fall
+    bool isSeeingPlayer()
+    {
+        return countVisibleDetectionPoints() > 0;
+    }
+
+    private Transform getDetectionPoints() //finds the DetectionPoints object on the current player
+    {
+        if (player == null)
+            return null;
+
+        //the player can change (e.g. through hearing), so look the points up again for a new player
+        if (detectionPointsOwner != player)
+        {
+            detectionPointsOwner = player;
+
+            if (detectionPoints == null || !detectionPoints.IsChildOf(player))
+            {
+                detectionPoints = null;
+                foreach (Transform child in player.GetComponentsInChildren<Transform>(true))
+                {
+                    if (child.name == "DetectionPoints")
+                    {
+                        detectionPoints = child;
+                        break;
+                    }
+                }
+
+                if (detectionPoints == null)
+                    Debug.LogWarning("No 'DetectionPoints' object found on the player, falling back to the center line of sight check.", this);
+            }
+        }
+
+        return detectionPoints;
+    }
+
+    private int countVisibleDetectionPoints() //how many body points the enemy can see inside its vision cone
+    {
+        if (player == null || eyePoint == null)
+            return 0;
+
+        Transform points = getDetectionPoints();
+        if (points == null || points.childCount == 0)
+            return isPointInViewCone(getPlayerTarget()) && hasLineOfSightToPlayer() ? 1 : 0; //fallback: only the center, never instant aggro
+
+        int visibleCount = 0;
+        foreach (Transform point in points)
+        {
+            if (!point.gameObject.activeInHierarchy)
+                continue;
+
+            if (isPointInViewCone(point.position) && hasClearRayTo(point.position))
+                visibleCount++;
+        }
+
+        return visibleCount;
+    }
+
+    private bool isPointInViewCone(Vector3 point)
+    {
+        Vector3 directionToPoint = point - eyePoint.position;
+
+        if (directionToPoint.sqrMagnitude > math.square(viewDistance)) //too far away? stop.
+            return false;
+
+        float angle = Vector3.Angle(eyePoint.forward, directionToPoint); //angle between eyepoint and the point
+
+        return angle <= viewAngle / 2f; //outside the view angle? not visible.
+    }
+
+    private bool hasClearRayTo(Vector3 point) //true if no level geometry is between the eye point and the point
+    {
+        Vector3 directionToPoint = point - eyePoint.position;
+
+        int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
+        if (Physics.Raycast(
+                eyePoint.position,
+                directionToPoint.normalized,
+                out RaycastHit hit,
+                directionToPoint.magnitude,
+                sightMask,
+                QueryTriggerInteraction.Ignore))
+        {
+            //hitting the player's own body on the way to the point still counts as seeing it
+            return hit.transform == player || hit.transform.IsChildOf(player);
+        }
+
+        return true; //nothing in the way
+    }
+
+    private void OnDrawGizmosSelected() //green = visible point, red = blocked/outside the cone
+    {
+        if (!Application.isPlaying || player == null || eyePoint == null)
+            return;
+
+        Transform points = getDetectionPoints();
+        if (points == null)
+            return;
+
+        foreach (Transform point in points)
+        {
+            bool visible = isPointInViewCone(point.position) && hasClearRayTo(point.position);
+            Gizmos.color = visible ? Color.green : Color.red;
+            Gizmos.DrawLine(eyePoint.position, point.position);
+        }
+    }
+
+    private Vector3 getPlayerTarget() //use the center of the player if there is a controller
+    {
+        var controller = player.GetComponent<UnityEngine.CharacterController>();
+        return controller != null ? controller.bounds.center : player.position;
+    }
+
+    private bool hasLineOfSightToPlayer() //true if nothing blocks the ray from the eye point to the player
     {
         if (player == null || eyePoint == null)
             return false;
 
-        var controller = player.GetComponent<UnityEngine.CharacterController>(); //get the controller of the player to get the center of the player, if there is no controller, just use the position of the player.
-        Vector3 target = controller != null ? controller.bounds.center : player.position;
-        Vector3 directionToPlayer = target - eyePoint.position;
-
-
-        if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //is the dist between player and enemy bigger? stop.
-        {
-            return false;
-        }
-
-
-        float angle = Vector3.Angle(eyePoint.forward, directionToPlayer); //measures the angle between eyepoint and player!
-
-        if (angle > viewAngle / 2f) //if the angle is bigger than the view angle, stop.
-        {
-            return false;
-        }
+        Vector3 directionToPlayer = getPlayerTarget() - eyePoint.position;
 
         int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
         if (Physics.Raycast(
