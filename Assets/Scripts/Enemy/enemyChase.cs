@@ -34,17 +34,17 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
-    [Header("Parry")] 
+    [Header("Parry")]
     [SerializeField] private float staggerTime = 5f;
     private bool isStaggered;
     private Coroutine staggerCoroutine;
 
-    [Header("Enemy Attack")] 
+    [Header("Enemy Attack")]
     private Coroutine attackVisualCoroutine;
     [SerializeField] private GameObject enemyAttackVisual;
     private bool isAttacking = false;
-    
-    
+
+
 
     private void StopEnemyMovementForStagger()
     {
@@ -129,7 +129,7 @@ public class enemyChase : MonoBehaviour
 
     private void StartAttackVisual()
     {
-        if ( isAttacking == false)
+        if (isAttacking == false)
         {
             attackVisualCoroutine = StartCoroutine(AttackVisualSequence());
         }
@@ -142,14 +142,14 @@ public class enemyChase : MonoBehaviour
         enemyAttackVisual.SetActive(true);
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.blue;
         yield return new WaitForSeconds(0.4f);
-        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.orange;
+        enemyAttackVisual.GetComponent<Renderer>().material.color = new Color(1f, 0.5f, 0f);
         yield return new WaitForSeconds(0.4f);
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.red;
-        
+
         yield return new WaitForSeconds(0.02f);
         firstPersonController.HitByEnemyAttack(this);
         yield return new WaitForSeconds(0.02f);
-        
+
         enemyAttackVisual.GetComponent<Renderer>().material.color = Color.green;
         yield return new WaitForSeconds(1.5f);
         enemyAttackVisual.SetActive(false);
@@ -161,7 +161,7 @@ public class enemyChase : MonoBehaviour
 
 
     }
-    
+
     private void TryKillPlayerAtCloseRange()
     {
         if (player == null || eyePoint == null)
@@ -177,37 +177,38 @@ public class enemyChase : MonoBehaviour
                 QueryTriggerInteraction.Ignore) &&
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
-        { 
+        {
 
             StartAttackVisual();
-            
 
-        {
-            if (levelManager == null)
+
             {
-                Debug.LogError("No LevelManager in scene, can't reset level.", this);
-                return;
+                if (levelManager == null)
+                {
+                    Debug.LogError("No LevelManager in scene, can't reset level.", this);
+                    return;
+                }
+                SaveSystem.ResetLevel();
+                SaveSystem.ResetLevel();
+                UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
+                if (characterController != null)
+                    characterController.enabled = false;
+
+                player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+
+                if (characterController != null)
+                    characterController.enabled = true;
+
+                isAggro = false;
+                heardPlayer = false;
+                keepsSuspiciousForABit = false;
+                keepSuspicionTimer = keepSuspicionTimerInit;
+
+                timeBeforeAggro = timeBeforeAggroInit;
+                aggroTimer = aggroTimerInit;
+                navMeshAgent.speed = passiveMoveSpeed;
+                navMeshAgent.ResetPath();
             }
-    SaveSystem.ResetLevel();
-SaveSystem.ResetLevel();
-            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-            if (characterController != null)
-                characterController.enabled = false;
-
-            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-            if (characterController != null)
-                characterController.enabled = true;
-
-            isAggro = false;
-            heardPlayer = false;
-            keepsSuspiciousForABit = false;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-
-            timeBeforeAggro = timeBeforeAggroInit;
-            aggroTimer = aggroTimerInit;
-            navMeshAgent.speed = passiveMoveSpeed;
-            navMeshAgent.ResetPath();
         }
     }
 
@@ -231,7 +232,7 @@ SaveSystem.ResetLevel();
         isAggro = false;
         keepsSuspiciousForABit = false;
         keepSuspicionTimer = keepSuspicionTimerInit;
-        timeBeforeAlerted = timeBeforeAlertedInit;
+        timeBeforeAggro = timeBeforeAggroInit;
         aggroTimer = aggroTimerInit;
         navMeshAgent.speed = passiveMoveSpeed;
         navMeshAgent.ResetPath();
@@ -630,5 +631,5 @@ SaveSystem.ResetLevel();
         ResumeEnemyMovementAfterStagger();
         staggerCoroutine = null;
     }
-    
+
 }

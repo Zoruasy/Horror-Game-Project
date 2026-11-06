@@ -354,7 +354,7 @@ namespace CharacterController
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
                     if (dot >= backstabThreshold &&
-                        hasWeapon &&
+                        HasWeapon &&
                         !enemy.IsPlayerDetected &&
                         !enemy.IsStaggered)
                     {
@@ -439,7 +439,7 @@ namespace CharacterController
         
         
         
-        public void PickUpWeapon()
+        public void PickUpWeapon(){}
         private void OnEnable()
         {
             if (inventory) inventory.Changed += RefreshWeaponUi;
