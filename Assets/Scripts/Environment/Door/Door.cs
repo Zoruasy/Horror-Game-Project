@@ -1,10 +1,18 @@
 using System.Collections;
 using UnityEngine;
 
-public class Door : Interactable
+public class Door : Interactable, ILockableDoor
 {
-    [SerializeField] Transform hinge;
-    [SerializeField] float openAngle = 90f;
+    [System.Serializable]
+    class Leaf
+    {
+        public Transform hinge;
+        public float openAngle = 90f;
+        [HideInInspector] public Quaternion closedRotation;
+        [HideInInspector] public Quaternion openRotation;
+    }
+
+    [SerializeField] Leaf[] leaves;
     [SerializeField] float degreesPerSecond = 180f;
 
     [Header("Hold")]
@@ -12,42 +20,58 @@ public class Door : Interactable
     [SerializeField] float holdTime = 3.0f;
 
     [Header("Lock")]
-    [SerializeField] bool locked;
+    [SerializeField] LockType lockType = LockType.None;
+    [SerializeField] string requiredCode = "1234"; //only for codelocks
+    [SerializeField] Key requiredKey; //only for item locks
     [SerializeField] string lockedPrompt = "locked";
-    [SerializeField] Key requiredKey;
+
+    bool locked;
+
+    public string RequiredCode => requiredCode;
+    public bool IsLocked => locked;
 
     bool isOpen;
-    Quaternion closedRotation;
-    Quaternion openRotation;
     new Coroutine animation;
 
     void Awake()
     {
-        if (!hinge) hinge = transform;
-        closedRotation = hinge.localRotation;
-        openRotation = closedRotation * Quaternion.Euler(0f, openAngle, 0f);
+        locked = lockType != LockType.None;
+
+        if (leaves == null || leaves.Length == 0)
+            leaves = new[] { new Leaf { hinge = transform } };
+
+        foreach (Leaf leaf in leaves)
+        {
+            if (!leaf.hinge) leaf.hinge = transform;
+            leaf.closedRotation = leaf.hinge.localRotation;
+            leaf.openRotation = leaf.closedRotation * Quaternion.Euler(0f, leaf.openAngle, 0f);
+        }
     }
 
     public override string GetPrompt(GameObject interactor)
     {
-        if (locked) return HasKey(interactor) ? "unlock" : lockedPrompt;
+        if (locked)
+        {
+            return lockType == LockType.Item && HasKey(interactor) ? "unlock" : lockedPrompt;
+        }
         return isOpen ? "close" : "open";
     }
 
-    public override bool CanInteract(GameObject interactor) => !locked || HasKey(interactor);
+    public override bool CanInteract(GameObject interactor) => !locked || (lockType == LockType.Item && HasKey(interactor));
 
     public override void Interact(GameObject interactor)
     {
         if (locked)
         {
-            if (!HasKey(interactor)) return;
+            // Codelocked doors can only be opened via code lock
+            if (lockType != LockType.Item || !HasKey(interactor)) return;
             interactor.GetComponentInParent<Inventory>().Consume(requiredKey);
             locked = false;
         }
 
         isOpen = !isOpen;
         if (animation != null) StopCoroutine(animation);
-        animation = StartCoroutine(RotateTo(isOpen ? openRotation : closedRotation));
+        animation = StartCoroutine(RotateAll(isOpen));
     }
 
     public void Unlock() => locked = false;
@@ -59,20 +83,30 @@ public class Door : Interactable
         return inventory && inventory.Has(requiredKey);
     }
 
-    IEnumerator RotateTo(Quaternion target)
+    IEnumerator RotateAll(bool open)
     {
-        while (Quaternion.Angle(hinge.localRotation, target) > 0.01f)
+        bool moving = true;
+        while (moving)
         {
-            hinge.localRotation = Quaternion.RotateTowards(
-                hinge.localRotation, target, degreesPerSecond * Time.deltaTime);
+            moving = false;
+            foreach (Leaf leaf in leaves)
+            {
+                Quaternion target = open ? leaf.openRotation : leaf.closedRotation;
+                if (Quaternion.Angle(leaf.hinge.localRotation, target) > 0.01f)
+                {
+                    leaf.hinge.localRotation = Quaternion.RotateTowards(
+                        leaf.hinge.localRotation, target, degreesPerSecond * Time.deltaTime);
+                    moving = true;
+                }
+            }
             yield return null;
         }
-        hinge.localRotation = target;
+
+        foreach (Leaf leaf in leaves)
+            leaf.hinge.localRotation = open ? leaf.openRotation : leaf.closedRotation;
+
         animation = null;
     }
 
-    public override float GetHoldTime()
-    {
-        return requireHold ? holdTime : 0f;
-    }
+    public override float GetHoldTime() => requireHold ? holdTime : 0f;
 }
