@@ -35,61 +35,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.5510858746179679" />
-      <entry key="MS500" value="5.526568082835065" />
-      <entry key="S2" value="15.45354522862307" />
-      <entry key="S5" value="29.051808272564447" />
-      <entry key="S10" value="41.040679565325526" />
-      <entry key="S30" value="54.98298597368913" />
-      <entry key="S60" value="62.28885442825239" />
-      <entry key="M2" value="83.81134907592516" />
-      <entry key="M5" value="153.8380894319349" />
-      <entry key="M10" value="231.08800303535526" />
-      <entry key="M15" value="285.9413121716563" />
-      <entry key="M30" value="409.953761437033" />
-      <entry key="H1" value="601.9824527804745" />
-      <entry key="H2" value="873.0456401226288" />
-      <entry key="H4" value="1164.962544965131" />
-      <entry key="D1" value="1612.9620094135446" />
-      <entry key="W1" value="1722.4818849279889" />
+      <entry key="MS100" value="2.0587974938764986" />
+      <entry key="MS500" value="4.874722783647799" />
+      <entry key="S2" value="11.53000029116516" />
+      <entry key="S5" value="16.457630453091156" />
+      <entry key="S10" value="18.92437832030123" />
+      <entry key="S30" value="20.898061319217835" />
+      <entry key="S60" value="21.636797586102606" />
+      <entry key="M2" value="25.33364900050478" />
+      <entry key="M5" value="42.61858165924264" />
+      <entry key="M10" value="62.79108251595398" />
+      <entry key="M15" value="84.36309115957755" />
+      <entry key="M30" value="167.0025584488782" />
+      <entry key="H1" value="327.33896791784554" />
+      <entry key="H2" value="561.0376203173622" />
+      <entry key="H4" value="807.8903951516434" />
+      <entry key="D1" value="1175.2990248133513" />
+      <entry key="W1" value="1263.3673783031593" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
       <entry key="MS500" value="0.0" />
       <entry key="S2" value="0.0" />
-      <entry key="S5" value="1.3873261966884164E-285" />
-      <entry key="S10" value="3.724689348408048E-143" />
-      <entry key="S30" value="3.4653472259674055E-48" />
-      <entry key="S60" value="2.7005094140554054E-24" />
-      <entry key="M2" value="3.849006544539816E-12" />
-      <entry key="M5" value="1.1922005993454958E-4" />
-      <entry key="M10" value="0.051030897862717146" />
-      <entry key="M15" value="0.43371953215568154" />
-      <entry key="M30" value="4.342556617422443" />
-      <entry key="H1" value="16.7557247316908" />
-      <entry key="H2" value="38.56711115676182" />
-      <entry key="H4" value="63.519396552591495" />
-      <entry key="D1" value="103.25959817013025" />
-      <entry key="W1" value="113.21581165832842" />
+      <entry key="S5" value="1.3216292933031096E-143" />
+      <entry key="S10" value="3.635428365204913E-72" />
+      <entry key="S30" value="1.5955188349442587E-24" />
+      <entry key="S60" value="1.832412664387303E-12" />
+      <entry key="M2" value="3.1705707159614946E-6" />
+      <entry key="M5" value="0.027711807507428445" />
+      <entry key="M10" value="0.7780203713141486" />
+      <entry key="M15" value="2.6667408885323547" />
+      <entry key="M30" value="10.767909802924935" />
+      <entry key="H1" value="26.384944004974006" />
+      <entry key="H2" value="48.396459274709244" />
+      <entry key="H4" value="71.15486573573419" />
+      <entry key="D1" value="105.2317527246066" />
+      <entry key="W1" value="113.52221388219621" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.495563119714186" />
-      <entry key="MS500" value="5.485128088795147" />
-      <entry key="S2" value="15.423784271641988" />
-      <entry key="S5" value="29.029248090894274" />
-      <entry key="S10" value="41.02472595127508" />
-      <entry key="S30" value="54.975856066502715" />
-      <entry key="S60" value="62.28480797403352" />
-      <entry key="M2" value="83.80859540122427" />
-      <entry key="M5" value="153.83613296635238" />
-      <entry key="M10" value="231.13720064318136" />
-      <entry key="M15" value="286.37234701249736" />
-      <entry key="M30" value="414.28836372805495" />
-      <entry key="H1" value="618.7234850335791" />
-      <entry key="H2" value="911.5956687773656" />
-      <entry key="H4" value="1228.4676859902622" />
-      <entry key="D1" value="1716.2176786395926" />
-      <entry key="W1" value="1835.6970789666952" />
+      <entry key="MS100" value="1.9901092707993358" />
+      <entry key="MS500" value="4.842258156602432" />
+      <entry key="S2" value="11.510582183036487" />
+      <entry key="S5" value="16.446328532163797" />
+      <entry key="S10" value="18.917824022593518" />
+      <entry key="S30" value="20.895633298493703" />
+      <entry key="S60" value="21.635538844139557" />
+      <entry key="M2" value="25.332916952602403" />
+      <entry key="M5" value="42.64557954354981" />
+      <entry key="M10" value="63.56529539520222" />
+      <entry key="M15" value="87.02133757819838" />
+      <entry key="M30" value="177.75287728023267" />
+      <entry key="H1" value="353.7015809932899" />
+      <entry key="H2" value="609.4129966677544" />
+      <entry key="H4" value="879.0294576753695" />
+      <entry key="D1" value="1280.5267998414768" />
+      <entry key="W1" value="1376.8889766174066" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -104,27 +104,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;featDaanParry&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "featDaanParry",
+    "junie.onboarding.icon.badge.shown": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\6000.3.23f1\Editor\Unity.exe" />
