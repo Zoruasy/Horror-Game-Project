@@ -9429,6 +9429,8 @@ MonoBehaviour:
   aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
   suspiciousVolume: 1
   aggroVolume: 0.492
+  suspiciousVolume: 10
+  aggroVolume: 0.214
   viewDistance: 20
   viewAngle: 90
   playerDetectMask:
