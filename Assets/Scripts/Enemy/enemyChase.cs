@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Threading;
+using CharacterController;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,7 +12,7 @@ public class enemyChase : MonoBehaviour
     [Header("Target")]
     public Transform player;
     public Transform eyePoint;
-    [SerializeField] private Transform respawnPoint;
+    public FirstPersonController firstPersonController;
 
     [Header("Vision Light")]
     [SerializeField] private Light visionLight;
@@ -43,6 +45,37 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
+    [Header("Parry")]
+    [SerializeField] private float staggerTime = 5f;
+    private bool isStaggered;
+    private Coroutine staggerCoroutine;
+
+    [Header("Enemy Attack")]
+    private Coroutine attackVisualCoroutine;
+    [SerializeField] private GameObject enemyAttackVisual;
+    private bool isAttacking = false;
+
+
+
+    private void StopEnemyMovementForStagger()
+    {
+        if (navMeshAgent == null)
+            return;
+
+        navMeshAgent.ResetPath();
+        navMeshAgent.velocity = Vector3.zero;
+        navMeshAgent.isStopped = true;
+        navMeshAgent.updateRotation = false;
+    }
+
+    private void ResumeEnemyMovementAfterStagger()
+    {
+        if (navMeshAgent == null)
+            return;
+
+        navMeshAgent.isStopped = false;
+        navMeshAgent.updateRotation = true;
+    }
     [Header("Detection Points")]
     [Tooltip("Parent object on the player whose children are the body points. Auto-found as a child of the player named 'DetectionPoints' if left empty.")]
     [SerializeField] private Transform detectionPoints;
@@ -67,7 +100,6 @@ public class enemyChase : MonoBehaviour
     bool isAggro = false;
     bool isSuspicious = false;
 
-    private LevelManager levelManager;
     private bool heardPlayer = false;
     private Vector3 lastHeardPlayerPosition;
 
@@ -106,7 +138,40 @@ public class enemyChase : MonoBehaviour
             visionLight.color = normalVisionColor;
     }
 
+    private void StartAttackVisual()
+    {
+        if (isAttacking == false)
+        {
+            attackVisualCoroutine = StartCoroutine(AttackVisualSequence());
+        }
 
+    }
+
+    private IEnumerator AttackVisualSequence()
+    {
+        isAttacking = true;
+        enemyAttackVisual.SetActive(true);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.blue;
+        yield return new WaitForSeconds(0.4f);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = new Color(1f, 0.5f, 0f);
+        yield return new WaitForSeconds(0.4f);
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.red;
+
+        yield return new WaitForSeconds(0.02f);
+        firstPersonController.HitByEnemyAttack(this);
+        yield return new WaitForSeconds(0.02f);
+
+        enemyAttackVisual.GetComponent<Renderer>().material.color = Color.green;
+        yield return new WaitForSeconds(1.5f);
+        enemyAttackVisual.SetActive(false);
+
+        attackVisualCoroutine = null;
+        isAttacking = false;
+
+
+
+
+    }
 
     //plays a sound once when the enemy enters the suspicious or aggro state
     private void PlayAlertSounds()
@@ -153,34 +218,15 @@ public class enemyChase : MonoBehaviour
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
         {
-            if (levelManager == null)
-            {
-                Debug.LogError("No LevelManager in scene, can't reset level.", this);
-                return;
-            }
-    SaveSystem.ResetLevel();
-SaveSystem.ResetLevel();
-            UnityEngine.CharacterController characterController = player.GetComponent<UnityEngine.CharacterController>();
-            if (characterController != null)
-                characterController.enabled = false;
 
-            player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-
-            if (characterController != null)
-                characterController.enabled = true;
-
-            isAggro = false;
-            heardPlayer = false;
-            keepsSuspiciousForABit = false;
-            keepSuspicionTimer = keepSuspicionTimerInit;
-
-            timeBeforeAggro = timeBeforeAggroInit;
-            aggroTimer = aggroTimerInit;
-            navMeshAgent.speed = passiveMoveSpeed;
-            navMeshAgent.ResetPath();
+            StartAttackVisual();
         }
     }
 
+    public void PlayerDies()
+    {
+        SaveSystem.ResetLevel();
+    }
 
     private void Start()
     {
@@ -197,8 +243,19 @@ SaveSystem.ResetLevel();
             alertAudioSource.maxDistance = 25f;
         }
 
-        if (levelManager == null)
-            levelManager = FindFirstObjectByType<LevelManager>();
+        if (alertAudioSource == null)
+            alertAudioSource = GetComponent<AudioSource>();
+        if (alertAudioSource == null)
+        {
+            alertAudioSource = gameObject.AddComponent<AudioSource>();
+            alertAudioSource.playOnAwake = false;
+            alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
+            alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
+            alertAudioSource.maxDistance = 25f;
+        }
+
+
+
         if (visionBox == null)
         {
             BoxCollider[] childBoxColliders = GetComponentsInChildren<BoxCollider>(true);
@@ -240,6 +297,15 @@ SaveSystem.ResetLevel();
 
         for (int i = 0; i < patrolPointsArray.Length;)
         {
+            if (isStaggered)
+            {
+                yield return null;
+                continue;
+            }
+
+            yield return new WaitForSeconds(0.01f);
+            patrolPointsArray[i] = patrolPoints.GetChild(i);
+            navMeshAgent.speed = passiveMoveSpeed;
             yield return null; //run once per frame, so Time.deltaTime matches the time since the last run and the timers stay accurate
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
 
@@ -278,6 +344,7 @@ SaveSystem.ResetLevel();
                 if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
                 {
                     keepsSuspiciousForABit = true;
+                    navMeshAgent.SetDestination(lastSeenPlayerPosition);
 
 
                     //if enough detection points are visible, or the player is in the vision box with a clear line of sight, INSTANTLY becomes AGGRO
@@ -322,7 +389,7 @@ SaveSystem.ResetLevel();
                         {
                             keepsSuspiciousForABit = false;
                         }
-                        else //while still suspicious
+                        else
                         {
                             keepsSuspiciousForABit = true;
                             keepSuspicionTimer -= Time.deltaTime; //slowly lose suspicion
@@ -332,8 +399,6 @@ SaveSystem.ResetLevel();
                 else
                 {
                     isAggro = false;
-
-                    //reset the timers
                     keepSuspicionTimer = keepSuspicionTimerInit;
                     timeBeforeAggro = timeBeforeAggroInit;
 
@@ -351,6 +416,14 @@ SaveSystem.ResetLevel();
                         float elapsed = 0f;
                         while (elapsed < patrolPauseDuration)
                         {
+                            if (isStaggered)
+                            {
+                                navMeshAgent.updateRotation = wasUpdatingRotation;
+                                navMeshAgent.isStopped = false;
+                                yield return null;
+                                continue;
+                            }
+
                             elapsed += Time.deltaTime;
                             transform.rotation = Quaternion.Slerp(
                                 startRotation,
@@ -381,6 +454,7 @@ SaveSystem.ResetLevel();
     }
 
     public bool IsPlayerDetected => isSeeingPlayer() || (isPlayerInVisionBox() && hasLineOfSightToPlayer());
+    public bool IsStaggered => isStaggered;
 
 
     private bool isPlayerInVisionBox() //detects if the player is in the (side) vision box
@@ -544,4 +618,29 @@ SaveSystem.ResetLevel();
 
         return false;
     }
+
+
+    public void StaggerByPlayerParry()
+    {
+        if (isStaggered)
+            return;
+
+        isStaggered = true;
+
+        if (staggerCoroutine != null)
+            StopCoroutine(staggerCoroutine);
+
+        StopEnemyMovementForStagger();
+        staggerCoroutine = StartCoroutine(RecoverFromStagger());
+    }
+
+    private IEnumerator RecoverFromStagger()
+    {
+        yield return new WaitForSeconds(staggerTime);
+
+        isStaggered = false;
+        ResumeEnemyMovementAfterStagger();
+        staggerCoroutine = null;
+    }
+
 }
