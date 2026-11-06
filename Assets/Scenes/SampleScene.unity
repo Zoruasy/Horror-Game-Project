@@ -5393,7 +5393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0391709c4f59cc44e8927e0632027455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Killbox
-  respawnPoint: {fileID: 0}
+  respawnPoint: {fileID: 1450936203}
 --- !u!54 &411790420
 Rigidbody:
   m_ObjectHideFlags: 0
