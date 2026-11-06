@@ -15,7 +15,10 @@ namespace CharacterController
 
         [Header("Stamina")]
         public float stamina = 3f;
+        public RawImage staminaFillImage;
+        private bool staminaExhausted = false;
         public RectTransform staminaBar;
+        public GameObject staminaBarUI;
         private float normalSprintSpeed;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
@@ -24,7 +27,7 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
-        public bool CanSprint => stamina > 0f;
+        public bool CanSprint => !staminaExhausted && stamina > 0f;
 
 
 
@@ -129,6 +132,8 @@ namespace CharacterController
                 GUILayout.Label("Current State: " + currentState.GetType().Name);
         }
 
+        private float staminaFullTimer = 0f;
+
         private void Awake()
         {
             normalSprintSpeed = sprintSpeed;
@@ -145,7 +150,10 @@ namespace CharacterController
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
 
-            
+            if (staminaBarUI != null)
+                staminaBarUI.SetActive(false);
+
+
             input = GetComponent<IInputManager>();
             if (input == null)
             {
@@ -184,20 +192,61 @@ namespace CharacterController
             bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
             hasGroundedState = true;
 
+
             // stamina 3 secs
             bool running = Keyboard.current != null &&
                 Keyboard.current.leftShiftKey.isPressed &&
                 input != null && input.moveInput.sqrMagnitude > 0.01f;
 
-            stamina = Mathf.Clamp(
-                stamina + (running ? -1f : 1f) * Time.deltaTime,
-                0f, 3f
-            );
 
-            sprintSpeed = stamina > 0f ? normalSprintSpeed : walkSpeed;
+            if (running && CanSprint)
+            {
+                stamina -= Time.deltaTime;
+
+                if (stamina <= 0f)
+                {
+                    stamina = 0f;
+                    staminaExhausted = true;
+                }
+            }
+            else
+            {
+                stamina += Time.deltaTime;
+            }
+
+            stamina = Mathf.Clamp(stamina, 0f, 3f);
+
+            if (staminaExhausted && stamina >= 3f)
+                staminaExhausted = false;
+
+            sprintSpeed = CanSprint ? normalSprintSpeed : walkSpeed;
+            if (staminaFillImage != null)
+                staminaFillImage.color = staminaExhausted ? Color.red : Color.green;
+
 
             if (staminaBar != null)
                 staminaBar.anchorMax = new Vector2(stamina / 3f, 1f);
+
+            if (staminaBarUI != null)
+            {
+                if (running && CanSprint)
+                {
+                    staminaFullTimer = 0f;
+                    staminaBarUI.SetActive(true);
+                }
+                else if (stamina >= 3f && staminaBarUI.activeSelf)
+                {
+                    staminaFullTimer += Time.deltaTime;
+
+                    if (staminaFullTimer >= 1f)
+                        staminaBarUI.SetActive(false);
+                }
+                else if (stamina < 3f)
+                {
+                    staminaFullTimer = 0f;
+                }
+            }
+
 
 
             if (currentState != null)
