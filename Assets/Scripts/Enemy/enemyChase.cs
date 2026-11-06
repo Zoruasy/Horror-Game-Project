@@ -31,6 +31,13 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
 
+    [Header("Detection Points")]
+    [Tooltip("Parent object on the player whose children are the body points. Auto-found as a child of the player named 'DetectionPoints' if left empty.")]
+    [SerializeField] private Transform detectionPoints;
+    [Tooltip("When this many detection points (or more) are visible, the enemy instantly becomes aggro.")]
+    [SerializeField] private int pointsNeededForInstantAggro = 3;
+    private Transform detectionPointsOwner; //the player the detection points were looked up for
+
 
     [Header("Navigation")]
     private NavMeshAgent navMeshAgent;
@@ -189,7 +196,13 @@ SaveSystem.ResetLevel();
             else
                 navMeshAgent.speed = passiveMoveSpeed;
 
-            bool seesPlayer = IsPlayerDetected;
+            int visiblePoints = countVisibleDetectionPoints();
+            bool seenInVisionBox = isPlayerInVisionBox() && hasLineOfSightToPlayer();
+            bool seesPlayer = visiblePoints > 0 || seenInVisionBox;
+
+            //enough of the body is visible (or the player is in the vision box) = instantly aggro, otherwise the normal suspicion route
+            bool instantAggro = seenInVisionBox || visiblePoints >= pointsNeededForInstantAggro;
+
             if (seesPlayer)
             {
                 lastSeenPlayerPosition = player.position;
@@ -214,8 +227,8 @@ SaveSystem.ResetLevel();
                     keepsSuspiciousForABit = true;
 
 
-                    //if the player is in the vision box with a clear line of sight, INSTANTLY becomes AGGRO
-                    if (isPlayerInVisionBox() && hasLineOfSightToPlayer())
+                    //if enough detection points are visible, or the player is in the vision box with a clear line of sight, INSTANTLY becomes AGGRO
+                    if (instantAggro)
                     {
                         timeBeforeAggro = 0;
                         isAggro = true;
@@ -345,24 +358,108 @@ SaveSystem.ResetLevel();
 
     bool isSeeingPlayer()
     {
+        return countVisibleDetectionPoints() > 0;
+    }
+
+    private Transform getDetectionPoints() //finds the DetectionPoints object on the current player
+    {
+        if (player == null)
+            return null;
+
+        //the player can change (e.g. through hearing), so look the points up again for a new player
+        if (detectionPointsOwner != player)
+        {
+            detectionPointsOwner = player;
+
+            if (detectionPoints == null || !detectionPoints.IsChildOf(player))
+            {
+                detectionPoints = null;
+                foreach (Transform child in player.GetComponentsInChildren<Transform>(true))
+                {
+                    if (child.name == "DetectionPoints")
+                    {
+                        detectionPoints = child;
+                        break;
+                    }
+                }
+
+                if (detectionPoints == null)
+                    Debug.LogWarning("No 'DetectionPoints' object found on the player, falling back to the center line of sight check.", this);
+            }
+        }
+
+        return detectionPoints;
+    }
+
+    private int countVisibleDetectionPoints() //how many body points the enemy can see inside its vision cone
+    {
         if (player == null || eyePoint == null)
-            return false;
+            return 0;
 
-        Vector3 directionToPlayer = getPlayerTarget() - eyePoint.position;
+        Transform points = getDetectionPoints();
+        if (points == null || points.childCount == 0)
+            return isPointInViewCone(getPlayerTarget()) && hasLineOfSightToPlayer() ? 1 : 0; //fallback: only the center, never instant aggro
 
-        if (directionToPlayer.sqrMagnitude > math.square(viewDistance)) //too far away? stop.
+        int visibleCount = 0;
+        foreach (Transform point in points)
         {
-            return false;
+            if (!point.gameObject.activeInHierarchy)
+                continue;
+
+            if (isPointInViewCone(point.position) && hasClearRayTo(point.position))
+                visibleCount++;
         }
 
-        float angle = Vector3.Angle(eyePoint.forward, directionToPlayer); //angle between eyepoint and player
+        return visibleCount;
+    }
 
-        if (angle > viewAngle / 2f) //outside the view angle? stop.
-        {
+    private bool isPointInViewCone(Vector3 point)
+    {
+        Vector3 directionToPoint = point - eyePoint.position;
+
+        if (directionToPoint.sqrMagnitude > math.square(viewDistance)) //too far away? stop.
             return false;
+
+        float angle = Vector3.Angle(eyePoint.forward, directionToPoint); //angle between eyepoint and the point
+
+        return angle <= viewAngle / 2f; //outside the view angle? not visible.
+    }
+
+    private bool hasClearRayTo(Vector3 point) //true if no level geometry is between the eye point and the point
+    {
+        Vector3 directionToPoint = point - eyePoint.position;
+
+        int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
+        if (Physics.Raycast(
+                eyePoint.position,
+                directionToPoint.normalized,
+                out RaycastHit hit,
+                directionToPoint.magnitude,
+                sightMask,
+                QueryTriggerInteraction.Ignore))
+        {
+            //hitting the player's own body on the way to the point still counts as seeing it
+            return hit.transform == player || hit.transform.IsChildOf(player);
         }
 
-        return hasLineOfSightToPlayer();
+        return true; //nothing in the way
+    }
+
+    private void OnDrawGizmosSelected() //green = visible point, red = blocked/outside the cone
+    {
+        if (!Application.isPlaying || player == null || eyePoint == null)
+            return;
+
+        Transform points = getDetectionPoints();
+        if (points == null)
+            return;
+
+        foreach (Transform point in points)
+        {
+            bool visible = isPointInViewCone(point.position) && hasClearRayTo(point.position);
+            Gizmos.color = visible ? Color.green : Color.red;
+            Gizmos.DrawLine(eyePoint.position, point.position);
+        }
     }
 
     private Vector3 getPlayerTarget() //use the center of the player if there is a controller
