@@ -13748,7 +13748,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7025222dc83d2409102fdd22327f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
-  defaultEyeIn: 0
+  defaultEyeIn: 1
   switchDuration: 3
   cooldownMultiplier: 2
 --- !u!4 &1001191485
@@ -17187,7 +17187,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 190c5deca74f019419f647536edaccb4, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: ea14f6f172e0c8645a7b67fd01c1dd47, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1483885050
 Transform:
@@ -19719,12 +19719,12 @@ GameObject:
   - component: {fileID: 1673968659}
   - component: {fileID: 1673968658}
   m_Layer: 7
-  m_Name: Capsule
+  m_Name: ParryVisualCapsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1673968657
 Transform:
   m_ObjectHideFlags: 0

@@ -54,7 +54,11 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-        if (current && promptUI)
+        if (promptUI && !RealityObject.FlashActive)
+        {
+            promptUI.Hide();
+        }
+        else if (current && promptUI)
         {
             string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
@@ -102,7 +106,6 @@ public class PlayerInteractor : MonoBehaviour
         {
             return GetInteractable(sphereHit.collider);
         }
-
         return null;
     }
 
