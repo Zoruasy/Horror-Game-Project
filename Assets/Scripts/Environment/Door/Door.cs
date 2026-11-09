@@ -77,6 +77,17 @@ public class Door : Interactable, ILockableDoor
     public void Unlock() => locked = false;
     public void Lock() => locked = true;
 
+    public void CloseAndLock()
+    {
+        if (isOpen)
+        {
+            isOpen = false;
+            if (animation != null) StopCoroutine(animation);
+            animation = StartCoroutine(RotateAll(false));   // DoorSlide: MoveAll(false)
+        }
+        locked = true;
+    }
+
     bool HasKey(GameObject interactor)
     {
         Inventory inventory = interactor.GetComponentInParent<Inventory>();
