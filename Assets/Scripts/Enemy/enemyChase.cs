@@ -29,8 +29,6 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private AudioClip aggroSound;
     [SerializeField, Range(0f, 1f)] private float suspiciousVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float aggroVolume = 1f;
-    [SerializeField, Range(0f, 5f)] private float suspiciousVolume = 1f;
-    [SerializeField, Range(0f, 5f)] private float aggroVolume = 1f;
     private bool wasAggro = false;
     private bool wasSuspicious = false;
 
