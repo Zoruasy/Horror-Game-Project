@@ -428,7 +428,6 @@ GameObject:
   - component: {fileID: 8385696734740405135}
   - component: {fileID: 2148455237475930307}
   - component: {fileID: 5086528032093165493}
-  - component: {fileID: 162483152384126832}
   m_Layer: 0
   m_Name: SinglePivotDoor
   m_TagString: Untagged
@@ -1007,23 +1006,3 @@ MonoBehaviour:
   requiredCode: 0000
   requiredKey: {fileID: 0}
   lockedPrompt: locked
---- !u!114 &162483152384126832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6613742657133864470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1340148ff49592b42956562a0c22c550, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RealityObject
-  mode: 0
-  realObjectRenderers:
-  - {fileID: 4599247297978357505}
-  - {fileID: 1042279666555808141}
-  collidersToToggle: []
-  triggersUIGlitch: 0
-  glitchRadius: 6
-  glitchOverRealObjects: []
