@@ -20,6 +20,18 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private Color spottedVisionColor = Color.yellow;
     [SerializeField] private Color aggroVisionColor = Color.red;
 
+    [Header("Sound Effects")]
+    [Tooltip("Plays the alert sounds. Auto-found (or added) on this enemy if left empty.")]
+    [SerializeField] private AudioSource alertAudioSource;
+    [Tooltip("Played once when the enemy starts getting suspicious.")]
+    [SerializeField] private AudioClip suspiciousSound;
+    [Tooltip("Played once when the enemy becomes aggro.")]
+    [SerializeField] private AudioClip aggroSound;
+    [SerializeField, Range(0f, 1f)] private float suspiciousVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float aggroVolume = 1f;
+    private bool wasAggro = false;
+    private bool wasSuspicious = false;
+
     [Header("Vision Settings")]
     public float viewDistance = 10f;
     [Range(0f, 180f)]
@@ -113,6 +125,7 @@ public class enemyChase : MonoBehaviour
     void Update()
     {
         TryKillPlayerAtCloseRange();
+        PlayAlertSounds();
 
         if (visionLight == null)
             return;
@@ -160,6 +173,35 @@ public class enemyChase : MonoBehaviour
 
     }
 
+    //plays a sound once when the enemy enters the suspicious or aggro state
+    private void PlayAlertSounds()
+    {
+        bool suspiciousNow = keepsSuspiciousForABit && !isAggro;
+
+        if (isAggro && !wasAggro)
+        {
+            PlayAlertClip(aggroSound, aggroVolume);
+        }
+        else if (suspiciousNow && !wasSuspicious && !wasAggro) //not when calming down from aggro to suspicious
+        {
+            PlayAlertClip(suspiciousSound, suspiciousVolume);
+        }
+
+        wasAggro = isAggro;
+        wasSuspicious = suspiciousNow;
+    }
+
+    private void PlayAlertClip(AudioClip clip, float volume)
+    {
+        if (clip == null || alertAudioSource == null)
+            return;
+
+        alertAudioSource.Stop(); //cut off the suspicious sound if it goes straight to aggro
+        alertAudioSource.clip = clip;
+        alertAudioSource.volume = volume;
+        alertAudioSource.Play();
+    }
+
     private void TryKillPlayerAtCloseRange()
     {
         if (player == null || eyePoint == null)
@@ -189,6 +231,29 @@ public class enemyChase : MonoBehaviour
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+
+        if (alertAudioSource == null)
+            alertAudioSource = GetComponent<AudioSource>();
+        if (alertAudioSource == null)
+        {
+            alertAudioSource = gameObject.AddComponent<AudioSource>();
+            alertAudioSource.playOnAwake = false;
+            alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
+            alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
+            alertAudioSource.maxDistance = 25f;
+        }
+
+        if (alertAudioSource == null)
+            alertAudioSource = GetComponent<AudioSource>();
+        if (alertAudioSource == null)
+        {
+            alertAudioSource = gameObject.AddComponent<AudioSource>();
+            alertAudioSource.playOnAwake = false;
+            alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
+            alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
+            alertAudioSource.maxDistance = 25f;
+        }
+
 
 
         if (visionBox == null)

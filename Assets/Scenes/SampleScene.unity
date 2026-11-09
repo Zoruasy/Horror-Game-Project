@@ -9424,6 +9424,13 @@ MonoBehaviour:
   normalVisionColor: {r: 1, g: 1, b: 1, a: 1}
   spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
   aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
+  alertAudioSource: {fileID: 0}
+  suspiciousSound: {fileID: 8300000, guid: 1f9535bdddd4efd44901106e63b8189b, type: 3}
+  aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
+  suspiciousVolume: 1
+  aggroVolume: 0.492
+  suspiciousVolume: 10
+  aggroVolume: 0.214
   viewDistance: 20
   viewAngle: 90
   playerDetectMask:
@@ -9436,8 +9443,8 @@ MonoBehaviour:
   alertedMoveSpeed: 3
   staggerTime: 1.5
   enemyAttackVisual: {fileID: 1673968656}
-  detectionPoints: {fileID: 0}
-  pointsNeededForInstantAggro: 3
+  detectionPoints: {fileID: 572846698}
+  pointsNeededForInstantAggro: 4
   patrolPoints: {fileID: 149082376}
   visionBox: {fileID: 588234467}
 --- !u!195 &741472329
