@@ -27,8 +27,11 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private AudioClip suspiciousSound;
     [Tooltip("Played once when the enemy becomes aggro.")]
     [SerializeField] private AudioClip aggroSound;
+    [Tooltip("Played once when the enemy loses all aggro/suspicion and goes back to patrolling.")]
+    [SerializeField] private AudioClip lostSuspicionSound;
     [SerializeField, Range(0f, 1f)] private float suspiciousVolume = 1f;
     [SerializeField, Range(0f, 1f)] private float aggroVolume = 1f;
+    [SerializeField, Range(0f, 1f)] private float lostSuspicionVolume = 1f;
     private bool wasAggro = false;
     private bool wasSuspicious = false;
 
@@ -51,6 +54,7 @@ public class enemyChase : MonoBehaviour
     private Coroutine staggerCoroutine;
 
     [Header("Enemy Attack")]
+    [SerializeField] private float stoppingDistance = 2f; //so it doesn't get too close to the player OR the patrol points.
     private Coroutine attackVisualCoroutine;
     [SerializeField] private GameObject enemyAttackVisual;
     private bool isAttacking = false;
@@ -124,7 +128,7 @@ public class enemyChase : MonoBehaviour
 
     void Update()
     {
-        TryKillPlayerAtCloseRange();
+        // TryKillPlayerAtCloseRange();
         PlayAlertSounds();
 
         if (visionLight == null)
@@ -173,10 +177,11 @@ public class enemyChase : MonoBehaviour
 
     }
 
-    //plays a sound once when the enemy enters the suspicious or aggro state
+    //plays a sound once when the enemy enters the suspicious or aggro state, or calms down completely
     private void PlayAlertSounds()
     {
         bool suspiciousNow = keepsSuspiciousForABit && !isAggro;
+        bool calmNow = !isAggro && !keepsSuspiciousForABit;
 
         if (isAggro && !wasAggro)
         {
@@ -185,6 +190,10 @@ public class enemyChase : MonoBehaviour
         else if (suspiciousNow && !wasSuspicious && !wasAggro) //not when calming down from aggro to suspicious
         {
             PlayAlertClip(suspiciousSound, suspiciousVolume);
+        }
+        else if (calmNow && (wasAggro || wasSuspicious)) //lost all aggro/suspicion, back to patrolling
+        {
+            PlayAlertClip(lostSuspicionSound, lostSuspicionVolume);
         }
 
         wasAggro = isAggro;
@@ -252,6 +261,7 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
+            navMeshAgent.stoppingDistance = stoppingDistance; //set the stopping distance to the serialized value
         }
 
 
@@ -278,7 +288,7 @@ public class enemyChase : MonoBehaviour
             }
         }
 
-        navMeshAgent.stoppingDistance = 1f; //so it doesn't get too close to the player OR the patrol points.
+        
 
         patrolPointsArray = new Transform[patrolPoints.childCount]; // CANNOT use GetComponentsInChildren, because that also contains the parent.
 

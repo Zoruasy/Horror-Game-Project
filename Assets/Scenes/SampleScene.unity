@@ -9427,10 +9427,10 @@ MonoBehaviour:
   alertAudioSource: {fileID: 0}
   suspiciousSound: {fileID: 8300000, guid: 1f9535bdddd4efd44901106e63b8189b, type: 3}
   aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
+  lostSuspicionSound: {fileID: 0}
   suspiciousVolume: 1
   aggroVolume: 0.492
-  suspiciousVolume: 10
-  aggroVolume: 0.214
+  lostSuspicionVolume: 1
   viewDistance: 20
   viewAngle: 90
   playerDetectMask:
@@ -9442,6 +9442,7 @@ MonoBehaviour:
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   staggerTime: 1.5
+  navMeshAgentStoppingDistance: 5
   enemyAttackVisual: {fileID: 1673968656}
   detectionPoints: {fileID: 572846698}
   pointsNeededForInstantAggro: 4
@@ -13177,7 +13178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf7025222dc83d2409102fdd22327f7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EyeController
-  defaultEyeIn: 0
+  defaultEyeIn: 1
   switchDuration: 3
   cooldownMultiplier: 2
 --- !u!4 &1001191485
