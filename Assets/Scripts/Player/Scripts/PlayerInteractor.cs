@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 public class PlayerInteractor : MonoBehaviour
 {
@@ -54,15 +55,16 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-        if (promptUI && !RealityObject.FlashActive)
-        {
-            promptUI.Hide();
-        }
-        else if (current && promptUI)
-        {
-            string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
-            promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
-        }
+if (promptUI && current &&
+    current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
+{
+    string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
+    promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+}
+else if (promptUI)
+{
+    promptUI.Hide();
+}
 
         UpdateHold();
 
