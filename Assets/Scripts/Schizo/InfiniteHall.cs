@@ -1,81 +1,85 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class  InfiniteHall : MonoBehaviour
+public class InfiniteHall : MonoBehaviour
 {
-    [Header("Referenties")]
-    public Transform speler;
+    [Header("References")]
+    public Transform player;
     public GameObject segmentPrefab;
+    public Transform backWall;               // wall that closes the hallway behind the player
 
-    [Header("Gang")]
-    public float segmentLength = 1f;        // prefab length
-    public float hallwayFront = 5f;        // how many segments in front
-    public float hallwayBehind = 3f;      // how many segments behind
+    [Header("Hallway")]
+    public float segmentLength = 1f;         // depth of one prefab (1 for 5x5x1)
+    public float startLength = 15f;          // starting hallway length in meters
+    public float heightOffset = 2.5f;        // half the prefab height (center pivot)
 
-    [Header("Stretch")]
-    public bool Stretch = true;
-    public float stretchPerSegment = 0.03f;  // elk nieuw segment is iets langer
-    public float maxStretch = 3f;
+    [Header("Effect")]
+    public float growth = 2f;                // how fast the end moves away after halfway
+    public float shrink = 1.5f;              // how fast the start moves forward after halfway
+    public float minBehind = 3f;             // minimum hallway kept behind the player
+    public float maxLength = 80f;            // safety limit for total hallway length
 
-    struct Segment
-    {
-        public GameObject obj;
-        public float eindAfstand;
-    }
-
-    readonly Queue<Segment> segmenten = new Queue<Segment>();
-    float nextStart = 0f;   // range when next segment starts
-    int counter = 0;
-
-    void Start()
-    {
-        // Fill the hallway at the start
-        AddSegments();
-    }
+    readonly Dictionary<int, GameObject> segments = new Dictionary<int, GameObject>();
 
     void Update()
     {
-        AddSegments();
-        DestroySegments();
+        float d = PlayerDistance();
+        float half = startLength / 2f;
+        float t = Mathf.Max(0f, d - half);   // how far past the halfway point
+
+        float end = startLength + t * growth;
+        float start = Mathf.Min(t * shrink, d - minBehind);
+        start = Mathf.Max(0f, start);
+        end = Mathf.Min(end, start + maxLength);
+
+        int firstIndex = Mathf.FloorToInt(start / segmentLength);
+        int lastIndex = Mathf.CeilToInt(end / segmentLength) - 1;
+
+        // Spawn missing segments
+        for (int i = firstIndex; i <= lastIndex; i++)
+        {
+            if (!segments.ContainsKey(i))
+                segments[i] = SpawnSegment(i);
+        }
+
+        // Remove segments outside the range
+        List<int> toRemove = null;
+        foreach (var kvp in segments)
+        {
+            if (kvp.Key < firstIndex || kvp.Key > lastIndex)
+            {
+                if (toRemove == null) toRemove = new List<int>();
+                toRemove.Add(kvp.Key);
+            }
+        }
+        if (toRemove != null)
+        {
+            foreach (int i in toRemove)
+            {
+                Destroy(segments[i]);
+                segments.Remove(i);
+            }
+        }
+
+        // Back wall snaps to the start of the first segment
+        if (backWall != null)
+            backWall.position = HallPoint(firstIndex * segmentLength) + Vector3.up * heightOffset;
+    }
+
+    GameObject SpawnSegment(int index)
+    {
+        // Pivot is in the center: half a segment further than the start
+        Vector3 pos = HallPoint((index + 0.5f) * segmentLength) + Vector3.up * heightOffset;
+        return Instantiate(segmentPrefab, pos, transform.rotation, transform);
+    }
+
+    Vector3 HallPoint(float distance)
+    {
+        return transform.position + transform.forward * distance;
     }
 
     float PlayerDistance()
     {
-        // How far is the player into the hallway
-        return Vector3.Dot(speler.position - transform.position, transform.forward);
-    }
-
-    void AddSegments()
-    {
-        float goal = PlayerDistance() + hallwayFront;
-
-        while (nextStart < goal)
-        {
-            float stretch = 1f;
-            if (Stretch)
-                stretch = Mathf.Min(1f + counter * stretchPerSegment, maxStretch);
-
-            float lengte = segmentLength * stretch;
-
-            Vector3 pos = transform.position + transform.forward * nextStart;
-            GameObject seg = Instantiate(segmentPrefab, pos, transform.rotation, transform);
-
-            // Only scale in length (z) axis
-            seg.transform.localScale = new Vector3(1f, 1f, stretch);
-
-            nextStart += lengte;
-            segmenten.Enqueue(new Segment { obj = seg, eindAfstand = nextStart });
-            counter++;
-        }
-    }
-
-    void DestroySegments()
-    {
-        float grens = PlayerDistance() - hallwayBehind;
-
-        while (segmenten.Count > 0 && segmenten.Peek().eindAfstand < grens)
-        {
-            Destroy(segmenten.Dequeue().obj);
-        }
+        return Vector3.Dot(player.position - transform.position, transform.forward);
     }
 }
