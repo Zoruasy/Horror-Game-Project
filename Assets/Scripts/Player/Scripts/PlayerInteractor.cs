@@ -54,7 +54,7 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-        if (promptUI && RealityObject.FlashActive)
+        if (promptUI && !RealityObject.FlashActive)
         {
             promptUI.Hide();
         }
