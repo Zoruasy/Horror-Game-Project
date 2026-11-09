@@ -86,6 +86,8 @@ public class PlayerInteractor : MonoBehaviour
 
     Interactable FindTarget()
     {
+        if (RealityObject.FlashActive) return null;
+
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         float maxDistance = range;
 
@@ -102,7 +104,6 @@ public class PlayerInteractor : MonoBehaviour
         {
             return GetInteractable(sphereHit.collider);
         }
-
         return null;
     }
 
