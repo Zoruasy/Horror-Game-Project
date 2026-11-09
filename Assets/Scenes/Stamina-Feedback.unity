@@ -28221,8 +28221,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 741472328}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: fastRegen
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: walkSpeed
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: regenDelay
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: staminaBar
@@ -28244,6 +28252,10 @@ PrefabInstance:
       propertyPath: staminaBarUI
       value: 
       objectReference: {fileID: 339109804}
+    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      propertyPath: staminaSystem
+      value: 
+      objectReference: {fileID: 2104777755}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: staminaFillImage
       value: 
@@ -28332,6 +28344,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2104777748}
+    - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2104777755}
   m_SourcePrefab: {fileID: 100100000, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
 --- !u!1 &2104777740 stripped
 GameObject:
@@ -28394,6 +28409,31 @@ MonoBehaviour:
   eye: {fileID: 1001191484}
   screenGlitchMaterial: {fileID: 0}
   smoothing: 6
+--- !u!114 &2104777755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104777740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b608804b4052b784e9c6015685a915c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterController.PlayerStamina
+  maxStamina: 3
+  stamina: 3
+  drainPerSecond: 1
+  staminaSystem: {fileID: 2104777755}
+  regenDelay: 0.75
+  exhaustedRegenDelay: 1
+  fastRegen: 3
+  halfRegen: 0.5
+  slowRegen: 0.5
+  staminaFillImage: {fileID: 1407929880}
+  staminaBar: {fileID: 1407929879}
+  staminaBarUI: {fileID: 339109804}
+  hideAfterFullSeconds: 1
 --- !u!43 &2133540511
 Mesh:
   m_ObjectHideFlags: 0

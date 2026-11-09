@@ -37,8 +37,11 @@ namespace CharacterController
 
             // Check whether the player is sprinting
             bool isSprinting =
-                ctx.input.sprint &&
-                ctx.input.moveInput.y > 0f;
+   
+        ctx.input.sprint &&
+        ctx.input.moveInput.y > 0f &&
+        ctx.staminaSystem != null &&
+        ctx.staminaSystem.CanSprint;
 
             float speed = isSprinting
                 ? ctx.sprintSpeed
@@ -70,7 +73,6 @@ namespace CharacterController
 
         public override void CheckSwitchStates()
         {
-           
             // Klimmen vanaf de grond met E
             if (ctx.input.climbing && ctx.CheckLedge(out _))
             {
@@ -132,7 +134,7 @@ namespace CharacterController
             }
             else
             {
-                // Instantly restore the standing capsule
+                // Instantly restore the capsule height
                 ctx.characterController.height =
                     targetHeight;
 
@@ -149,15 +151,14 @@ namespace CharacterController
 
             height = Mathf.Max(height, minimumHeight);
 
-            // Update the capsule height
-            ctx.characterController.height = height;
-
             // Keep the capsule bottom at the same position
             Vector3 standingCenter =
                 ctx.standingCharacterControllerCenter;
 
             float standingHeight =
                 ctx.standingCharacterControllerHeight;
+
+            ctx.characterController.height = height;
 
             ctx.characterController.center = new Vector3(
                 standingCenter.x,

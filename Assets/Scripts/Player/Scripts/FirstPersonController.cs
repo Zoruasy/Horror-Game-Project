@@ -13,13 +13,9 @@ namespace CharacterController
         public float walkSpeed = 3f;
         public float sprintSpeed = 5f;
 
-        [Header("Stamina")]
-        public float stamina = 3f;
-        public RawImage staminaFillImage;
-        private bool staminaExhausted = false;
-        public RectTransform staminaBar;
-        public GameObject staminaBarUI;
-        private float normalSprintSpeed;
+        [Header("Stamina Reference")]
+        public PlayerStamina staminaSystem;
+        public bool CanSprint => staminaSystem != null && staminaSystem.CanSprint;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
         public float gravity = 9.81f;
@@ -27,9 +23,6 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
-        public bool CanSprint => !staminaExhausted && stamina > 0f;
-
-
 
         [Header("Attack Settings")]
         public LayerMask attackMask = ~0;
@@ -132,11 +125,8 @@ namespace CharacterController
                 GUILayout.Label("Current State: " + currentState.GetType().Name);
         }
 
-        private float staminaFullTimer = 0f;
-
         private void Awake()
         {
-            normalSprintSpeed = sprintSpeed;
             cam = playerCamera.GetComponent<Camera>();
             targetFov = normalFov;
             targetCameraY = standingCameraHeight;
@@ -150,8 +140,8 @@ namespace CharacterController
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
 
-            if (staminaBarUI != null)
-                staminaBarUI.SetActive(false);
+            if (staminaSystem == null)
+                staminaSystem = GetComponent<PlayerStamina>();
 
 
             input = GetComponent<IInputManager>();
@@ -193,61 +183,9 @@ namespace CharacterController
             hasGroundedState = true;
 
 
-            // stamina 3 secs
-            bool running = Keyboard.current != null &&
-                Keyboard.current.leftShiftKey.isPressed &&
-                input != null && input.moveInput.sqrMagnitude > 0.01f;
-
-
-            if (running && CanSprint)
-            {
-                stamina -= Time.deltaTime;
-
-                if (stamina <= 0f)
-                {
-                    stamina = 0f;
-                    staminaExhausted = true;
-                }
-            }
-            else
-            {
-                stamina += Time.deltaTime;
-            }
-
-            stamina = Mathf.Clamp(stamina, 0f, 3f);
-
-            if (staminaExhausted && stamina >= 3f)
-                staminaExhausted = false;
-
-            sprintSpeed = CanSprint ? normalSprintSpeed : walkSpeed;
-            if (staminaFillImage != null)
-                staminaFillImage.color = staminaExhausted ? Color.red : Color.green;
-
-
-            if (staminaBar != null)
-                staminaBar.anchorMax = new Vector2(stamina / 3f, 1f);
-
-            if (staminaBarUI != null)
-            {
-                if (running && CanSprint)
-                {
-                    staminaFullTimer = 0f;
-                    staminaBarUI.SetActive(true);
-                }
-                else if (stamina >= 3f && staminaBarUI.activeSelf)
-                {
-                    staminaFullTimer += Time.deltaTime;
-
-                    if (staminaFullTimer >= 1f)
-                        staminaBarUI.SetActive(false);
-                }
-                else if (stamina < 3f)
-                {
-                    staminaFullTimer = 0f;
-                }
-            }
-
-
+            // Stamina wordt volledig beheerd door PlayerStamina.
+            if (staminaSystem != null)
+                staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
             if (currentState != null)
                 currentState.UpdateState();
@@ -266,7 +204,7 @@ namespace CharacterController
 
         private void HandleRotation()
         {
-           
+
             if (input == null) return;
 
             float mouseX = input.lookInput.x * mouseSensitivity;
@@ -292,7 +230,7 @@ namespace CharacterController
             }
             cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, targetFov, ref fovVelocity, 1f / fovChangeSpeed);
 
-            
+
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
@@ -303,14 +241,14 @@ namespace CharacterController
             }
             else
             {
-             
+
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 
-         
+
             float desiredY = originalCamY + targetBobOffset;
 
-            
+
             if (cameraShakeTimer > 0)
             {
                 cameraShakeTimer -= Time.deltaTime;
@@ -318,7 +256,7 @@ namespace CharacterController
                 float normalizedTime = cameraShakeTimer / 0.4f;
                 float shakeFactor = normalizedTime * normalizedTime * normalizedTime;
 
-               
+
                 float frontalImpact = Mathf.Abs(cameraShakeDirection.z) + 0.5f;
                 float dipY = -cameraShakeIntensity * shakeFactor * frontalImpact;
 
@@ -326,11 +264,11 @@ namespace CharacterController
                 float sideImpact = cameraShakeDirection.x;
                 float dipTilt = (cameraShakeIntensity * 15f) * sideImpact * shakeFactor;
 
-              
+
                 if (Mathf.Abs(sideImpact) < 0.1f)
                     dipTilt = (cameraShakeIntensity * 5f) * shakeFactor * (Mathf.PerlinNoise(Time.time, 0) > 0.5f ? 1 : -1);
 
-              
+
                 float rattle = (Mathf.PerlinNoise(Time.time * 30f, 0f) - 0.5f) * (cameraShakeIntensity * 0.2f) * shakeFactor;
 
                 desiredY += dipY + rattle;
@@ -371,7 +309,7 @@ namespace CharacterController
                 enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
                 if (enemy != null)
                 {
-                   
+
                     Vector3 myForward = transform.forward;
                     Vector3 enemyForward = enemy.transform.forward;
                     myForward.y = 0f;
@@ -439,7 +377,7 @@ namespace CharacterController
             if (!wallHit.collider.CompareTag("Climbable"))
                 return false;
 
-           
+
             Vector3 topOrigin =
                 wallHit.point
                 + transform.forward * (radius + 0.15f)
@@ -460,7 +398,7 @@ namespace CharacterController
             if (topHit.collider != wallHit.collider)
                 return false;
 
-            
+
             if (Vector3.Angle(topHit.normal, Vector3.up) > 45f)
                 return false;
 
