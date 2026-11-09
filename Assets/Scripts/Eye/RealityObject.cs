@@ -31,10 +31,9 @@ public class RealityObject : MonoBehaviour
 
     public void Apply(bool flash)
     {
-        bool visible = mode == RevealMode.VisibleOnlyInFlash ? flash : !flash;
+        bool visible = mode == RevealMode.VisibleOnlyInFlash ? !flash : flash;
 
         foreach (var r in realObjectRenderers) if (r) r.enabled = visible;
-        foreach (var c in collidersToToggle) if (c) c.enabled = mode == RevealMode.VisibleOnlyInFlash ? flash : !flash;
         if (flash) SetGlitch(0f);
     }
 
