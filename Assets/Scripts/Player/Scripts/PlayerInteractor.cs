@@ -141,6 +141,7 @@ else if (promptUI)
             isHolding = true;
             holdTimer = 0f;
         }
+        Debug.Log("INTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACT");
     }
 
     void CancelInteract(InputAction.CallbackContext ctx)
