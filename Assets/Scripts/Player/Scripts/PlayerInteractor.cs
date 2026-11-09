@@ -54,7 +54,11 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-        if (current && promptUI)
+        if (promptUI && RealityObject.FlashActive)
+        {
+            promptUI.Hide();
+        }
+        else if (current && promptUI)
         {
             string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
             promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
@@ -86,8 +90,6 @@ public class PlayerInteractor : MonoBehaviour
 
     Interactable FindTarget()
     {
-        if (RealityObject.FlashActive) return null;
-
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         float maxDistance = range;
 
