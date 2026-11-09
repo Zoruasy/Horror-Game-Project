@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5850761435204681798}
   - component: {fileID: 5807515994522229932}
   m_Layer: 0
-  m_Name: Ceiling Light
+  m_Name: Room Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,11 +43,11 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 0
-  m_Color: {r: 1, g: 0.9291616, b: 0.58679235, a: 1}
-  m_Intensity: 0.25
+  m_Color: {r: 1, g: 0.96793395, b: 0.80566037, a: 1}
+  m_Intensity: 0.5
   m_Range: 10
   m_SpotAngle: 179
-  m_InnerSpotAngle: 100
+  m_InnerSpotAngle: 145
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
     m_Type: 0
