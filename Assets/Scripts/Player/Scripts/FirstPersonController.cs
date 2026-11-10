@@ -47,6 +47,14 @@ namespace CharacterController
         [HideInInspector] private bool isParryWindowOpen = false;
         public float parryCooldown = 1f; // not used but can be used later
         [HideInInspector] private bool isParryOnCooldown = false;
+        [SerializeField, Min(0f)] private float parryShakeIntensity = 1f;
+        [SerializeField, Min(0.01f)] private float parryShakeDuration = 0.16f;
+        [SerializeField, Min(0f)] private float parryShakePositionAmplitude = 0.018f;
+        [SerializeField, Min(0f)] private float parryShakeRotationAmplitude = 1.6f;
+        [SerializeField, Min(0.01f)] private float parryShakeFrequency = 24f;
+        [SerializeField, Range(0f, 1f)] private float parryShakeDirectionInfluence = 0.35f;
+        [SerializeField] private AnimationCurve parryShakeFadeOut =
+            AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
 
         [Header("Parry Audio")]
         [SerializeField] private AudioClip successfulParrySound;
@@ -70,6 +78,7 @@ namespace CharacterController
         [Header("References")]
         public Transform playerCamera;
         public Transform cameraParent;
+        [SerializeField] private ScreenShake screenShake;
         public Transform groundCheck;
         public LayerMask groundMask; // ceiling
         public TMP_Text WeaponAvailableUIText;
@@ -107,9 +116,6 @@ namespace CharacterController
         private float bobTimer;
         private float fovVelocity;
         private float originalCamY;
-
-        [HideInInspector] public float cameraShakeTimer;
-        [HideInInspector] public float cameraShakeIntensity;
 
         [Header("Height Settings")]
         public float standingCameraHeight = 1.75f;
@@ -151,6 +157,9 @@ namespace CharacterController
         {
             normalSprintSpeed = sprintSpeed;
             cam = playerCamera.GetComponent<Camera>();
+            if (screenShake == null)
+                screenShake = playerCamera.GetComponentInParent<ScreenShake>();
+
             targetFov = normalFov;
             targetCameraY = standingCameraHeight;
             originalCamY = standingCameraHeight;
@@ -282,43 +291,28 @@ namespace CharacterController
             float desiredY = originalCamY + targetBobOffset;
 
             
-            if (cameraShakeTimer > 0)
-            {
-                cameraShakeTimer -= Time.deltaTime;
-
-                float normalizedTime = cameraShakeTimer / 0.4f;
-                float shakeFactor = normalizedTime * normalizedTime * normalizedTime;
-
-               
-                float frontalImpact = Mathf.Abs(cameraShakeDirection.z) + 0.5f;
-                float dipY = -cameraShakeIntensity * shakeFactor * frontalImpact;
-
-
-                float sideImpact = cameraShakeDirection.x;
-                float dipTilt = (cameraShakeIntensity * 15f) * sideImpact * shakeFactor;
-
-              
-                if (Mathf.Abs(sideImpact) < 0.1f)
-                    dipTilt = (cameraShakeIntensity * 5f) * shakeFactor * (Mathf.PerlinNoise(Time.time, 0) > 0.5f ? 1 : -1);
-
-              
-                float rattle = (Mathf.PerlinNoise(Time.time * 30f, 0f) - 0.5f) * (cameraShakeIntensity * 0.2f) * shakeFactor;
-
-                desiredY += dipY + rattle;
-                currentTilt += dipTilt + (rattle * 5f);
-            }
-
             float smoothedY = Mathf.Lerp(cameraParent.localPosition.y, desiredY, Time.deltaTime * 15f);
 
             cameraParent.localPosition = new Vector3(cameraParent.localPosition.x, smoothedY, cameraParent.localPosition.z);
         }
 
-        [HideInInspector] public Vector3 cameraShakeDirection;
         public void TriggerCameraShake(float intensity, float duration, Vector3 direction = default)
         {
-            cameraShakeIntensity = intensity;
-            cameraShakeTimer = duration;
-            cameraShakeDirection = direction.normalized;
+            if (screenShake == null)
+            {
+                Debug.LogWarning("No ScreenShake component is assigned or found on the player camera hierarchy.", this);
+                return;
+            }
+
+            screenShake.TriggerShake(
+                intensity,
+                duration,
+                parryShakePositionAmplitude,
+                parryShakeRotationAmplitude,
+                parryShakeFrequency,
+                parryShakeDirectionInfluence,
+                parryShakeFadeOut,
+                direction);
         }
 
         public bool HasCeiling()
@@ -422,6 +416,7 @@ namespace CharacterController
         private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
             PlayPlayerSound(successfulParrySound, successfulParryVolume);
+            TriggerCameraShake(parryShakeIntensity, parryShakeDuration);
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
             enemyThatHitsPlayer.StaggerByPlayerParry();
