@@ -32,7 +32,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 9156347144824098802}
+  m_Father: {fileID: 800000000000000002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &9156347143994207883
 Camera:
@@ -215,6 +215,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2922308556bc98e4898cb3309250e781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parryShakeIntensity: 1
+  parryShakeDuration: 0.16
+  parryShakePositionAmplitude: 0.018
+  parryShakeRotationAmplitude: 1.6
+  parryShakeFrequency: 24
+  parryShakeDirectionInfluence: 0.35
+  parryShakeFadeOut:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   walkSpeed: 3
   sprintSpeed: 5
   crouchSpeed: 1.5
@@ -234,6 +264,7 @@ MonoBehaviour:
   slideSteerControl: 4
   playerCamera: {fileID: 9156347143994207885}
   cameraParent: {fileID: 9156347144824098802}
+  screenShake: {fileID: 800000000000000003}
   groundCheck: {fileID: 9156347144365898843}
   groundMask:
     serializedVersion: 2
@@ -253,8 +284,6 @@ MonoBehaviour:
   currentBobIntensity: 0
   currentBobSpeed: 0
   targetTilt: 0
-  cameraShakeTimer: 0
-  cameraShakeIntensity: 0
   standingCameraHeight: 1.75
   crouchingCameraHeight: 1
   crouchingCharacterControllerHeight: 1
@@ -274,7 +303,6 @@ MonoBehaviour:
   useCameraTilt: 1
   useClimbTilt: 1
   currentStateDebug: 1
-  cameraShakeDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &825849739443659256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,6 +525,51 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9156347143994207885}
+  - {fileID: 800000000000000002}
   m_Father: {fileID: 9156347144040445546}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &800000000000000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 800000000000000002}
+  - component: {fileID: 800000000000000003}
+  m_Layer: 2
+  m_Name: ShakePivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &800000000000000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800000000000000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 9156347143994207885}
+  m_Father: {fileID: 9156347144824098802}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &800000000000000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800000000000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52acb9ec466bd0b43a74801a4623be9a, type: 3}
+  m_Name: ""
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenShake
