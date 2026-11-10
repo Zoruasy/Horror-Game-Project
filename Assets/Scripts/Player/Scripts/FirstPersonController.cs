@@ -17,10 +17,9 @@ namespace CharacterController
         [Header("Settings")] public float walkSpeed = 3f;
         public float sprintSpeed = 5f;
 
-        [Header("Stamina")]
-        public float stamina = 3f;
-        public RectTransform staminaBar;
-        private float normalSprintSpeed;
+        [Header("Stamina Reference")]
+        public PlayerStamina staminaSystem;
+        public bool CanSprint => staminaSystem != null && staminaSystem.CanSprint;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
         public float gravity = 9.81f;
@@ -28,9 +27,6 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
-        public bool CanSprint => stamina > 0f;
-
-
 
         [Header("Attack Settings")]
         public LayerMask attackMask = ~0;
@@ -82,6 +78,13 @@ namespace CharacterController
         public Transform groundCheck;
         public LayerMask groundMask; // ceiling
         public TMP_Text WeaponAvailableUIText;
+
+        [Header("Headbob Settings")]
+        public float walkingBobSpeed = 10f;
+        public float sprintingBobSpeed = 16f;
+
+        public float walkingBobIntensity = 0.05f;
+        public float sprintingBobIntensity = 0.08f;
 
         [HideInInspector] public CharacterController characterController;
         [HideInInspector] public IInputManager input;
@@ -145,7 +148,7 @@ namespace CharacterController
         [Header("Debug")]
         public bool currentStateDebug = true;
 
-        public enemyChase enemy; // Reference to the enemyChase script
+        public enemyChase enemy; 
 
         void OnGUI()
         {
@@ -155,7 +158,6 @@ namespace CharacterController
 
         private void Awake()
         {
-            normalSprintSpeed = sprintSpeed;
             cam = playerCamera.GetComponent<Camera>();
             if (screenShake == null)
                 screenShake = playerCamera.GetComponentInParent<ScreenShake>();
@@ -172,7 +174,10 @@ namespace CharacterController
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
 
-            
+            if (staminaSystem == null)
+                staminaSystem = GetComponent<PlayerStamina>();
+
+
             input = GetComponent<IInputManager>();
             if (input == null)
             {
@@ -213,21 +218,10 @@ namespace CharacterController
             bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
             hasGroundedState = true;
 
-            // stamina 3 secs
-            bool running = Keyboard.current != null &&
-                Keyboard.current.leftShiftKey.isPressed &&
-                input != null && input.moveInput.sqrMagnitude > 0.01f;
 
-            stamina = Mathf.Clamp(
-                stamina + (running ? -1f : 1f) * Time.deltaTime,
-                0f, 3f
-            );
-
-            sprintSpeed = stamina > 0f ? normalSprintSpeed : walkSpeed;
-
-            if (staminaBar != null)
-                staminaBar.anchorMax = new Vector2(stamina / 3f, 1f);
-
+            
+            if (staminaSystem != null)
+                staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
             if (currentState != null)
                 currentState.UpdateState();
@@ -243,10 +237,9 @@ namespace CharacterController
         }
 
 
-
         private void HandleRotation()
         {
-           
+
             if (input == null) return;
 
             float mouseX = input.lookInput.x * mouseSensitivity;
@@ -272,7 +265,7 @@ namespace CharacterController
             }
             cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, targetFov, ref fovVelocity, 1f / fovChangeSpeed);
 
-            
+
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
@@ -283,11 +276,11 @@ namespace CharacterController
             }
             else
             {
-             
+
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 
-         
+
             float desiredY = originalCamY + targetBobOffset;
 
             
@@ -338,7 +331,7 @@ namespace CharacterController
                 enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
                 if (enemy != null)
                 {
-                   
+
                     Vector3 myForward = transform.forward;
                     Vector3 enemyForward = enemy.transform.forward;
                     myForward.y = 0f;
@@ -476,11 +469,11 @@ namespace CharacterController
                 return false;
             }
 
-            // Only objects with the Climbable tag
+            
             if (!wallHit.collider.CompareTag("Climbable"))
                 return false;
 
-           
+
             Vector3 topOrigin =
                 wallHit.point
                 + transform.forward * (radius + 0.15f)
@@ -501,7 +494,7 @@ namespace CharacterController
             if (topHit.collider != wallHit.collider)
                 return false;
 
-            
+
             if (Vector3.Angle(topHit.normal, Vector3.up) > 45f)
                 return false;
 
