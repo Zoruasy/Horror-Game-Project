@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 public class PlayerInteractor : MonoBehaviour
 {
@@ -54,11 +55,16 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-        if (current && promptUI)
-        {
-            string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
-            promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
-        }
+if (promptUI && current &&
+    current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
+{
+    string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
+    promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+}
+else if (promptUI)
+{
+    promptUI.Hide();
+}
 
         UpdateHold();
 
@@ -102,7 +108,6 @@ public class PlayerInteractor : MonoBehaviour
         {
             return GetInteractable(sphereHit.collider);
         }
-
         return null;
     }
 
@@ -136,6 +141,7 @@ public class PlayerInteractor : MonoBehaviour
             isHolding = true;
             holdTimer = 0f;
         }
+        Debug.Log("INTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACT");
     }
 
     void CancelInteract(InputAction.CallbackContext ctx)

@@ -17,10 +17,9 @@ namespace CharacterController
         [Header("Settings")] public float walkSpeed = 3f;
         public float sprintSpeed = 5f;
 
-        [Header("Stamina")]
-        public float stamina = 3f;
-        public RectTransform staminaBar;
-        private float normalSprintSpeed;
+        [Header("Stamina Reference")]
+        public PlayerStamina staminaSystem;
+        public bool CanSprint => staminaSystem != null && staminaSystem.CanSprint;
         public float crouchSpeed = 1.5f;
         public float jumpSpeed = 4f;
         public float gravity = 9.81f;
@@ -28,9 +27,6 @@ namespace CharacterController
         public float slideSpeed = 6f;
         public float mouseSensitivity = 2f;
         public float strafeTiltAmount = 2f;
-        public bool CanSprint => stamina > 0f;
-
-
 
         [Header("Attack Settings")]
         public LayerMask attackMask = ~0;
@@ -47,6 +43,14 @@ namespace CharacterController
         [HideInInspector] private bool isParryWindowOpen = false;
         public float parryCooldown = 1f; // not used but can be used later
         [HideInInspector] private bool isParryOnCooldown = false;
+        [SerializeField, Min(0f)] private float parryShakeIntensity = 1f;
+        [SerializeField, Min(0.01f)] private float parryShakeDuration = 0.16f;
+        [SerializeField, Min(0f)] private float parryShakePositionAmplitude = 0.018f;
+        [SerializeField, Min(0f)] private float parryShakeRotationAmplitude = 1.6f;
+        [SerializeField, Min(0.01f)] private float parryShakeFrequency = 24f;
+        [SerializeField, Range(0f, 1f)] private float parryShakeDirectionInfluence = 0.35f;
+        [SerializeField] private AnimationCurve parryShakeFadeOut =
+            AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
 
         [Header("Parry Audio")]
         [SerializeField] private AudioClip successfulParrySound;
@@ -70,9 +74,17 @@ namespace CharacterController
         [Header("References")]
         public Transform playerCamera;
         public Transform cameraParent;
+        [SerializeField] private ScreenShake screenShake;
         public Transform groundCheck;
         public LayerMask groundMask; // ceiling
         public TMP_Text WeaponAvailableUIText;
+
+        [Header("Headbob Settings")]
+        public float walkingBobSpeed = 10f;
+        public float sprintingBobSpeed = 16f;
+
+        public float walkingBobIntensity = 0.05f;
+        public float sprintingBobIntensity = 0.08f;
 
         [HideInInspector] public CharacterController characterController;
         [HideInInspector] public IInputManager input;
@@ -108,9 +120,6 @@ namespace CharacterController
         private float fovVelocity;
         private float originalCamY;
 
-        [HideInInspector] public float cameraShakeTimer;
-        [HideInInspector] public float cameraShakeIntensity;
-
         [Header("Height Settings")]
         public float standingCameraHeight = 1.75f;
         public float crouchingCameraHeight = 1f;
@@ -139,7 +148,7 @@ namespace CharacterController
         [Header("Debug")]
         public bool currentStateDebug = true;
 
-        public enemyChase enemy; // Reference to the enemyChase script
+        public enemyChase enemy; 
 
         void OnGUI()
         {
@@ -149,8 +158,10 @@ namespace CharacterController
 
         private void Awake()
         {
-            normalSprintSpeed = sprintSpeed;
             cam = playerCamera.GetComponent<Camera>();
+            if (screenShake == null)
+                screenShake = playerCamera.GetComponentInParent<ScreenShake>();
+
             targetFov = normalFov;
             targetCameraY = standingCameraHeight;
             originalCamY = standingCameraHeight;
@@ -163,7 +174,10 @@ namespace CharacterController
             standingCharacterControllerHeight = characterController.height;
             standingCharacterControllerCenter = characterController.center;
 
-            
+            if (staminaSystem == null)
+                staminaSystem = GetComponent<PlayerStamina>();
+
+
             input = GetComponent<IInputManager>();
             if (input == null)
             {
@@ -204,21 +218,10 @@ namespace CharacterController
             bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
             hasGroundedState = true;
 
-            // stamina 3 secs
-            bool running = Keyboard.current != null &&
-                Keyboard.current.leftShiftKey.isPressed &&
-                input != null && input.moveInput.sqrMagnitude > 0.01f;
 
-            stamina = Mathf.Clamp(
-                stamina + (running ? -1f : 1f) * Time.deltaTime,
-                0f, 3f
-            );
-
-            sprintSpeed = stamina > 0f ? normalSprintSpeed : walkSpeed;
-
-            if (staminaBar != null)
-                staminaBar.anchorMax = new Vector2(stamina / 3f, 1f);
-
+            
+            if (staminaSystem != null)
+                staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
             if (currentState != null)
                 currentState.UpdateState();
@@ -234,10 +237,9 @@ namespace CharacterController
         }
 
 
-
         private void HandleRotation()
         {
-           
+
             if (input == null) return;
 
             float mouseX = input.lookInput.x * mouseSensitivity;
@@ -263,7 +265,7 @@ namespace CharacterController
             }
             cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, targetFov, ref fovVelocity, 1f / fovChangeSpeed);
 
-            
+
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
@@ -274,51 +276,36 @@ namespace CharacterController
             }
             else
             {
-             
+
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 
-         
+
             float desiredY = originalCamY + targetBobOffset;
 
             
-            if (cameraShakeTimer > 0)
-            {
-                cameraShakeTimer -= Time.deltaTime;
-
-                float normalizedTime = cameraShakeTimer / 0.4f;
-                float shakeFactor = normalizedTime * normalizedTime * normalizedTime;
-
-               
-                float frontalImpact = Mathf.Abs(cameraShakeDirection.z) + 0.5f;
-                float dipY = -cameraShakeIntensity * shakeFactor * frontalImpact;
-
-
-                float sideImpact = cameraShakeDirection.x;
-                float dipTilt = (cameraShakeIntensity * 15f) * sideImpact * shakeFactor;
-
-              
-                if (Mathf.Abs(sideImpact) < 0.1f)
-                    dipTilt = (cameraShakeIntensity * 5f) * shakeFactor * (Mathf.PerlinNoise(Time.time, 0) > 0.5f ? 1 : -1);
-
-              
-                float rattle = (Mathf.PerlinNoise(Time.time * 30f, 0f) - 0.5f) * (cameraShakeIntensity * 0.2f) * shakeFactor;
-
-                desiredY += dipY + rattle;
-                currentTilt += dipTilt + (rattle * 5f);
-            }
-
             float smoothedY = Mathf.Lerp(cameraParent.localPosition.y, desiredY, Time.deltaTime * 15f);
 
             cameraParent.localPosition = new Vector3(cameraParent.localPosition.x, smoothedY, cameraParent.localPosition.z);
         }
 
-        [HideInInspector] public Vector3 cameraShakeDirection;
         public void TriggerCameraShake(float intensity, float duration, Vector3 direction = default)
         {
-            cameraShakeIntensity = intensity;
-            cameraShakeTimer = duration;
-            cameraShakeDirection = direction.normalized;
+            if (screenShake == null)
+            {
+                Debug.LogWarning("No ScreenShake component is assigned or found on the player camera hierarchy.", this);
+                return;
+            }
+
+            screenShake.TriggerShake(
+                intensity,
+                duration,
+                parryShakePositionAmplitude,
+                parryShakeRotationAmplitude,
+                parryShakeFrequency,
+                parryShakeDirectionInfluence,
+                parryShakeFadeOut,
+                direction);
         }
 
         public bool HasCeiling()
@@ -344,7 +331,7 @@ namespace CharacterController
                 enemyChase enemy = hit.collider.GetComponentInParent<enemyChase>();
                 if (enemy != null)
                 {
-                   
+
                     Vector3 myForward = transform.forward;
                     Vector3 enemyForward = enemy.transform.forward;
                     myForward.y = 0f;
@@ -422,6 +409,7 @@ namespace CharacterController
         private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
             PlayPlayerSound(successfulParrySound, successfulParryVolume);
+            TriggerCameraShake(parryShakeIntensity, parryShakeDuration);
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
             enemyThatHitsPlayer.StaggerByPlayerParry();
@@ -481,11 +469,11 @@ namespace CharacterController
                 return false;
             }
 
-            // Only objects with the Climbable tag
+            
             if (!wallHit.collider.CompareTag("Climbable"))
                 return false;
 
-           
+
             Vector3 topOrigin =
                 wallHit.point
                 + transform.forward * (radius + 0.15f)
@@ -506,7 +494,7 @@ namespace CharacterController
             if (topHit.collider != wallHit.collider)
                 return false;
 
-            
+
             if (Vector3.Angle(topHit.normal, Vector3.up) > 45f)
                 return false;
 

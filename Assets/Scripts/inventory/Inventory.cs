@@ -7,6 +7,8 @@ using UnityEngine;
 public class Inventory : MonoBehaviour, ISaveable<Inventory.State>
 {
     readonly List<Item> items = new();
+
+    public IReadOnlyList<Item> GetItems() => items;
     readonly List<string> unresolvedItemIds = new();
 
     public event Action Changed;
@@ -70,4 +72,5 @@ public class Inventory : MonoBehaviour, ISaveable<Inventory.State>
         }
         Changed?.Invoke();
     }
+    
 }
