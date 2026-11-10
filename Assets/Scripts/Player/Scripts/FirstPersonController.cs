@@ -52,6 +52,13 @@ namespace CharacterController
         public LayerMask groundMask; // ceiling
         public TMP_Text WeaponAvailableUIText;
 
+        [Header("Headbob Settings")]
+        public float walkingBobSpeed = 10f;
+        public float sprintingBobSpeed = 16f;
+
+        public float walkingBobIntensity = 0.05f;
+        public float sprintingBobIntensity = 0.08f;
+
         [HideInInspector] public CharacterController characterController;
         [HideInInspector] public IInputManager input;
         [HideInInspector] public Vector3 moveDirection;
@@ -117,7 +124,7 @@ namespace CharacterController
         [Header("Debug")]
         public bool currentStateDebug = true;
 
-        public enemyChase enemy; // Reference to the enemyChase script
+        public enemyChase enemy; 
 
         void OnGUI()
         {
@@ -183,7 +190,7 @@ namespace CharacterController
             hasGroundedState = true;
 
 
-            // Stamina wordt volledig beheerd door PlayerStamina.
+            
             if (staminaSystem != null)
                 staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
@@ -199,7 +206,6 @@ namespace CharacterController
                 Attack();
 
         }
-
 
 
         private void HandleRotation()
@@ -373,7 +379,7 @@ namespace CharacterController
                 return false;
             }
 
-            // Only objects with the Climbable tag
+            
             if (!wallHit.collider.CompareTag("Climbable"))
                 return false;
 
