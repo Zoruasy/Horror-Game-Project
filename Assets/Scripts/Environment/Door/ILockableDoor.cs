@@ -5,4 +5,5 @@ public interface ILockableDoor
     string RequiredCode { get; }
     bool IsLocked { get; }
     void Unlock();
+    void CloseAndLock();
 }

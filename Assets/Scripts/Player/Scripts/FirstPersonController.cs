@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine.UI;
 
@@ -5,12 +6,15 @@ namespace CharacterController
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
+    using System.Collections;
+    
+    
+    
     using UnityEngine.Rendering;
 
     public partial class FirstPersonController : MonoBehaviour
     {
-        [Header("Settings")]
-        public float walkSpeed = 3f;
+        [Header("Settings")] public float walkSpeed = 3f;
         public float sprintSpeed = 5f;
 
         [Header("Stamina Reference")]
@@ -33,7 +37,21 @@ namespace CharacterController
         private Inventory inventory;
         public bool HasWeapon => inventory && inventory.Has<WeaponPickup>();
 
-        [Header("Movement Polish")]
+        [Header("Parry Settings")] 
+        public float parryWindowTime = 0.3f;
+        [HideInInspector] private Coroutine parryCoroutine;
+        [HideInInspector] private bool isParryWindowOpen = false;
+        public float parryCooldown = 1f; // not used but can be used later
+        [HideInInspector] private bool isParryOnCooldown = false;
+
+        [Header("Parry Audio")]
+        [SerializeField] private AudioClip successfulParrySound;
+        [SerializeField, Range(0f, 1f)] private float successfulParryVolume = 0.8f;
+        [SerializeField] private AudioClip attackGruntSound;
+        [SerializeField] private AudioClip clothesRufflingSound;
+        [SerializeField] private AudioSource parryAudioSource;
+
+        [Header("Movement polish")]
         public float groundAcceleration = 50f;
         public float groundDeceleration = 60f;
         [HideInInspector] public Vector3 currentVelocity;
@@ -158,7 +176,9 @@ namespace CharacterController
                 if (fallback != null)
                     input = fallback;
             }
+            
 
+        
             states = new PlayerStateFactory(this);
 
             currentState = states.Grounded();
@@ -305,6 +325,8 @@ namespace CharacterController
 
         public void Attack()
         {
+
+            OpenParryWindow();
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
 
@@ -320,10 +342,14 @@ namespace CharacterController
                     Vector3 enemyForward = enemy.transform.forward;
                     myForward.y = 0f;
                     enemyForward.y = 0f;
+                    
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
-                    if (dot >= backstabThreshold && HasWeapon && !enemy.IsPlayerDetected)
+                    if (dot >= backstabThreshold &&
+                        HasWeapon &&
+                        !enemy.IsPlayerDetected &&
+                        !enemy.IsStaggered)
                     {
                         enemy.KillEnemy();
                         inventory.Consume(inventory.Get<WeaponPickup>());
@@ -338,6 +364,75 @@ namespace CharacterController
             Debug.DrawRay(ray.origin, ray.direction * attackRange, Color.red, 1f);
         }
 
+
+
+        private void OpenParryWindow()
+        {
+
+            if (isParryOnCooldown == false)
+            {
+                PlayPlayerSound(attackGruntSound);
+                PlayPlayerSound(clothesRufflingSound);
+                parryCoroutine = StartCoroutine(ParryWindow());
+            }
+            else
+            {
+            Debug.Log("parry is on cooldown");
+            }
+        }
+
+        private IEnumerator ParryWindow()
+        {
+            isParryOnCooldown = true;
+            isParryWindowOpen = true;
+            
+            Debug.Log("OpenParryWindow");
+            yield return new WaitForSeconds(parryWindowTime);
+            Debug.Log("Parry Window Closed");
+            
+            isParryWindowOpen = false;
+            
+            yield return new WaitForSeconds(parryCooldown - parryWindowTime);
+            isParryOnCooldown = false;
+            parryCoroutine = null;
+            Debug.Log("Parry cooldown OVER");
+            
+        }
+
+        public void HitByEnemyAttack(enemyChase enemyThatHitsPlayer)
+        {
+            if (isParryWindowOpen == true)
+            {
+                triggerParry(enemyThatHitsPlayer);
+            }
+            else
+            {
+                enemyThatHitsPlayer.PlayerDies();
+            }
+        }
+        
+
+        private void triggerParry(enemyChase enemyThatHitsPlayer)
+        {
+            PlayPlayerSound(successfulParrySound, successfulParryVolume);
+            // stagger enemy functionality on the correct enemy that attacks you
+            Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
+            enemyThatHitsPlayer.StaggerByPlayerParry();
+        }
+
+        private void PlayPlayerSound(AudioClip clip, float volume = 1f)
+        {
+            if (clip == null) return;
+
+            if (parryAudioSource != null)
+                parryAudioSource.PlayOneShot(clip, volume);
+            else
+                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+        }
+        
+        
+        
+        public void PickUpWeapon(){}
         private void OnEnable()
         {
             if (inventory) inventory.Changed += RefreshWeaponUi;
