@@ -11,6 +11,7 @@ namespace CharacterController
         public float stamina = 3f;
         public float drainPerSecond = 1f;
         public PlayerStamina staminaSystem;
+        private bool isCrouching;
 
         [Header("Regeneration")]
         public float regenDelay = 0.75f;
@@ -46,7 +47,7 @@ namespace CharacterController
         
         public void Tick(bool sprintRequested)
         {
-            bool sprinting = sprintRequested && CanSprint;
+            bool sprinting = sprintRequested && CanSprint && !isCrouching;
 
             if (sprinting)
             {
@@ -109,5 +110,13 @@ namespace CharacterController
             if (staminaBar != null)
                 staminaBar.anchorMax = new Vector2(stamina / maxStamina, 1f);
         }
+
+        // so crouching doesnt drain stamina
+        public void SetCrouching(bool crouching)
+        {
+            isCrouching = crouching;
+        }
+        // increasing headbob
+
     }
 }
