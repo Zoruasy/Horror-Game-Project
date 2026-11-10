@@ -131,7 +131,7 @@ public class enemyChase : MonoBehaviour
 
     void Update()
     {
-        // TryKillPlayerAtCloseRange();
+        TryKillPlayerAtCloseRange();
         PlayAlertSounds();
 
         if (visionLight == null)
@@ -219,14 +219,21 @@ public class enemyChase : MonoBehaviour
         if (player == null || eyePoint == null)
             return;
 
+        const float killRange = 0.5f;
+        const float killRayRadius = 0.2f; //thickness of the ray (20 cm)
         int sightMask = Physics.DefaultRaycastLayers & ~(1 << gameObject.layer);
-        if (Physics.Raycast(
-                eyePoint.position,
-                eyePoint.forward,
-                out RaycastHit hit,
-                0.5f,
-                sightMask,
-                QueryTriggerInteraction.Ignore) &&
+        bool didHit = Physics.SphereCast(
+            eyePoint.position,
+            killRayRadius,
+            eyePoint.forward,
+            out RaycastHit hit,
+            killRange,
+            sightMask,
+            QueryTriggerInteraction.Ignore);
+
+        DebugRay.DrawSphereCastResult(eyePoint.position, eyePoint.forward, killRayRadius, killRange, didHit, hit);
+
+        if (didHit &&
             (hit.transform == player || hit.transform.IsChildOf(player)) &&
             (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
         {
