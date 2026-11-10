@@ -43,7 +43,10 @@ public class enemyChase : MonoBehaviour
     [Header("Detection")]
     public LayerMask playerDetectMask;
     [SerializeField] private float keepSuspicionTimerInit = 2f;
-    [SerializeField] private float timeBeforeAggroInit = 2f;
+    [Tooltip("Seconds the enemy has to see the whole player (enough detection points) before becoming aggro, when the player is right in front of it (range 0).")]
+    [SerializeField] private float timeToAggroAtZeroRange = 0.5f;
+    [Tooltip("Seconds the enemy has to see the whole player (enough detection points) before becoming aggro, when the player is at the max view distance.")]
+    [SerializeField] private float timeToAggroAtMaxRange = 3f;
     [SerializeField] private float aggroTimerInit = 5f;
     [SerializeField] private float passiveMoveSpeed = 1f;
     [SerializeField] private float alertedMoveSpeed = 3f;
@@ -86,8 +89,8 @@ public class enemyChase : MonoBehaviour
     [Header("Detection Points")]
     [Tooltip("Parent object on the player whose children are the body points. Auto-found as a child of the player named 'DetectionPoints' if left empty.")]
     [SerializeField] private Transform detectionPoints;
-    [Tooltip("When this many detection points (or more) are visible, the enemy instantly becomes aggro.")]
-    [SerializeField] private int pointsNeededForInstantAggro = 3;
+    [Tooltip("The enemy only builds up aggro while it sees at least this many detection points. Fewer = it can only get suspicious (unless the player is in the vision box, that is always instant aggro).")]
+    [SerializeField] private int pointsNeededForAggro = 4;
     private Transform detectionPointsOwner; //the player the detection points were looked up for
 
 
@@ -101,7 +104,7 @@ public class enemyChase : MonoBehaviour
     private Collider[] playerColliders;
     private bool keepsSuspiciousForABit = false;
     float keepSuspicionTimer = 2f;
-    float timeBeforeAggro = 2f;
+    float aggroBuildUp = 0f; //0 = not aggro at all, 1 = aggro now
     float aggroTimer = 5f;
 
     bool isAggro = false;
@@ -119,6 +122,12 @@ public class enemyChase : MonoBehaviour
     {
         Debug.Log("HEARING HEARING HEARING");
         player = playerTransform;
+
+        //already investigating (suspicious or aggro)? then ignore new sounds, so it walks to where it
+        //first heard/last saw the player instead of tracking the player's live position through walls.
+        //once it reaches that spot and calms down, it can hear the player again.
+        if (keepsSuspiciousForABit || isAggro)
+            return;
 
         heardPlayer = true;
         lastHeardPlayerPosition = playerTransform.position;
@@ -293,7 +302,7 @@ public class enemyChase : MonoBehaviour
 
         StartCoroutine(enemyMovement());
         keepSuspicionTimer = keepSuspicionTimerInit;
-        timeBeforeAggro = timeBeforeAggroInit;
+        aggroBuildUp = 0f;
         aggroTimer = aggroTimerInit;
     }
 
@@ -325,8 +334,8 @@ public class enemyChase : MonoBehaviour
             bool seenInVisionBox = isPlayerInVisionBox() && hasLineOfSightToPlayer();
             bool seesPlayer = visiblePoints > 0 || seenInVisionBox;
 
-            //enough of the body is visible (or the player is in the vision box) = instantly aggro, otherwise the normal suspicion route
-            bool instantAggro = seenInVisionBox || visiblePoints >= pointsNeededForInstantAggro;
+            //only builds up aggro when it sees enough of the body, otherwise it can only get suspicious
+            bool seesWholePlayer = visiblePoints >= pointsNeededForAggro;
 
             if (seesPlayer)
             {
@@ -350,25 +359,21 @@ public class enemyChase : MonoBehaviour
                 if ((seesPlayer || keepsSuspiciousForABit) && hasLastSeenPlayerPosition) //sees a player, is suspicious
                 {
                     keepsSuspiciousForABit = true;
-                    navMeshAgent.SetDestination(lastSeenPlayerPosition);
-
-
-                    //if enough detection points are visible, or the player is in the vision box with a clear line of sight, INSTANTLY becomes AGGRO
-                    if (instantAggro)
-                    {
-                        timeBeforeAggro = 0;
-                        isAggro = true;
-                    }
-
-
                     navMeshAgent.SetDestination(lastSeenPlayerPosition); // walk to the last seen/heard player location
 
                     if (seesPlayer)//if still spotting the player for a period of time
                     {
                         aggroTimer = aggroTimerInit;
 
-                        timeBeforeAggro -= Time.deltaTime; //slowly becomes aggro (fully aggro at 0) while spotting player
-                        if (timeBeforeAggro <= 0) // IS AGGRO NOW.
+                        //slowly becomes aggro while seeing the whole player: faster up close, slower far away
+                        if (seesWholePlayer)
+                            aggroBuildUp += Time.deltaTime / getTimeToAggro();
+
+                        //player in the vision box with a clear line of sight = INSTANTLY aggro
+                        if (seenInVisionBox)
+                            aggroBuildUp = 1f;
+
+                        if (aggroBuildUp >= 1f) // IS AGGRO NOW.
                         {
                             isAggro = true;
                             navMeshAgent.speed = alertedMoveSpeed;
@@ -406,7 +411,7 @@ public class enemyChase : MonoBehaviour
                 {
                     isAggro = false;
                     keepSuspicionTimer = keepSuspicionTimerInit;
-                    timeBeforeAggro = timeBeforeAggroInit;
+                    aggroBuildUp = 0f;
 
                     navMeshAgent.SetDestination(patrolPointsArray[i].position);
 
@@ -453,6 +458,14 @@ public class enemyChase : MonoBehaviour
             //the NavMeshAgent ignores the player's collider, so check the real distance to the player ourselves
             HoldPositionNearPlayer(isAggro || seesPlayer);
         }
+    }
+
+    //how many seconds of seeing the whole player it takes to become aggro: timeToAggroAtZeroRange up close, timeToAggroAtMaxRange at the view distance
+    private float getTimeToAggro()
+    {
+        float distance = Vector3.Distance(eyePoint.position, getPlayerTarget());
+        float t = viewDistance > 0f ? Mathf.Clamp01(distance / viewDistance) : 1f;
+        return Mathf.Max(0.01f, Mathf.Lerp(timeToAggroAtZeroRange, timeToAggroAtMaxRange, t)); //never 0, to avoid dividing by 0
     }
 
     //stops the enemy when it's close enough to the player, so it never walks into (and pushes) the player

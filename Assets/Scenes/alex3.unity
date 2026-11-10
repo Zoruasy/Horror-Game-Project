@@ -9437,7 +9437,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   keepSuspicionTimerInit: 8
-  timeBeforeAggroInit: 2
+  timeToAggroAtZeroRange: 0.3
+  timeToAggroAtMaxRange: 3
   aggroTimerInit: 3
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
@@ -9446,7 +9447,7 @@ MonoBehaviour:
   personalSpaceDistance: 1.5
   enemyAttackVisual: {fileID: 1673968656}
   detectionPoints: {fileID: 572846698}
-  pointsNeededForInstantAggro: 4
+  pointsNeededForAggro: 4
   patrolPoints: {fileID: 149082376}
   visionBox: {fileID: 588234467}
 --- !u!195 &741472329
