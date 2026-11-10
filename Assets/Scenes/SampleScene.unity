@@ -9442,7 +9442,8 @@ MonoBehaviour:
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   staggerTime: 1.5
-  navMeshAgentStoppingDistance: 5
+  stoppingDistance: 1.67
+  personalSpaceDistance: 1.5
   enemyAttackVisual: {fileID: 1673968656}
   detectionPoints: {fileID: 572846698}
   pointsNeededForInstantAggro: 4
@@ -9457,7 +9458,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 741472327}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 2
+  m_Radius: 0.8
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50

@@ -54,7 +54,10 @@ public class enemyChase : MonoBehaviour
     private Coroutine staggerCoroutine;
 
     [Header("Enemy Attack")]
-    [SerializeField] private float stoppingDistance = 2f; //so it doesn't get too close to the player OR the patrol points.
+    [SerializeField] private float stoppingDistance = 5f; //so it doesn't get too close to the player OR the patrol points.
+    [Tooltip("When not chasing, the enemy still never walks closer to the player than this (so it can't push the player).")]
+    [SerializeField] private float personalSpaceDistance = 1.5f;
+    private bool isHoldingNearPlayer = false;
     private Coroutine attackVisualCoroutine;
     [SerializeField] private GameObject enemyAttackVisual;
     private bool isAttacking = false;
@@ -240,6 +243,7 @@ public class enemyChase : MonoBehaviour
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
+        navMeshAgent.stoppingDistance = stoppingDistance; //set the stopping distance to the serialized value
 
         if (alertAudioSource == null)
             alertAudioSource = GetComponent<AudioSource>();
@@ -250,18 +254,6 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
-        }
-
-        if (alertAudioSource == null)
-            alertAudioSource = GetComponent<AudioSource>();
-        if (alertAudioSource == null)
-        {
-            alertAudioSource = gameObject.AddComponent<AudioSource>();
-            alertAudioSource.playOnAwake = false;
-            alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
-            alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
-            alertAudioSource.maxDistance = 25f;
-            navMeshAgent.stoppingDistance = stoppingDistance; //set the stopping distance to the serialized value
         }
 
 
@@ -313,9 +305,6 @@ public class enemyChase : MonoBehaviour
                 continue;
             }
 
-            yield return new WaitForSeconds(0.01f);
-            patrolPointsArray[i] = patrolPoints.GetChild(i);
-            navMeshAgent.speed = passiveMoveSpeed;
             yield return null; //run once per frame, so Time.deltaTime matches the time since the last run and the timers stay accurate
             patrolPointsArray[i] = patrolPoints.GetChild(i); //fill the array with the children
 
@@ -453,6 +442,45 @@ public class enemyChase : MonoBehaviour
                     }
                 }
             }
+
+            //the NavMeshAgent ignores the player's collider, so check the real distance to the player ourselves
+            HoldPositionNearPlayer(isAggro || seesPlayer);
+        }
+    }
+
+    //stops the enemy when it's close enough to the player, so it never walks into (and pushes) the player
+    private void HoldPositionNearPlayer(bool isChasing)
+    {
+        if (player == null)
+            return;
+
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        float distanceToPlayer = toPlayer.magnitude;
+
+        //while chasing: stop at the stopping distance. otherwise (patrolling/searching): only stop when it would bump into the player
+        float holdDistance = isChasing ? stoppingDistance : personalSpaceDistance;
+        bool shouldHold = distanceToPlayer <= holdDistance;
+
+        if (shouldHold)
+        {
+            navMeshAgent.isStopped = true;
+            navMeshAgent.velocity = Vector3.zero; //stop instantly instead of sliding into the player
+            isHoldingNearPlayer = true;
+
+            //the agent doesn't rotate while stopped, so keep facing the player manually
+            if (isChasing && toPlayer.sqrMagnitude > 0.001f)
+            {
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    Quaternion.LookRotation(toPlayer),
+                    navMeshAgent.angularSpeed * Time.deltaTime);
+            }
+        }
+        else if (isHoldingNearPlayer) //only release the stop we set ourselves
+        {
+            navMeshAgent.isStopped = false;
+            isHoldingNearPlayer = false;
         }
     }
 
