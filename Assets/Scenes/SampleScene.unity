@@ -9889,7 +9889,7 @@ MonoBehaviour:
   alertAudioSource: {fileID: 0}
   suspiciousSound: {fileID: 8300000, guid: 1f9535bdddd4efd44901106e63b8189b, type: 3}
   aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
-  lostSuspicionSound: {fileID: 0}
+  lostSuspicionSound: {fileID: 8300000, guid: d75f8d1f6a178274cbaf3b1ff0de8175, type: 3}
   suspiciousVolume: 1
   aggroVolume: 0.492
   lostSuspicionVolume: 1
@@ -9899,16 +9899,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   keepSuspicionTimerInit: 8
-  timeBeforeAggroInit: 2
+  timeToAggroAtZeroRange: 0.5
+  timeToAggroAtMaxRange: 3
   aggroTimerInit: 3
   passiveMoveSpeed: 1
   alertedMoveSpeed: 3
   staggerTime: 1.5
-  stoppingDistance: 1.67
+  stoppingDistance: 1.4
   personalSpaceDistance: 1.5
   enemyAttackVisual: {fileID: 1673968656}
   detectionPoints: {fileID: 572846698}
-  pointsNeededForInstantAggro: 4
+  pointsNeededForAggro: 4
   patrolPoints: {fileID: 149082376}
   visionBox: {fileID: 588234467}
 --- !u!195 &741472329
@@ -10186,6 +10187,70 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &776756860
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 776756861}
+  - component: {fileID: 776756863}
+  - component: {fileID: 776756862}
+  m_Layer: 6
+  m_Name: HitboxForEnemyToKill
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &776756861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776756860}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.251, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2104777742}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &776756862
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776756860}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &776756863
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 776756860}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &792074980
 GameObject:
   m_ObjectHideFlags: 0
@@ -29676,6 +29741,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 9156347144040445546, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      insertIndex: 0
+      addedObject: {fileID: 776756861}
+    - targetCorrespondingSourceObject: {fileID: 9156347144040445546, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 740620826}
     - targetCorrespondingSourceObject: {fileID: 9156347144040445546, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
@@ -29738,6 +29806,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   transitionSpeed: 50
+  spawnSilenceDuration: 2
 --- !u!20 &2104777744 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 9156347143994207883, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
