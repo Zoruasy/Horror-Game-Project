@@ -148,7 +148,7 @@ namespace CharacterController
                 Vector3 localCrashDirection = ctx.transform.InverseTransformDirection(crashVector);
 
                 // Trigger a lighter, directional camera shake!
-                ctx.TriggerCameraShake(0.15f, 0.4f, localCrashDirection);
+                ctx.TriggerCameraShake(0.8f, 0.4f, localCrashDirection);
                 
                 // End the slide forcefully since we crashed
                 SwitchState(factory.Crouching());

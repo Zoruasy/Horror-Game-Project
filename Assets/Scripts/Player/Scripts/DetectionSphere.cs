@@ -25,23 +25,60 @@ namespace CharacterController
         [Header("Smooth Transition")]
         public float transitionSpeed = 16f;
 
+        [Header("Spawn")]
+        [Tooltip("How many seconds after spawning/respawning the player makes no noise at all (radius forced to 0).")]
+        [SerializeField] private float spawnSilenceDuration = 2f;
+
         private float currentRadius;
         private bool wasGrounded = true;
         private float lastAirborneYVelocity;
         private float landingNoiseTimer;
+        private float spawnSilenceTimer;
+
+        public float SpawnSilenceDuration => spawnSilenceDuration;
+
+        private void Awake()
+        {
+            ForceSilence(spawnSilenceDuration);
+        }
 
         private void Start()
         {
             if (player == null)
                 player = GetComponent<FirstPersonController>();
 
-            currentRadius = idleRadius; //start idle ofc
+            ForceSilence(spawnSilenceDuration);
+        }
+
+        //forces the radius to 0 for a while, e.g. after (re)spawning so falling onto the spawn point isn't heard
+        public void ForceSilence(float duration)
+        {
+            spawnSilenceTimer = Mathf.Max(spawnSilenceTimer, duration);
+            currentRadius = 0f;
+            landingNoiseTimer = 0f;
+            wasGrounded = true; //don't count the first landing after spawning as a loud landing
+            lastAirborneYVelocity = 0f;
+
+            if (detectionSphere != null)
+                detectionSphere.localScale = Vector3.zero;
         }
 
         private void Update()
         {
             if (player == null || detectionSphere == null)
                 return;
+
+            //just spawned: completely silent, skip all noise and enemy checks
+            if (spawnSilenceTimer > 0f)
+            {
+                spawnSilenceTimer -= Time.deltaTime;
+                currentRadius = 0f;
+                landingNoiseTimer = 0f;
+                wasGrounded = player.isGrounded;
+                lastAirborneYVelocity = 0f;
+                detectionSphere.localScale = Vector3.zero;
+                return;
+            }
 
             // Check the player's current state
             bool isCrouching =

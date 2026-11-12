@@ -46,6 +46,11 @@ public class PlayerRespawn : MonoBehaviour, ISaveable<PlayerRespawn.State>
             fpc.currentVelocity = Vector3.zero;
             fpc.moveDirection = Vector3.zero;
         }
+
+        //make no noise right after respawning
+        var detectionSphere = GetComponentInChildren<CharacterController.DetectionSphere>();
+        if (detectionSphere)
+            detectionSphere.ForceSilence(detectionSphere.SpawnSilenceDuration);
     }
 
 
