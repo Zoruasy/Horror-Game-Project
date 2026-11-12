@@ -158,10 +158,48 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6613742657133864470, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1232582503066981638}
   m_SourcePrefab: {fileID: 100100000, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+--- !u!1 &3784991657920245833 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6613742657133864470, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+  m_PrefabInstance: {fileID: 8020425210482710111}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1232582503066981638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3784991657920245833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1340148ff49592b42956562a0c22c550, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RealityObject
+  mode: 1
+  realObjectRenderers:
+  - {fileID: 5808949936116728158}
+  - {fileID: 7005540438824402898}
+  collidersToToggle: []
+  triggersUIGlitch: 0
+  glitchRadius: 6
+  glitchOverRealObjects: []
 --- !u!4 &5096211846521545140 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3023929175546607595, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+  m_PrefabInstance: {fileID: 8020425210482710111}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5808949936116728158 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4599247297978357505, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+  m_PrefabInstance: {fileID: 8020425210482710111}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &7005540438824402898 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1042279666555808141, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
   m_PrefabInstance: {fileID: 8020425210482710111}
   m_PrefabAsset: {fileID: 0}

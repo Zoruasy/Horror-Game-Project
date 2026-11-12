@@ -10052,7 +10052,6 @@ MonoBehaviour:
   realObjectRenderers:
   - {fileID: 741472331}
   - {fileID: 1483914387}
-  - {fileID: 1866194166}
   collidersToToggle: []
   triggersUIGlitch: 1
   glitchRadius: 6
