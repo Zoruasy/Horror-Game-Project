@@ -120,6 +120,7 @@ namespace CharacterController
         private float fovVelocity;
         private float originalCamY;
         private float visionZoomAmount;
+        private bool controlsLocked;
         private VisionTurningSE visionTurning;
 
         [Header("Height Settings")]
@@ -200,6 +201,12 @@ namespace CharacterController
 
         private void Update()
         {
+            if (controlsLocked)
+            {
+                UpdateVisuals();
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.E))
             {
                 Debug.Log("E was pressed!");
@@ -272,6 +279,11 @@ namespace CharacterController
             visionZoomAmount = Mathf.Max(0f, amount);
         }
 
+        public void SetControlsLocked(bool locked)
+        {
+            controlsLocked = locked;
+        }
+
         public void UpdateVisuals()
         {
             if (!useFovKick)
@@ -288,14 +300,18 @@ namespace CharacterController
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
-            if (useHeadBob && characterController.velocity.magnitude > 0.1f && isGrounded)
+            if (!controlsLocked && useHeadBob &&
+                characterController.velocity.magnitude > 0.1f && isGrounded)
             {
                 bobTimer += Time.deltaTime * currentBobSpeed;
                 targetBobOffset = Mathf.Sin(bobTimer) * currentBobIntensity;
             }
+            else if (controlsLocked)
+            {
+                bobTimer = 0f;
+            }
             else
             {
-
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 

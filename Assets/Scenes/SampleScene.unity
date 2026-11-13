@@ -5896,80 +5896,6 @@ MonoBehaviour:
   m_SelectedFaces: 
   m_SelectedEdges: []
   m_SelectedVertices: 
---- !u!1001 &371684394
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 3.3284
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 3.3284
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 3.3284
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 10.21
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.00000012898
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 5.8805075
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 987286368092652687, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-      propertyPath: m_Name
-      value: BaseTrigger
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
---- !u!65 &371684395 stripped
-BoxCollider:
-  m_CorrespondingSourceObject: {fileID: 7797583241730129488, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
-  m_PrefabInstance: {fileID: 371684394}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &401555660
 Mesh:
   m_ObjectHideFlags: 0
@@ -28862,15 +28788,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisionTurningSE
   playerController: {fileID: 2104777741}
-  turnTrigger: {fileID: 371684395}
+  turnTrigger: {fileID: 0}
   lookTarget: {fileID: 741472333}
   turnDuration: 2
-  returnDelay: 1.75
+  returnDelay: 2.5
   turnCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.001679657
+      time: 0
       value: 0
       inSlope: 0
       outSlope: 0
@@ -28879,7 +28805,7 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.6356964
+      time: 0.75
       value: 1
       inSlope: 0
       outSlope: 0
@@ -28890,15 +28816,13 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  zoomAmount: 30
-  zoomDuration: 1.75
-  zoomReturnDelay: 1.85
+  zoomAmount: 25
   zoomCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.409886
-      value: 0.000013641082
+      time: 0.41
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -29311,4 +29235,3 @@ SceneRoots:
   - {fileID: 2003762679}
   - {fileID: 142883612}
   - {fileID: 1469694512}
-  - {fileID: 371684394}

@@ -4,31 +4,31 @@ using UnityEngine;
 public class VisionTurningSE : MonoBehaviour
 {
     [SerializeField] private FirstPersonController playerController;
+    private PlayerInteractor playerInteractor;
 
     [Header("Trigger")]
     [SerializeField] private Collider turnTrigger;
     [SerializeField] private Transform lookTarget;
 
     [Header("Turn")]
-    [SerializeField] private float turnDuration = 0.5f;
-    [SerializeField, Min(0f)] private float returnDelay = 1f;
+    [SerializeField] private float turnDuration = 2f;
+    [SerializeField, Min(0f)] private float returnDelay = 2.5f;
     [Tooltip("X is normalized time; Y is turn progress from 0 to 1. The same curve is played backward to return.")]
-    [SerializeField] private AnimationCurve turnCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField] private AnimationCurve turnCurve = new AnimationCurve(
+        new Keyframe(0f, 0f, 0f, 0f),
+        new Keyframe(0.75f, 1f, 0f, 0f));
 
     [Header("Zoom")]
     [Tooltip("How many degrees to reduce the camera's field of view while turned toward the target.")]
-    [SerializeField, Min(0f)] private float zoomAmount = 15f;
-    [SerializeField, Min(0f)] private float zoomDuration = 0.5f;
-    [SerializeField, Min(0f)] private float zoomReturnDelay = 1f;
-    [Tooltip("X is normalized time; Y is zoom progress from 0 to 1. This curve is played backward to zoom out.")]
-    [SerializeField] private AnimationCurve zoomCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+    [SerializeField, Min(0f)] private float zoomAmount = 25f;
+    [Tooltip("X is normalized time; Y is zoom progress from 0 to 1. This curve is played backward with the turn.")]
+    [SerializeField] private AnimationCurve zoomCurve = new AnimationCurve(
+        new Keyframe(0.41f, 0f, 0f, 0f),
+        new Keyframe(1f, 1f, 0f, 0f));
 
     private bool isTurning;
     private bool isReturning;
     private float turnTimer;
-    private bool isZooming;
-    private bool isZoomReturning;
-    private float zoomTimer;
     private float startPitch;
     private Quaternion startBodyRotation;
     private Quaternion targetBodyRotation;
@@ -44,6 +44,8 @@ public class VisionTurningSE : MonoBehaviour
 
         if (playerController == null)
             Debug.LogError("VisionTurningSE requires a FirstPersonController on the same GameObject.", this);
+
+        playerInteractor = GetComponent<PlayerInteractor>();
 
         if (turnTrigger != null && !turnTrigger.isTrigger)
             Debug.LogError("The selected turn trigger must have Is Trigger enabled.", turnTrigger);
@@ -65,7 +67,7 @@ public class VisionTurningSE : MonoBehaviour
 
     public void TurnTo(Vector3 worldPoint)
     {
-        if (playerController == null || isTurning || isZooming)
+        if (playerController == null || isTurning)
             return;
 
         Transform playerCamera = playerController.playerCamera;
@@ -98,28 +100,24 @@ public class VisionTurningSE : MonoBehaviour
         turnTimer = 0f;
         isReturning = false;
         isTurning = true;
-        zoomTimer = 0f;
-        isZoomReturning = false;
-        isZooming = true;
+        playerController.SetControlsLocked(true);
+        if (playerInteractor != null)
+            playerInteractor.SetControlsLocked(true);
     }
 
     private void Update()
     {
-        if (isTurning)
-            UpdateTurn();
+        if (!isTurning)
+            return;
 
-        if (isZooming)
-            UpdateZoom();
-    }
-
-    private void UpdateTurn()
-    {
         turnTimer += Time.deltaTime;
 
         if (!isReturning)
         {
             float normalizedTime = turnDuration <= 0f ? 1f : Mathf.Clamp01(turnTimer / turnDuration);
-            ApplyTurnProgress(Mathf.Clamp01(turnCurve.Evaluate(normalizedTime)));
+            ApplyProgress(
+                Mathf.Clamp01(turnCurve.Evaluate(normalizedTime)),
+                Mathf.Clamp01(zoomCurve.Evaluate(normalizedTime)));
 
             if (normalizedTime >= 1f)
             {
@@ -132,69 +130,34 @@ public class VisionTurningSE : MonoBehaviour
 
         if (turnTimer < 0f)
         {
-            ApplyTurnProgress(1f);
+            ApplyProgress(1f, 1f);
             turnTimer += Time.deltaTime;
             return;
         }
 
         float returnTime = turnDuration <= 0f ? 1f : Mathf.Clamp01(turnTimer / turnDuration);
-        ApplyTurnProgress(Mathf.Clamp01(turnCurve.Evaluate(1f - returnTime)));
+        ApplyProgress(
+            Mathf.Clamp01(turnCurve.Evaluate(1f - returnTime)),
+            Mathf.Clamp01(zoomCurve.Evaluate(1f - returnTime)));
 
         if (returnTime >= 1f)
         {
-            ApplyTurnProgress(0f);
+            ApplyProgress(0f, 0f);
             playerController.SetPitchFromExternal(startPitch);
+            playerController.SetControlsLocked(false);
+            if (playerInteractor != null)
+                playerInteractor.SetControlsLocked(false);
             isReturning = false;
             isTurning = false;
         }
     }
 
-    private void UpdateZoom()
-    {
-        zoomTimer += Time.deltaTime;
-
-        if (!isZoomReturning)
-        {
-            float normalizedTime = zoomDuration <= 0f ? 1f : Mathf.Clamp01(zoomTimer / zoomDuration);
-            ApplyZoomProgress(Mathf.Clamp01(zoomCurve.Evaluate(normalizedTime)));
-
-            if (normalizedTime >= 1f)
-            {
-                isZoomReturning = true;
-                zoomTimer = -zoomReturnDelay;
-            }
-
-            return;
-        }
-
-        if (zoomTimer < 0f)
-        {
-            ApplyZoomProgress(1f);
-            zoomTimer += Time.deltaTime;
-            return;
-        }
-
-        float returnTime = zoomDuration <= 0f ? 1f : Mathf.Clamp01(zoomTimer / zoomDuration);
-        ApplyZoomProgress(Mathf.Clamp01(zoomCurve.Evaluate(1f - returnTime)));
-
-        if (returnTime >= 1f)
-        {
-            ApplyZoomProgress(0f);
-            isZoomReturning = false;
-            isZooming = false;
-        }
-    }
-
-    private void ApplyTurnProgress(float progress)
+    private void ApplyProgress(float turnProgress, float zoomProgress)
     {
         playerController.transform.rotation =
-            Quaternion.Slerp(startBodyRotation, targetBodyRotation, progress);
+            Quaternion.Slerp(startBodyRotation, targetBodyRotation, turnProgress);
         playerController.playerCamera.localRotation =
-            Quaternion.Slerp(startCameraRotation, targetCameraRotation, progress);
-    }
-
-    private void ApplyZoomProgress(float progress)
-    {
-        playerController.SetVisionZoom(zoomAmount * progress);
+            Quaternion.Slerp(startCameraRotation, targetCameraRotation, turnProgress);
+        playerController.SetVisionZoom(zoomAmount * zoomProgress);
     }
 }

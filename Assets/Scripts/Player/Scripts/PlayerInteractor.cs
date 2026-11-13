@@ -21,6 +21,7 @@ public class PlayerInteractor : MonoBehaviour
 
     float holdTimer;
     bool isHolding;
+    bool controlsLocked;
 
     public Interactable Current => current;
 
@@ -53,6 +54,13 @@ public class PlayerInteractor : MonoBehaviour
 
     void Update()
     {
+        if (controlsLocked)
+        {
+            SetCurrent(null);
+            if (promptUI) promptUI.Hide();
+            return;
+        }
+
         SetCurrent(FindTarget());
 
 if (promptUI && current &&
@@ -136,6 +144,8 @@ else if (promptUI)
 
     void OnInteract(InputAction.CallbackContext ctx)
     {
+        if (controlsLocked) return;
+
         if (current && current.CanInteract(gameObject))
         {
             isHolding = true;
@@ -148,6 +158,16 @@ else if (promptUI)
     {
         isHolding = false;
         holdTimer = 0f;
+    }
+
+    public void SetControlsLocked(bool locked)
+    {
+        controlsLocked = locked;
+        if (locked)
+        {
+            isHolding = false;
+            holdTimer = 0f;
+        }
     }
 
 #if UNITY_EDITOR
