@@ -151,7 +151,7 @@ public class VisionTurningSE : MonoBehaviour
             isTurning = false;
 
             if (turnTrigger != null)
-                Destroy(turnTrigger.gameObject);
+            turnTrigger.enabled = false;
         }
     }
 
