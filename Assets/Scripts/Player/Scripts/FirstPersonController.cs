@@ -119,6 +119,9 @@ namespace CharacterController
         private float bobTimer;
         private float fovVelocity;
         private float originalCamY;
+        private float visionZoomAmount;
+        private bool controlsLocked;
+        private VisionTurningSE visionTurning;
 
         [Header("Height Settings")]
         public float standingCameraHeight = 1.75f;
@@ -158,6 +161,7 @@ namespace CharacterController
 
         private void Awake()
         {
+            visionTurning = GetComponent<VisionTurningSE>();
             cam = playerCamera.GetComponent<Camera>();
             if (screenShake == null)
                 screenShake = playerCamera.GetComponentInParent<ScreenShake>();
@@ -197,6 +201,12 @@ namespace CharacterController
 
         private void Update()
         {
+            if (controlsLocked)
+            {
+                UpdateVisuals();
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.E))
             {
                 Debug.Log("E was pressed!");
@@ -239,6 +249,8 @@ namespace CharacterController
 
         private void HandleRotation()
         {
+            if (visionTurning != null && visionTurning.IsTurning)
+                return;
 
             if (input == null) return;
 
@@ -257,26 +269,49 @@ namespace CharacterController
             playerCamera.localRotation = Quaternion.Euler(xRotation, 0, currentTilt);
         }
 
+        public void SetPitchFromExternal(float pitch)
+        {
+            xRotation = pitch;
+        }
+
+        public void SetVisionZoom(float amount)
+        {
+            visionZoomAmount = Mathf.Max(0f, amount);
+        }
+
+        public void SetControlsLocked(bool locked)
+        {
+            controlsLocked = locked;
+        }
+
         public void UpdateVisuals()
         {
             if (!useFovKick)
             {
                 targetFov = normalFov;
             }
-            cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, targetFov, ref fovVelocity, 1f / fovChangeSpeed);
+            cam.fieldOfView = Mathf.SmoothDamp(
+                cam.fieldOfView,
+                Mathf.Max(1f, targetFov - visionZoomAmount),
+                ref fovVelocity,
+                1f / fovChangeSpeed);
 
 
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
-            if (useHeadBob && characterController.velocity.magnitude > 0.1f && isGrounded)
+            if (!controlsLocked && useHeadBob &&
+                characterController.velocity.magnitude > 0.1f && isGrounded)
             {
                 bobTimer += Time.deltaTime * currentBobSpeed;
                 targetBobOffset = Mathf.Sin(bobTimer) * currentBobIntensity;
             }
+            else if (controlsLocked)
+            {
+                bobTimer = 0f;
+            }
             else
             {
-
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 
