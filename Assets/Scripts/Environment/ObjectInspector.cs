@@ -12,8 +12,6 @@ public class ObjectInspector : MonoBehaviour
     [Header("References")]
     [Tooltip("Camera the object is brought in front of. Main camera if empty.")]
     [SerializeField] Camera cam;
-    [Tooltip("Closes the inspection (usually the Interact action). Right click and Escape always close it too.")]
-    [SerializeField] InputActionReference closeAction;
 
     [Header("UI (optional)")]
     [Tooltip("Shown while inspecting.")]
@@ -69,6 +67,8 @@ public class ObjectInspector : MonoBehaviour
     Transform[] layered;
     int[] originalLayers;
 
+    InputAction interactAction;
+
     FirstPersonController controller;
     PlayerInteractor interactor;
 
@@ -85,6 +85,7 @@ public class ObjectInspector : MonoBehaviour
     {
         Instance = this;
         if (root) root.SetActive(false);
+        interactAction = InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Interact") : null;
     }
 
     void OnDestroy()
@@ -226,7 +227,7 @@ public class ObjectInspector : MonoBehaviour
         Keyboard keyboard = Keyboard.current;
 
         bool close = (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
-                     || (closeAction && closeAction.action.WasPressedThisFrame());
+                     || (interactAction != null && interactAction.WasPressedThisFrame());
         if (close)
         {
             Close();
@@ -356,7 +357,7 @@ public class ObjectInspector : MonoBehaviour
 
         if (hintLabel)
         {
-            string key = closeAction ? closeAction.action.GetBindingDisplayString() : null;
+            string key = interactAction?.GetBindingDisplayString();
             string close = string.IsNullOrEmpty(key) ? "[Esc]" : $"[{key}] / [Esc]";
             hintLabel.text = $"[Left Click] Rotate   [Scroll] Zoom   {close} Close";
         }

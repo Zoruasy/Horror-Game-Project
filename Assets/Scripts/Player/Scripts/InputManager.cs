@@ -10,6 +10,7 @@ namespace CharacterController
         InputAction sprintAction;
         InputAction crouchAction;
         InputAction interactAction;
+        InputAction attackAction;
 
         void Awake()
         {
@@ -25,6 +26,7 @@ namespace CharacterController
             sprintAction = actions.FindAction("Player/Sprint");
             crouchAction = actions.FindAction("Player/Crouch");
             interactAction = actions.FindAction("Player/Interact");
+            attackAction = actions.FindAction("Player/Attack");
         }
 
         public Vector2 moveInput =>
@@ -37,6 +39,8 @@ namespace CharacterController
         public bool jump => jumpAction != null && jumpAction.IsPressed();
 
         public bool climbing => interactAction != null && interactAction.WasPressedThisFrame();
+
+        public bool attack => attackAction != null && attackAction.WasPressedThisFrame();
 
         public bool sprint => sprintAction != null && sprintAction.IsPressed();
 

@@ -183,7 +183,7 @@ namespace CharacterController
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (input != null && input.climbing)
             {
                 Debug.Log("E was pressed!");
 
@@ -205,9 +205,8 @@ namespace CharacterController
             hasGroundedState = true;
 
             // stamina 3 secs
-            bool running = Keyboard.current != null &&
-                Keyboard.current.leftShiftKey.isPressed &&
-                input != null && input.moveInput.sqrMagnitude > 0.01f;
+            bool running = input != null && input.sprint &&
+                input.moveInput.sqrMagnitude > 0.01f;
 
             stamina = Mathf.Clamp(
                 stamina + (running ? -1f : 1f) * Time.deltaTime,
@@ -228,7 +227,7 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
 
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            if (input != null && input.attack)
                 Attack();
 
         }

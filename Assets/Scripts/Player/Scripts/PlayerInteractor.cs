@@ -6,7 +6,6 @@ public class PlayerInteractor : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Camera cam;
-    [SerializeField] InputActionReference interactAction;
     [SerializeField] InteractionPromptUI promptUI;
 
     [Header("Detection")]
@@ -22,6 +21,8 @@ public class PlayerInteractor : MonoBehaviour
     float holdTimer;
     bool isHolding;
 
+    InputAction interactAction;
+
     public Interactable Current => current;
 
     public float HoldRemaining => isHolding && current ? Mathf.Max(0f, current.GetHoldTime() - holdTimer) : 0f;
@@ -29,24 +30,25 @@ public class PlayerInteractor : MonoBehaviour
     void Awake()
     {
         if (!cam) cam = Camera.main;
+        interactAction = InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Interact") : null;
     }
 
     void OnEnable()
     {
-        if (interactAction)
+        if (interactAction != null)
         {
-            interactAction.action.Enable();
-            interactAction.action.started += OnInteract;
-            interactAction.action.canceled += CancelInteract;
+            interactAction.Enable();
+            interactAction.started += OnInteract;
+            interactAction.canceled += CancelInteract;
         }
     }
 
     void OnDisable()
     {
-        if (interactAction)
+        if (interactAction != null)
         {
-            interactAction.action.started -= OnInteract;
-            interactAction.action.canceled -= CancelInteract;
+            interactAction.started -= OnInteract;
+            interactAction.canceled -= CancelInteract;
         }
         SetCurrent(null);
     }
@@ -55,16 +57,16 @@ public class PlayerInteractor : MonoBehaviour
     {
         SetCurrent(FindTarget());
 
-if (promptUI && current &&
-    current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
-{
-    string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
-    promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
-}
-else if (promptUI)
-{
-    promptUI.Hide();
-}
+        if (promptUI && current &&
+            current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
+        {
+            string key = interactAction?.GetBindingDisplayString();
+            promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+        }
+        else if (promptUI)
+        {
+            promptUI.Hide();
+        }
 
         UpdateHold();
 
