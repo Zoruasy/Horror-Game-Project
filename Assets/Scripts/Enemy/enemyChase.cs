@@ -242,18 +242,7 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
         }
-
-        if (alertAudioSource == null)
-            alertAudioSource = GetComponent<AudioSource>();
-        if (alertAudioSource == null)
-        {
-            alertAudioSource = gameObject.AddComponent<AudioSource>();
-            alertAudioSource.playOnAwake = false;
-            alertAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
-            alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
-            alertAudioSource.maxDistance = 25f;
-        }
-
+        GameSettings.Route(alertAudioSource);
 
 
         if (visionBox == null)

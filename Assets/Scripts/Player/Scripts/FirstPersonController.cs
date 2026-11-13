@@ -240,8 +240,9 @@ namespace CharacterController
            
             if (input == null) return;
 
-            float mouseX = input.lookInput.x * mouseSensitivity;
-            float mouseY = input.lookInput.y * mouseSensitivity;
+            float sensitivity = mouseSensitivity * GameSettings.MouseSensitivity;
+            float mouseX = input.lookInput.x * sensitivity;
+            float mouseY = input.lookInput.y * sensitivity;
 
             transform.Rotate(Vector3.up * mouseX);
 
@@ -434,7 +435,7 @@ namespace CharacterController
             if (parryAudioSource != null)
                 parryAudioSource.PlayOneShot(clip, volume);
             else
-                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+                GameSettings.PlayClipAtPoint(clip, transform.position, volume);
         }
         
         
