@@ -136,6 +136,18 @@ public class enemyChase : MonoBehaviour
 
     }
 
+    //called by a noise in the world (e.g. glass shards): the enemy gets suspicious and walks to that spot.
+    //unlike isHearingPlayer this also redirects a suspicious enemy, because it's a clear, loud noise.
+    //an aggro enemy is already chasing, so it ignores it.
+    public void HearNoiseAt(Vector3 noisePosition)
+    {
+        if (isAggro)
+            return;
+
+        heardPlayer = true;
+        lastHeardPlayerPosition = noisePosition;
+    }
+
 
 
     void Update()
