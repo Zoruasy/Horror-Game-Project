@@ -10,6 +10,8 @@ public class CodeLockUI : MonoBehaviour
 {
     public static CodeLockUI Instance { get; private set; }
 
+    public bool IsOpen => current != null;
+
     [SerializeField] GameObject panel;
     [SerializeField] TMP_Text display;
     [SerializeField] Button[] digitButtons;      // 10 stuks, index = cijfer

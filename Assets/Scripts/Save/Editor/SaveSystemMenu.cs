@@ -13,7 +13,7 @@ static class SaveSystemMenu
     [MenuItem("Tools/Save/Delete Save")]
     static void DeleteSave()
     {
-        if (!EditorUtility.DisplayDialog("Delete save", $"Delete everything in\n{SaveSystem.SaveDirectory} ?", "Delete", "Cancel")) return;
+        if (!EditorUtility.DisplayDialog("Delete save", $"Delete the game save in\n{SaveSystem.SaveDirectory} ?\n(settings.json is kept)", "Delete", "Cancel")) return;
         SaveSystem.DeleteSave();
     }
 }

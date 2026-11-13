@@ -11,5 +11,6 @@ namespace CharacterController
         bool crouch { get; }
         bool slide { get; }
         bool climbing { get; }
+        bool attack { get; }
     }
 }

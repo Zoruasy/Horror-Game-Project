@@ -29,13 +29,12 @@ public class EyeController : MonoBehaviour
     public event Action<bool> OnEyeToggled;
 
     private Coroutine switchRoutine;
+    private InputAction eyeAction;
 
     private void Update()
     {
-        // F only works if not in a vision or on cooldown
-        if (CanActivate &&
-            Keyboard.current != null &&
-            Keyboard.current.fKey.wasPressedThisFrame)
+        eyeAction ??= InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Eye") : null;
+        if (CanActivate && eyeAction != null && eyeAction.WasPressedThisFrame())
         {
             switchRoutine = StartCoroutine(TemporarySwitch());
         }

@@ -207,7 +207,7 @@ namespace CharacterController
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.E))
+            if (input != null && input.climbing)
             {
                 Debug.Log("E was pressed!");
 
@@ -228,8 +228,6 @@ namespace CharacterController
             bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
             hasGroundedState = true;
 
-
-            
             if (staminaSystem != null)
                 staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
@@ -241,7 +239,7 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
 
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            if (input != null && input.attack)
                 Attack();
 
         }
@@ -254,8 +252,9 @@ namespace CharacterController
 
             if (input == null) return;
 
-            float mouseX = input.lookInput.x * mouseSensitivity;
-            float mouseY = input.lookInput.y * mouseSensitivity;
+            float sensitivity = mouseSensitivity * GameSettings.MouseSensitivity;
+            float mouseX = input.lookInput.x * sensitivity;
+            float mouseY = input.lookInput.y * sensitivity;
 
             transform.Rotate(Vector3.up * mouseX);
 
@@ -457,7 +456,7 @@ namespace CharacterController
             if (parryAudioSource != null)
                 parryAudioSource.PlayOneShot(clip, volume);
             else
-                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+                GameSettings.PlayClipAtPoint(clip, transform.position, volume);
         }
         
         
