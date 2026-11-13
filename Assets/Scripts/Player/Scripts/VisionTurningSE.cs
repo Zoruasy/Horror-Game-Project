@@ -149,6 +149,9 @@ public class VisionTurningSE : MonoBehaviour
                 playerInteractor.SetControlsLocked(false);
             isReturning = false;
             isTurning = false;
+
+            if (turnTrigger != null)
+                Destroy(turnTrigger.gameObject);
         }
     }
 

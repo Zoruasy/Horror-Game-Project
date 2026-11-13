@@ -10663,13 +10663,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 987286368092652687, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
       propertyPath: m_Name
-      value: BaseTrigger
+      value: TriggerVisionTurnToEnemy
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+--- !u!65 &909278407 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 7797583241730129488, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+  m_PrefabInstance: {fileID: 909278406}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &916087673
 GameObject:
   m_ObjectHideFlags: 0
@@ -29243,7 +29248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisionTurningSE
   playerController: {fileID: 2104777741}
-  turnTrigger: {fileID: 0}
+  turnTrigger: {fileID: 909278407}
   lookTarget: {fileID: 741472333}
   turnDuration: 2
   returnDelay: 2.5
