@@ -9405,7 +9405,7 @@ GameObject:
   - component: {fileID: 813025683}
   - component: {fileID: 813025688}
   - component: {fileID: 813025689}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10276,6 +10276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 909631255}
   - component: {fileID: 909631254}
+  - component: {fileID: 909631256}
   m_Layer: 0
   m_Name: enemyBonkOnDoorTrigger
   m_TagString: Untagged
@@ -10313,12 +10314,26 @@ Transform:
   m_GameObject: {fileID: 909631253}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.77, y: 0, z: 1.98}
-  m_LocalScale: {x: 1, y: 1, z: 4.0747056}
+  m_LocalPosition: {x: -18.77, y: 1.797, z: 1.98}
+  m_LocalScale: {x: 1, y: 3.2802, z: 4.0747056}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &909631256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909631253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6465ece72f34e643b260fb0411c8fc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::enemyBonkOnDoorTrigger
+  bonkSound: {fileID: 8300000, guid: f17070e86efbc3e4490898f1784c2627, type: 3}
+  bonkVolume: 1
 --- !u!1 &916087673
 GameObject:
   m_ObjectHideFlags: 0
@@ -16080,7 +16095,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: ea14f6f172e0c8645a7b67fd01c1dd47, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: cff09f19ba0048047bc6a088c67560b8, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1483885050
 Transform:
@@ -29177,9 +29192,21 @@ PrefabInstance:
       propertyPath: id
       value: 56595125924f4113887c0201555136d2
       objectReference: {fileID: 0}
+    - target: {fileID: 6744010686595296332, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7201198304786734877, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
       propertyPath: m_Name
       value: Key
+      objectReference: {fileID: 0}
+    - target: {fileID: 7201198304786734877, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251571558646960168, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7540181470233822631, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
       propertyPath: m_LocalPosition.x

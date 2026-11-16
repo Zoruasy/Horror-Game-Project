@@ -53,7 +53,8 @@ public class enemyChase : MonoBehaviour
     private bool isStaggered;
     private Coroutine staggerCoroutine;
 
-    private bool isBonked; //standing still after bonking into a door (see enemyBonkOnDoorTrigger)
+    private bool isBonked; //stuck at a door for good (see enemyBonkOnDoorTrigger)
+    private AudioSource bonkAudioSource; //loops the bonk sound, created when the enemy bonks
     private bool IsFrozen => isStaggered || isBonked;
 
     [Header("Enemy Attack")]
@@ -711,28 +712,33 @@ public class enemyChase : MonoBehaviour
         staggerCoroutine = null;
     }
 
-    //called by enemyBonkOnDoorTrigger: the enemy stops for a bit and plays a bonk sound
-    public void BonkOnDoor(float duration, SoundCue bonkSound)
+    //called by enemyBonkOnDoorTrigger: the enemy stops moving for good and loops the bonk sound
+    public void BonkOnDoor(AudioClip bonkSound, float volume)
     {
         if (isBonked)
             return;
 
         isBonked = true;
-
-        if (bonkSound != null && alertAudioSource != null)
-            bonkSound.PlayOneShot(alertAudioSource); //one shot, so it doesn't cut off an alert sound
-
         StopEnemyMovementForStagger();
-        StartCoroutine(RecoverFromBonk(duration));
-    }
 
-    private IEnumerator RecoverFromBonk(float duration)
-    {
-        yield return new WaitForSeconds(duration);
+        if (bonkSound != null)
+        {
+            //own audio source, so the alert sounds can't cut off the loop (and the loop can't cut them off)
+            if (bonkAudioSource == null)
+            {
+                bonkAudioSource = gameObject.AddComponent<AudioSource>();
+                bonkAudioSource.playOnAwake = false;
+                bonkAudioSource.spatialBlend = 1f; //3D sound, so the player can hear where the enemy is
+                bonkAudioSource.rolloffMode = AudioRolloffMode.Linear;
+                bonkAudioSource.maxDistance = 25f;
+            }
 
-        isBonked = false;
-        if (!isStaggered)
-            ResumeEnemyMovementAfterStagger();
+            bonkAudioSource.outputAudioMixerGroup = GameSettings.GetGroup(GameSettings.AudioChannel.Sfx); //follows the SFX volume slider
+            bonkAudioSource.clip = bonkSound;
+            bonkAudioSource.volume = volume;
+            bonkAudioSource.loop = true;
+            bonkAudioSource.Play();
+        }
     }
 
 }
