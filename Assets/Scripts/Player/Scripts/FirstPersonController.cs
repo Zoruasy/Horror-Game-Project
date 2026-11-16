@@ -53,10 +53,9 @@ namespace CharacterController
             AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
 
         [Header("Parry Audio")]
-        [SerializeField] private AudioClip successfulParrySound;
-        [SerializeField, Range(0f, 1f)] private float successfulParryVolume = 0.8f;
-        [SerializeField] private AudioClip attackGruntSound;
-        [SerializeField] private AudioClip clothesRufflingSound;
+        [SerializeField] private SoundCue successfulParrySound;
+        [SerializeField] private SoundCue attackGruntSound;
+        [SerializeField] private SoundCue clothesRufflingSound;
         [SerializeField] private AudioSource parryAudioSource;
 
         [Header("Movement polish")]
@@ -442,21 +441,21 @@ namespace CharacterController
 
         private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
-            PlayPlayerSound(successfulParrySound, successfulParryVolume);
+            PlayPlayerSound(successfulParrySound);
             TriggerCameraShake(parryShakeIntensity, parryShakeDuration);
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
             enemyThatHitsPlayer.StaggerByPlayerParry();
         }
 
-        private void PlayPlayerSound(AudioClip clip, float volume = 1f)
+        private void PlayPlayerSound(SoundCue cue)
         {
-            if (clip == null) return;
+            if (cue == null) return;
 
             if (parryAudioSource != null)
-                parryAudioSource.PlayOneShot(clip, volume);
+                cue.PlayOneShot(parryAudioSource);
             else
-                GameSettings.PlayClipAtPoint(clip, transform.position, volume);
+                cue.PlayAtPoint(transform.position);
         }
         
         
