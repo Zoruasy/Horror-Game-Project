@@ -373,14 +373,19 @@ namespace CharacterController
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
-                    if (dot >= backstabThreshold &&
-                        HasWeapon &&
-                        !enemy.IsPlayerDetected &&
-                        !enemy.IsStaggered)
-                    {
-                        enemy.KillEnemy();
-                        inventory.Consume(inventory.Get<WeaponPickup>());
-                    }
+if (dot >= backstabThreshold &&
+    HasWeapon &&
+    !enemy.IsPlayerDetected &&
+    !enemy.IsStaggered)
+{
+    // Bloed eerst spawnen, voordat de enemy eventueel vernietigd wordt
+    BloodSpatterScript blood = hit.collider.GetComponentInParent<BloodSpatterScript>();
+    if (blood != null)
+        blood.SpawnBlood(hit.point, hit.normal);
+
+    enemy.KillEnemy();
+    inventory.Consume(inventory.Get<WeaponPickup>());
+}
                     else
                     {
                         Debug.Log("No backstab, dot = " + dot);
