@@ -29389,6 +29389,7 @@ SceneRoots:
   - {fileID: 1576711055}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   - {fileID: 7904163553943794398}
 =======
   - {fileID: 1245503445}
@@ -29396,3 +29397,7 @@ SceneRoots:
 >>>>>>> dev
 =======
 >>>>>>> parent of 07cd600 (feat: added colliders on every prop)
+=======
+  - {fileID: 1245503445}
+  - {fileID: 1994969705}
+>>>>>>> colliders-scaling
