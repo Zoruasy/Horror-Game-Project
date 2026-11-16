@@ -131,12 +131,17 @@ public class SettingsMenu : MonoBehaviour
         Time.timeScale = previousTimeScale;
         AudioListener.pause = false;
 
-        Cursor.lockState = previousLockState;
-        Cursor.visible = previousCursorVisible;
-
+        bool inGameplay = false;
         foreach (Behaviour b in disabledWhileOpen)
-            if (b) b.enabled = true;
+        {
+            if (!b) continue;
+            b.enabled = true;
+            if (b is FirstPersonController) inGameplay = true;
+        }
         disabledWhileOpen.Clear();
+
+        Cursor.lockState = inGameplay ? CursorLockMode.Locked : previousLockState;
+        Cursor.visible = inGameplay ? false : previousCursorVisible;
     }
 
     public void ScrollTo(RectTransform section)

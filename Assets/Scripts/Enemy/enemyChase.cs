@@ -24,14 +24,11 @@ public class enemyChase : MonoBehaviour
     [Tooltip("Plays the alert sounds. Auto-found (or added) on this enemy if left empty.")]
     [SerializeField] private AudioSource alertAudioSource;
     [Tooltip("Played once when the enemy starts getting suspicious.")]
-    [SerializeField] private AudioClip suspiciousSound;
+    [SerializeField] private SoundCue suspiciousSound;
     [Tooltip("Played once when the enemy becomes aggro.")]
-    [SerializeField] private AudioClip aggroSound;
+    [SerializeField] private SoundCue aggroSound;
     [Tooltip("Played once when the enemy loses all aggro/suspicion and goes back to patrolling.")]
-    [SerializeField] private AudioClip lostSuspicionSound;
-    [SerializeField, Range(0f, 1f)] private float suspiciousVolume = 1f;
-    [SerializeField, Range(0f, 1f)] private float aggroVolume = 1f;
-    [SerializeField, Range(0f, 1f)] private float lostSuspicionVolume = 1f;
+    [SerializeField] private SoundCue lostSuspicionSound;
     private bool wasAggro = false;
     private bool wasSuspicious = false;
 
@@ -209,30 +206,27 @@ public class enemyChase : MonoBehaviour
 
         if (isAggro && !wasAggro)
         {
-            PlayAlertClip(aggroSound, aggroVolume);
+            PlayAlertSound(aggroSound);
         }
         else if (suspiciousNow && !wasSuspicious && !wasAggro) //not when calming down from aggro to suspicious
         {
-            PlayAlertClip(suspiciousSound, suspiciousVolume);
+            PlayAlertSound(suspiciousSound);
         }
         else if (calmNow && (wasAggro || wasSuspicious)) //lost all aggro/suspicion, back to patrolling
         {
-            PlayAlertClip(lostSuspicionSound, lostSuspicionVolume);
+            PlayAlertSound(lostSuspicionSound);
         }
 
         wasAggro = isAggro;
         wasSuspicious = suspiciousNow;
     }
 
-    private void PlayAlertClip(AudioClip clip, float volume)
+    private void PlayAlertSound(SoundCue cue)
     {
-        if (clip == null || alertAudioSource == null)
+        if (cue == null || alertAudioSource == null)
             return;
 
-        alertAudioSource.Stop(); //cut off the suspicious sound if it goes straight to aggro
-        alertAudioSource.clip = clip;
-        alertAudioSource.volume = volume;
-        alertAudioSource.Play();
+        cue.Play(alertAudioSource);
     }
 
     private void TryKillPlayerAtCloseRange()
@@ -283,7 +277,6 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
         }
-        GameSettings.Route(alertAudioSource);
 
 
 

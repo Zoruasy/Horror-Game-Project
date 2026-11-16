@@ -168,11 +168,6 @@ public static class GameSettings
     public static AudioMixerGroup GetGroup(AudioChannel channel) =>
         channel == AudioChannel.Music ? MusicGroup : SfxGroup;
 
-    public static void Route(AudioSource source, AudioChannel channel = AudioChannel.Sfx)
-    {
-        if (source) source.outputAudioMixerGroup = GetGroup(channel);
-    }
-
     static void RouteUnassignedSources()
     {
         if (!SfxGroup) return;
@@ -180,23 +175,6 @@ public static class GameSettings
         {
             if (!source.outputAudioMixerGroup) source.outputAudioMixerGroup = SfxGroup;
         }
-    }
-
-    // Same as AudioSource.PlayClipAtPoint, but routed through the mixer.
-    public static void PlayClipAtPoint(AudioClip clip, Vector3 position, float volume = 1f,
-        AudioChannel channel = AudioChannel.Sfx)
-    {
-        if (!clip) return;
-
-        var go = new GameObject("One shot audio");
-        go.transform.position = position;
-        var source = go.AddComponent<AudioSource>();
-        source.clip = clip;
-        source.spatialBlend = 1f;
-        source.volume = volume;
-        Route(source, channel);
-        source.Play();
-        Object.Destroy(go, clip.length * (Time.timeScale < 0.01f ? 0.01f : Time.timeScale));
     }
 
     static float ToDecibels(float value) => Mathf.Log10(Mathf.Clamp(value, 0.0001f, 1f)) * 20f;

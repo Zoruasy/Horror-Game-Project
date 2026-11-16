@@ -9887,10 +9887,8 @@ MonoBehaviour:
   spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
   aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
   alertAudioSource: {fileID: 0}
-  suspiciousSound: {fileID: 8300000, guid: 1f9535bdddd4efd44901106e63b8189b, type: 3}
-  aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
-  suspiciousVolume: 1
-  aggroVolume: 0.492
+  suspiciousSound: {fileID: 11400000, guid: 077348867804485eaaaf21f49cd2db2d, type: 2}
+  aggroSound: {fileID: 11400000, guid: 22d7473041ac422184fc440b9b165530, type: 2}
   viewDistance: 20
   viewAngle: 90
   playerDetectMask:
@@ -29595,7 +29593,7 @@ PrefabInstance:
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: attackGruntSound
       value: 
-      objectReference: {fileID: 8300000, guid: 09bcfbe39cb35b745979dcb0b612d0e8, type: 3}
+      objectReference: {fileID: 11400000, guid: 07ff7940c12048aabe44cdfed73db4c8, type: 2}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: backstabThreshold
       value: 0.1
@@ -29615,7 +29613,7 @@ PrefabInstance:
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: clothesRufflingSound
       value: 
-      objectReference: {fileID: 8300000, guid: fee2fa3837a260d4d86cccc6804baec3, type: 3}
+      objectReference: {fileID: 11400000, guid: af9e2fa63704470cb187be1a4bebd54b, type: 2}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: standingCameraHeight
       value: 1.5
@@ -29623,7 +29621,7 @@ PrefabInstance:
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: successfulParrySound
       value: 
-      objectReference: {fileID: 8300000, guid: 1647b298ed75fd340bfb30b0748fefad, type: 3}
+      objectReference: {fileID: 11400000, guid: 6b6c12467a17418d9c5cacc87658c0b9, type: 2}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: WeaponAvailableUIText
       value: 
@@ -29631,10 +29629,6 @@ PrefabInstance:
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: crouchingCameraHeight
       value: 0.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
-      propertyPath: successfulParryVolume
-      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 9156347144040445544, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       propertyPath: parryShakePositionAmplitude
