@@ -283,6 +283,7 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
         }
+        GameSettings.Route(alertAudioSource);
 
 
 
