@@ -53,6 +53,9 @@ public class enemyChase : MonoBehaviour
     private bool isStaggered;
     private Coroutine staggerCoroutine;
 
+    private bool isBonked; //standing still after bonking into a door (see enemyBonkOnDoorTrigger)
+    private bool IsFrozen => isStaggered || isBonked;
+
     [Header("Enemy Attack")]
     [SerializeField] private float stoppingDistance = 5f; //so it doesn't get too close to the player OR the patrol points.
     [Tooltip("When not chasing, the enemy still never walks closer to the player than this (so it can't push the player).")]
@@ -321,7 +324,7 @@ public class enemyChase : MonoBehaviour
 
         for (int i = 0; i < patrolPointsArray.Length;)
         {
-            if (isStaggered)
+            if (IsFrozen)
             {
                 yield return null;
                 continue;
@@ -433,7 +436,7 @@ public class enemyChase : MonoBehaviour
                         float elapsed = 0f;
                         while (elapsed < patrolPauseDuration)
                         {
-                            if (isStaggered)
+                            if (IsFrozen)
                             {
                                 navMeshAgent.updateRotation = wasUpdatingRotation;
                                 navMeshAgent.isStopped = false;
@@ -703,8 +706,33 @@ public class enemyChase : MonoBehaviour
         yield return new WaitForSeconds(staggerTime);
 
         isStaggered = false;
-        ResumeEnemyMovementAfterStagger();
+        if (!isBonked)
+            ResumeEnemyMovementAfterStagger();
         staggerCoroutine = null;
+    }
+
+    //called by enemyBonkOnDoorTrigger: the enemy stops for a bit and plays a bonk sound
+    public void BonkOnDoor(float duration, SoundCue bonkSound)
+    {
+        if (isBonked)
+            return;
+
+        isBonked = true;
+
+        if (bonkSound != null && alertAudioSource != null)
+            bonkSound.PlayOneShot(alertAudioSource); //one shot, so it doesn't cut off an alert sound
+
+        StopEnemyMovementForStagger();
+        StartCoroutine(RecoverFromBonk(duration));
+    }
+
+    private IEnumerator RecoverFromBonk(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+
+        isBonked = false;
+        if (!isStaggered)
+            ResumeEnemyMovementAfterStagger();
     }
 
 }

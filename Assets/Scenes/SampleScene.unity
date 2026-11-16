@@ -17874,7 +17874,7 @@ GameObject:
   - component: {fileID: 1576711053}
   - component: {fileID: 1576711052}
   - component: {fileID: 1576711051}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GlassShards
   m_TagString: Untagged
   m_Icon: {fileID: 0}
