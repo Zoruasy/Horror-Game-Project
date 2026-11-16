@@ -29192,6 +29192,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7540181470233822631, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
   m_PrefabInstance: {fileID: 3746166928976516529}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD:Assets/Scenes/DaanVFXBlood.unity
 --- !u!1001 &6291862917620219941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29293,6 +29294,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6d934a34ead7c7b4b98157d58745c7d6, type: 3}
+=======
+>>>>>>> parent of 07cd600 (feat: added colliders on every prop):Assets/Scenes/SampleScene.unity
 --- !u!1001 &7518257167210897313
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29369,4 +29372,7 @@ SceneRoots:
   - {fileID: 2072708641}
   - {fileID: 2003762679}
   - {fileID: 1576711055}
+<<<<<<< HEAD:Assets/Scenes/DaanVFXBlood.unity
   - {fileID: 6291862917620219941}
+=======
+>>>>>>> parent of 07cd600 (feat: added colliders on every prop):Assets/Scenes/SampleScene.unity
