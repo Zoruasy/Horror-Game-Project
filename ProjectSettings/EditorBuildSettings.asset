@@ -11,9 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 1b1b15fc60a282f1db1ad821f7a4e03e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/DaanParryScene.unity
     guid: d60fd9a23c5c088479418e27c1517bfb
+  - enabled: 1
+    path: Assets/Scenes/Scaling.unity
+    guid: 67a00eec7dafc144dad9bd9c35f1b54b
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

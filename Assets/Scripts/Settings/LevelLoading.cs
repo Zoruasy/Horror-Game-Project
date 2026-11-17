@@ -2,19 +2,18 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class LevelLoading : MonoBehaviour
 {
     public static LevelLoading Instance;
 
-    [Header("Loading Screen")]
-    [SerializeField] private GameObject loadingScreen;
-    [SerializeField] private Slider progressBar;
+    [SerializeField] GameObject loadingScreen;
+    [SerializeField] GameObject gameUI;
+    [SerializeField] MonoBehaviour[] playerControls;
 
-    private bool isLoading = false;
+    bool isLoading;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -24,53 +23,34 @@ public class LevelLoading : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        if (loadingScreen != null)
-            loadingScreen.SetActive(false);
+        loadingScreen.SetActive(false);
     }
 
     public void LoadLevel(string sceneName)
     {
-        if (isLoading) return;
-
-        if (!Application.CanStreamedLevelBeLoaded(sceneName))
-        {
-            Debug.LogError("Scene not found: " + sceneName);
-            return;
-        }
-
-        StartCoroutine(LoadSceneAsync(sceneName));
+        if (!isLoading)
+            StartCoroutine(Load(sceneName));
     }
 
-    private IEnumerator LoadSceneAsync(string sceneName)
+    IEnumerator Load(string sceneName)
     {
         isLoading = true;
 
-        if (loadingScreen != null)
-            loadingScreen.SetActive(true);
+        if (gameUI != null)
+            gameUI.SetActive(false);
 
-        if (progressBar != null)
-            progressBar.value = 0f;
+        foreach (var control in playerControls)
+            if (control != null)
+                control.enabled = false;
 
-        yield return null;
+        Time.timeScale = 0f;
+        loadingScreen.SetActive(true);
 
-        AsyncOperation operation =
-            SceneManager.LoadSceneAsync(sceneName);
+        yield return new WaitForSecondsRealtime(3f);
+        yield return SceneManager.LoadSceneAsync(sceneName);
 
-        while (!operation.isDone)
-        {
-            float progress =
-                Mathf.Clamp01(operation.progress / 0.9f);
-
-            if (progressBar != null)
-                progressBar.value = progress;
-
-            yield return null;
-        }
-
-        if (loadingScreen != null)
-            loadingScreen.SetActive(false);
-
+        loadingScreen.SetActive(false);
+        Time.timeScale = 1f;
         isLoading = false;
     }
 }
