@@ -35,7 +35,7 @@ public class LevelLoading : MonoBehaviour
 
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
-            Debug.LogError("Scene niet gevonden: " + sceneName);
+            Debug.LogError("Scene not found: " + sceneName);
             return;
         }
 
