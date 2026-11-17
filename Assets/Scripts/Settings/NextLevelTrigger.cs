@@ -22,7 +22,7 @@ public class NextLevelTrigger : MonoBehaviour
             }
             else
             {
-                Debug.LogError("LevelLoading niet gevonden!");
+                Debug.LogError("LevelLoading not used!");
             }
         }
     }
