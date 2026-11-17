@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CodeLock : Interactable
 {
-    [Tooltip("Leeg laten = deur wordt automatisch gezocht in de parents")]
+    [Tooltip("Leave empty = automatically searches door in parents")]
     [SerializeField] Interactable doorOverride;
     [SerializeField] string codeScreenText = "enter code";
     [SerializeField] Renderer indicator;
@@ -15,7 +15,7 @@ public class CodeLock : Interactable
     {
         door = doorOverride as ILockableDoor;
         if (door == null) door = GetComponentInParent<ILockableDoor>();
-        if (door == null) Debug.LogWarning($"{name}: geen deur gevonden voor deze codelock", this);
+        if (door == null) Debug.LogWarning($"{name}: No door found for this code lock", this);
     }
 
     //public override string GetPrompt(GameObject interactor) => codeScreenText;
@@ -27,7 +27,7 @@ public class CodeLock : Interactable
     public override void Interact(GameObject interactor)
     {
         if (CodeLockUI.Instance) CodeLockUI.Instance.Open(this);
-        else Debug.LogError("Geen CodeLockUI in de scene!");
+        else Debug.LogError("No CodeLockUI in this scene!");
     }
 
     public override float GetHoldTime() => 0f;
