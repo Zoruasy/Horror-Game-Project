@@ -9,13 +9,14 @@ public class LevelLoading : MonoBehaviour
 
     [SerializeField] GameObject loadingScreen;
     [SerializeField] GameObject gameUI;
-    [SerializeField] MonoBehaviour[] playerControls;
+    [SerializeField] GameObject player;
+    [SerializeField] GameObject loadingCamera;
 
     bool isLoading;
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
@@ -23,7 +24,9 @@ public class LevelLoading : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
         loadingScreen.SetActive(false);
+        loadingCamera.SetActive(false);
     }
 
     public void LoadLevel(string sceneName)
@@ -36,21 +39,21 @@ public class LevelLoading : MonoBehaviour
     {
         isLoading = true;
 
-        if (gameUI != null)
-            gameUI.SetActive(false);
+        loadingCamera.SetActive(true);
+        loadingScreen.SetActive(true);
 
-        foreach (var control in playerControls)
-            if (control != null)
-                control.enabled = false;
+        if (gameUI != null) gameUI.SetActive(false);
+        if (player != null) player.SetActive(false);
 
         Time.timeScale = 0f;
-        loadingScreen.SetActive(true);
 
         yield return new WaitForSecondsRealtime(3f);
         yield return SceneManager.LoadSceneAsync(sceneName);
 
-        loadingScreen.SetActive(false);
         Time.timeScale = 1f;
+        loadingScreen.SetActive(false);
+        loadingCamera.SetActive(false);
+
         isLoading = false;
     }
 }

@@ -32690,8 +32690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelLoading
   loadingScreen: {fileID: 774032568}
   gameUI: {fileID: 0}
-  playerControls:
-  - {fileID: 0}
+  player: {fileID: 1001191482}
 --- !u!4 &2118210318
 Transform:
   m_ObjectHideFlags: 0
