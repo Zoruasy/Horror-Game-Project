@@ -100,7 +100,6 @@ public class OscilloscopeController : MonoBehaviour
         target.matchTimer = matched ? target.matchTimer + Time.deltaTime : 0f;
         if (target.matchTimer < holdDuration) return;
 
-        Debug.Log("Resolved");
         target.solved = true;
         target.onSolved?.Invoke();
     }
