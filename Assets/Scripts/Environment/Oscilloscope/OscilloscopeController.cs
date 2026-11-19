@@ -61,6 +61,10 @@ public class OscilloscopeController : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = pointCount;
+
+        for (int i = 0; i < targets.Count; i++)
+            if (targets[i].line) targets[i].line.sortingOrder = i;
+        lineRenderer.sortingOrder = targets.Count;
     }
 
     void Update()
