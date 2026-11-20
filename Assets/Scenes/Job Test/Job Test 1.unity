@@ -8725,7 +8725,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7201198304786734877, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
       propertyPath: m_Name
-      value: Key section 2 (1)
+      value: Key section 3
       objectReference: {fileID: 0}
     - target: {fileID: 7540181470233822631, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
       propertyPath: m_LocalScale.x
@@ -21682,6 +21682,17 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!114 &312227009 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7492247248594503846, guid: 2f38f2f5b2e2e4942b624f2cfa871a0a, type: 3}
+  m_PrefabInstance: {fileID: 125416919}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00f223917c7f2eecf9303895cdc41194, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Key
 --- !u!43 &313737403
 Mesh:
   m_ObjectHideFlags: 0
@@ -46332,6 +46343,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+      propertyPath: lockType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+      propertyPath: requiredKey
+      value: 
+      objectReference: {fileID: 312227009}
     - target: {fileID: 5119218843213711847, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -55263,6 +55282,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+      propertyPath: lockType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
+      propertyPath: requiredKey
+      value: 
+      objectReference: {fileID: 695878065}
     - target: {fileID: 5119218843213711847, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -70647,7 +70674,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: lockType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: requireHold
@@ -70656,7 +70683,7 @@ PrefabInstance:
     - target: {fileID: 5086528032093165493, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: requiredKey
       value: 
-      objectReference: {fileID: 695878065}
+      objectReference: {fileID: 0}
     - target: {fileID: 5119218843213711847, guid: f9a92d32b40f1a8419626ba051189db7, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -97409,6 +97436,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Roof
       objectReference: {fileID: 0}
+    - target: {fileID: 5049621257337873049, guid: d3996419fc3d59740a872eeeb152bf4b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -117685,7 +117716,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5049621257337873049, guid: d3996419fc3d59740a872eeeb152bf4b, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
