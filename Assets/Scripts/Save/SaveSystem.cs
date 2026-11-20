@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -12,6 +13,8 @@ public static class SaveSystem
     public static bool AutoRestore = true;
 
     public static string SaveDirectory => Path.Combine(Application.persistentDataPath, "saves");
+
+    public const string SettingsFile = "settings";
 
     public static readonly JsonSerializerSettings Settings = new()
     {
@@ -57,19 +60,29 @@ public static class SaveSystem
     // ---- Manage Save ----
 
     public static bool HasSave() =>
-        Directory.Exists(SaveDirectory) && Directory.GetFiles(SaveDirectory, "*.json").Length > 0;
+        Directory.Exists(SaveDirectory)
+        && Directory.GetFiles(SaveDirectory, "*.json").Any(path => !IsSettingsFile(path));
 
     public static void DeleteSave()
     {
-        if (Directory.Exists(SaveDirectory)) Directory.Delete(SaveDirectory, true);
+        if (Directory.Exists(SaveDirectory))
+        {
+            foreach (string path in Directory.GetFiles(SaveDirectory))
+                if (!IsSettingsFile(path)) File.Delete(path);
+            foreach (string dir in Directory.GetDirectories(SaveDirectory))
+                Directory.Delete(dir, true);
+        }
         ReloadFromDisk();
     }
 
     public static void ReloadFromDisk()
     {
+        Flush(SettingsFile);
         files.Clear();
         dirty.Clear();
     }
+
+    static bool IsSettingsFile(string path) => Path.GetFileName(path).StartsWith(SettingsFile + ".json");
 
 
     // ---- Scenes ----
@@ -168,6 +181,11 @@ public static class SaveSystem
     {
         foreach (string name in dirty) Write(name, files[name]);
         dirty.Clear();
+    }
+
+    public static void Flush(string file)
+    {
+        if (dirty.Remove(file)) Write(Sanitize(file), files[Sanitize(file)]);
     }
 
     static SaveFile GetFile(string name)

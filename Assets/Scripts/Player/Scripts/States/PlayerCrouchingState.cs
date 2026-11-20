@@ -20,13 +20,13 @@ namespace CharacterController
         {
             wasCrouchPressed = ctx.input.crouch;
 
-            // Disable sprinting stamina while crouching
+            // sprinting stamina while crouching
             staminaSystem = ctx.GetComponent<PlayerStamina>();
 
             if (staminaSystem != null)
                 staminaSystem.SetCrouching(true);
 
-            // Lower the camera
+            // lwer the camera
             ctx.targetCameraY = ctx.crouchingCameraHeight;
 
             if (!ctx.enableSmoothCrouch)
@@ -69,7 +69,7 @@ namespace CharacterController
 
         public override void ExitState()
         {
-            // Allow sprinting stamina again
+            // allow sprinting stamina again
             if (staminaSystem != null)
                 staminaSystem.SetCrouching(false);
 

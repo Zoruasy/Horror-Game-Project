@@ -6,7 +6,6 @@ public class PlayerInteractor : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Camera cam;
-    [SerializeField] InputActionReference interactAction;
     [SerializeField] InteractionPromptUI promptUI;
 
     [Header("Detection")]
@@ -21,6 +20,9 @@ public class PlayerInteractor : MonoBehaviour
 
     float holdTimer;
     bool isHolding;
+    bool controlsLocked;
+
+    InputAction interactAction;
 
     public Interactable Current => current;
 
@@ -29,42 +31,50 @@ public class PlayerInteractor : MonoBehaviour
     void Awake()
     {
         if (!cam) cam = Camera.main;
+        interactAction = InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Interact") : null;
     }
 
     void OnEnable()
     {
-        if (interactAction)
+        if (interactAction != null)
         {
-            interactAction.action.Enable();
-            interactAction.action.started += OnInteract;
-            interactAction.action.canceled += CancelInteract;
+            interactAction.Enable();
+            interactAction.started += OnInteract;
+            interactAction.canceled += CancelInteract;
         }
     }
 
     void OnDisable()
     {
-        if (interactAction)
+        if (interactAction != null)
         {
-            interactAction.action.started -= OnInteract;
-            interactAction.action.canceled -= CancelInteract;
+            interactAction.started -= OnInteract;
+            interactAction.canceled -= CancelInteract;
         }
         SetCurrent(null);
     }
 
     void Update()
     {
+        if (controlsLocked)
+        {
+            SetCurrent(null);
+            if (promptUI) promptUI.Hide();
+            return;
+        }
+
         SetCurrent(FindTarget());
 
-if (promptUI && current &&
-    current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
-{
-    string key = interactAction ? interactAction.action.GetBindingDisplayString() : null;
-    promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
-}
-else if (promptUI)
-{
-    promptUI.Hide();
-}
+        if (promptUI && current &&
+            current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
+        {
+            string key = interactAction?.GetBindingDisplayString();
+            promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+        }
+        else if (promptUI)
+        {
+            promptUI.Hide();
+        }
 
         UpdateHold();
 
@@ -136,6 +146,8 @@ else if (promptUI)
 
     void OnInteract(InputAction.CallbackContext ctx)
     {
+        if (controlsLocked) return;
+
         if (current && current.CanInteract(gameObject))
         {
             isHolding = true;
@@ -148,6 +160,16 @@ else if (promptUI)
     {
         isHolding = false;
         holdTimer = 0f;
+    }
+
+    public void SetControlsLocked(bool locked)
+    {
+        controlsLocked = locked;
+        if (locked)
+        {
+            isHolding = false;
+            holdTimer = 0f;
+        }
     }
 
 #if UNITY_EDITOR

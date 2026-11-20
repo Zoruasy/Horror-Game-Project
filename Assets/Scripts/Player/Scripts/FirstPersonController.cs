@@ -53,10 +53,9 @@ namespace CharacterController
             AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
 
         [Header("Parry Audio")]
-        [SerializeField] private AudioClip successfulParrySound;
-        [SerializeField, Range(0f, 1f)] private float successfulParryVolume = 0.8f;
-        [SerializeField] private AudioClip attackGruntSound;
-        [SerializeField] private AudioClip clothesRufflingSound;
+        [SerializeField] private SoundCue successfulParrySound;
+        [SerializeField] private SoundCue attackGruntSound;
+        [SerializeField] private SoundCue clothesRufflingSound;
         [SerializeField] private AudioSource parryAudioSource;
 
         [Header("Movement polish")]
@@ -119,6 +118,9 @@ namespace CharacterController
         private float bobTimer;
         private float fovVelocity;
         private float originalCamY;
+        private float visionZoomAmount;
+        private bool controlsLocked;
+        private VisionTurningSE visionTurning;
 
         [Header("Height Settings")]
         public float standingCameraHeight = 1.75f;
@@ -158,6 +160,7 @@ namespace CharacterController
 
         private void Awake()
         {
+            visionTurning = GetComponent<VisionTurningSE>();
             cam = playerCamera.GetComponent<Camera>();
             if (screenShake == null)
                 screenShake = playerCamera.GetComponentInParent<ScreenShake>();
@@ -197,7 +200,13 @@ namespace CharacterController
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            if (controlsLocked)
+            {
+                UpdateVisuals();
+                return;
+            }
+
+            if (input != null && input.climbing)
             {
                 Debug.Log("E was pressed!");
 
@@ -218,8 +227,6 @@ namespace CharacterController
             bool justLanded = hasGroundedState && !wasGrounded && isGrounded;
             hasGroundedState = true;
 
-
-            
             if (staminaSystem != null)
                 staminaSystem.Tick(input != null && input.sprint && input.moveInput.y > 0f);
 
@@ -231,7 +238,7 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
 
-            if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            if (input != null && input.attack)
                 Attack();
 
         }
@@ -239,11 +246,14 @@ namespace CharacterController
 
         private void HandleRotation()
         {
+            if (visionTurning != null && visionTurning.IsTurning)
+                return;
 
             if (input == null) return;
 
-            float mouseX = input.lookInput.x * mouseSensitivity;
-            float mouseY = input.lookInput.y * mouseSensitivity;
+            float sensitivity = mouseSensitivity * GameSettings.MouseSensitivity;
+            float mouseX = input.lookInput.x * sensitivity;
+            float mouseY = input.lookInput.y * sensitivity;
 
             transform.Rotate(Vector3.up * mouseX);
 
@@ -257,26 +267,49 @@ namespace CharacterController
             playerCamera.localRotation = Quaternion.Euler(xRotation, 0, currentTilt);
         }
 
+        public void SetPitchFromExternal(float pitch)
+        {
+            xRotation = pitch;
+        }
+
+        public void SetVisionZoom(float amount)
+        {
+            visionZoomAmount = Mathf.Max(0f, amount);
+        }
+
+        public void SetControlsLocked(bool locked)
+        {
+            controlsLocked = locked;
+        }
+
         public void UpdateVisuals()
         {
             if (!useFovKick)
             {
                 targetFov = normalFov;
             }
-            cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, targetFov, ref fovVelocity, 1f / fovChangeSpeed);
+            cam.fieldOfView = Mathf.SmoothDamp(
+                cam.fieldOfView,
+                Mathf.Max(1f, targetFov - visionZoomAmount),
+                ref fovVelocity,
+                1f / fovChangeSpeed);
 
 
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
-            if (useHeadBob && characterController.velocity.magnitude > 0.1f && isGrounded)
+            if (!controlsLocked && useHeadBob &&
+                characterController.velocity.magnitude > 0.1f && isGrounded)
             {
                 bobTimer += Time.deltaTime * currentBobSpeed;
                 targetBobOffset = Mathf.Sin(bobTimer) * currentBobIntensity;
             }
+            else if (controlsLocked)
+            {
+                bobTimer = 0f;
+            }
             else
             {
-
                 bobTimer = Mathf.Lerp(bobTimer, 0, Time.deltaTime * 10f);
             }
 
@@ -340,14 +373,19 @@ namespace CharacterController
 
                     float dot = Vector3.Dot(myForward.normalized, enemyForward.normalized);
 
-                    if (dot >= backstabThreshold &&
-                        HasWeapon &&
-                        !enemy.IsPlayerDetected &&
-                        !enemy.IsStaggered)
-                    {
-                        enemy.KillEnemy();
-                        inventory.Consume(inventory.Get<WeaponPickup>());
-                    }
+if (dot >= backstabThreshold &&
+    HasWeapon &&
+    !enemy.IsPlayerDetected &&
+    !enemy.IsStaggered)
+{
+    // Bloed eerst spawnen, voordat de enemy eventueel vernietigd wordt
+    BloodSpatterScript blood = hit.collider.GetComponentInParent<BloodSpatterScript>();
+    if (blood != null)
+        blood.SpawnBlood(hit.point, hit.normal);
+
+    enemy.KillEnemy();
+    inventory.Consume(inventory.Get<WeaponPickup>());
+}
                     else
                     {
                         Debug.Log("No backstab, dot = " + dot);
@@ -408,21 +446,21 @@ namespace CharacterController
 
         private void triggerParry(enemyChase enemyThatHitsPlayer)
         {
-            PlayPlayerSound(successfulParrySound, successfulParryVolume);
+            PlayPlayerSound(successfulParrySound);
             TriggerCameraShake(parryShakeIntensity, parryShakeDuration);
             // stagger enemy functionality on the correct enemy that attacks you
             Debug.Log("will stagger the attacking enemy rn:) ( after attack is implemented");
             enemyThatHitsPlayer.StaggerByPlayerParry();
         }
 
-        private void PlayPlayerSound(AudioClip clip, float volume = 1f)
+        private void PlayPlayerSound(SoundCue cue)
         {
-            if (clip == null) return;
+            if (cue == null) return;
 
             if (parryAudioSource != null)
-                parryAudioSource.PlayOneShot(clip, volume);
+                cue.PlayOneShot(parryAudioSource);
             else
-                AudioSource.PlayClipAtPoint(clip, transform.position, volume);
+                cue.PlayAtPoint(transform.position);
         }
         
         

@@ -13526,7 +13526,7 @@ AudioSource:
   m_GameObject: {fileID: 1606100214}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 9070480319735437360, guid: 15b4827d941482b789c673a4a121b1c1, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 2f00b3f19daffec4ab87cb533c36bd7f, type: 3}
   m_PlayOnAwake: 1
@@ -13674,10 +13674,8 @@ MonoBehaviour:
   spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
   aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
   alertAudioSource: {fileID: 0}
-  suspiciousSound: {fileID: 8300000, guid: 1f9535bdddd4efd44901106e63b8189b, type: 3}
-  aggroSound: {fileID: 8300000, guid: 442dcf5058b4de7419f5616fc1019f53, type: 3}
-  suspiciousVolume: 1
-  aggroVolume: 0.492
+  suspiciousSound: {fileID: 11400000, guid: 077348867804485eaaaf21f49cd2db2d, type: 2}
+  aggroSound: {fileID: 11400000, guid: 22d7473041ac422184fc440b9b165530, type: 2}
   viewDistance: 20
   viewAngle: 90
   playerDetectMask:
