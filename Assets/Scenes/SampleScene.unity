@@ -23145,63 +23145,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1903476727}
   m_CullTransparentMesh: 1
---- !u!1001 &1912175229
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -10.479197
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.0018667803
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.0946445
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071067
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
-      propertyPath: m_Name
-      value: toiletUV-unwrapped (1)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a48eb0c8d0c3fb748bb5b50926b3f562, type: 3}
 --- !u!1 &1927538149
 GameObject:
   m_ObjectHideFlags: 0
@@ -31849,4 +31792,3 @@ SceneRoots:
   - {fileID: 1832958794}
   - {fileID: 545926318}
   - {fileID: 2118210318}
-  - {fileID: 1912175229}
