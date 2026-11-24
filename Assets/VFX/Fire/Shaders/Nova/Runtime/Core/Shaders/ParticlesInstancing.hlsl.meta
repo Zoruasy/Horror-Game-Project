@@ -13,5 +13,5 @@ AssetOrigin:
   productId: 326856
   packageName: Fire 001
   packageVersion: 1.0
-  assetPath: Assets/N2Studio/Shaders/Nova/Runtime/Core/Shaders/ParticlesInstancing.hlsl
+  assetPath: Assets/VFX/Fire/Shaders/Nova/Runtime/Core/Shaders/ParticlesInstancing.hlsl
   uploadId: 783724
