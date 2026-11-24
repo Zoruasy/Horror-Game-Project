@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - DetectionSphere
   - Climbable
+  - Enemy
   layers:
   - Default
   - TransparentFX
