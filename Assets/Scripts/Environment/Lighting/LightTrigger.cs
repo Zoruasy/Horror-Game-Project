@@ -6,6 +6,9 @@ public class LightTrigger : MonoBehaviour
     [Tooltip("Leave empty = all children lights")]
     [SerializeField] Light[] lights;
     [SerializeField] string playerTag = "Player";
+    [SerializeField] string enemyTag = "Enemy";
+
+    int occupants;
 
     void Awake()
     {
@@ -18,12 +21,21 @@ public class LightTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(playerTag)) SetLights(true);
+        if (!IsValid(other)) return;
+        occupants++;
+        SetLights(true);
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag(playerTag)) SetLights(false);
+        if (!IsValid(other)) return;
+        occupants = Mathf.Max(0, occupants - 1);
+        if (occupants == 0) SetLights(false);
+    }
+
+    bool IsValid(Collider other)
+    {
+        return other.CompareTag(playerTag) || other.CompareTag(enemyTag);
     }
 
     void SetLights(bool on)
