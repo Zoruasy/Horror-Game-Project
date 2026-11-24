@@ -12,6 +12,7 @@ public class InteractionPromptUI : MonoBehaviour
     [SerializeField] Color unavailableColor = new Color(1f, 1f, 1f, 0.45f);
 
     string lastPrompt;
+    string lastKey;
     bool lastCanInteract;
     string baseText;
 
@@ -21,8 +22,9 @@ public class InteractionPromptUI : MonoBehaviour
     {
         if (!root.activeSelf) root.SetActive(true);
 
-        if (prompt == lastPrompt && canInteract == lastCanInteract) return;
+        if (prompt == lastPrompt && key == lastKey && canInteract == lastCanInteract) return;
         lastPrompt = prompt;
+        lastKey = key;
         lastCanInteract = canInteract;
 
         baseText = canInteract && !string.IsNullOrEmpty(key) ? $"[{key}] {prompt}" : prompt;

@@ -21,10 +21,12 @@ public class PlayerInteractor : MonoBehaviour
     float holdTimer;
     bool isHolding;
     bool controlsLocked;
+    int interactionStartedFrame = -1;
 
     InputAction interactAction;
 
     public Interactable Current => current;
+    public bool StartedInteractionThisFrame => interactionStartedFrame == Time.frameCount;
 
     public float HoldRemaining => isHolding && current ? Mathf.Max(0f, current.GetHoldTime() - holdTimer) : 0f;
 
@@ -150,6 +152,7 @@ public class PlayerInteractor : MonoBehaviour
 
         if (current && current.CanInteract(gameObject))
         {
+            interactionStartedFrame = Time.frameCount;
             isHolding = true;
             holdTimer = 0f;
         }

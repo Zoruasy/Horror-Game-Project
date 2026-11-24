@@ -83,7 +83,11 @@ public class KeyBindingRow : MonoBehaviour
 
         rebindingRow = this;
         operation = inputAction.PerformInteractiveRebinding(index)
-            .WithControlsHavingToMatchPath("<Keyboard>")
+            .WithControlsHavingToMatchPath("<Keyboard>");
+        if (inputAction.actionMap?.name == "Player" && inputAction.name == "Interact")
+            operation.WithControlsHavingToMatchPath("<Mouse>");
+
+        operation
             .WithCancelingThrough("<Keyboard>/escape")
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(_ => Finish(inputAction, wasEnabled, true))
