@@ -632,8 +632,17 @@ MonoBehaviour:
   VirtualChannelSettings: []
   RealChannelSettings: []
   Plugins: []
+<<<<<<< HEAD
   MasterBanks: []
   Banks: []
+=======
+  MasterBanks:
+  - Master
+  Banks:
+  - ambience
+  - music
+  - sfx
+>>>>>>> fmod
   BanksToLoad:
   - music
   - ambience

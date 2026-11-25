@@ -23,8 +23,6 @@ public class PlayerInteractor : MonoBehaviour
     bool controlsLocked;
     int interactionStartedFrame = -1;
 
-    InputAction interactAction;
-
     public Interactable Current => current;
     public bool StartedInteractionThisFrame => interactionStartedFrame == Time.frameCount;
 
@@ -33,26 +31,15 @@ public class PlayerInteractor : MonoBehaviour
     void Awake()
     {
         if (!cam) cam = Camera.main;
-        interactAction = InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Interact") : null;
     }
 
     void OnEnable()
     {
-        if (interactAction != null)
-        {
-            interactAction.Enable();
-            interactAction.started += OnInteract;
-            interactAction.canceled += CancelInteract;
-        }
+        // Interaction is nu via left mouse button in Update()
     }
 
     void OnDisable()
     {
-        if (interactAction != null)
-        {
-            interactAction.started -= OnInteract;
-            interactAction.canceled -= CancelInteract;
-        }
         SetCurrent(null);
     }
 
@@ -70,8 +57,7 @@ public class PlayerInteractor : MonoBehaviour
         if (promptUI && current &&
             current.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled))
         {
-            string key = interactAction?.GetBindingDisplayString();
-            promptUI.Show(current.GetPrompt(gameObject), key, current.CanInteract(gameObject));
+            promptUI.Show(current.GetPrompt(gameObject), "[LMB]", current.CanInteract(gameObject));
         }
         else if (promptUI)
         {
@@ -81,6 +67,12 @@ public class PlayerInteractor : MonoBehaviour
         UpdateHold();
 
         if (promptUI) promptUI.SetHoldRemaining(HoldRemaining);
+
+        // Check for left mouse button click
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            OnInteract();
+        }
     }
 
     void UpdateHold()
@@ -146,7 +138,7 @@ public class PlayerInteractor : MonoBehaviour
         if (!current && promptUI) promptUI.Hide();
     }
 
-    void OnInteract(InputAction.CallbackContext ctx)
+    void OnInteract()
     {
         if (controlsLocked) return;
 
@@ -156,13 +148,6 @@ public class PlayerInteractor : MonoBehaviour
             isHolding = true;
             holdTimer = 0f;
         }
-        Debug.Log("INTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACTINTERACT");
-    }
-
-    void CancelInteract(InputAction.CallbackContext ctx)
-    {
-        isHolding = false;
-        holdTimer = 0f;
     }
 
     public void SetControlsLocked(bool locked)

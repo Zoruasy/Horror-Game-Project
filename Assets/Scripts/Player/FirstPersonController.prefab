@@ -57,7 +57,11 @@ GameObject:
   - component: {fileID: 9156347143994207883}
   - component: {fileID: 9156347143994207884}
   - component: {fileID: 5646304442106055214}
+<<<<<<< HEAD
   - component: {fileID: 280583217966365259}
+=======
+  - component: {fileID: 1232170671510447193}
+>>>>>>> fmod
   m_Layer: 2
   m_Name: Camera
   m_TagString: MainCamera
@@ -183,7 +187,11 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+<<<<<<< HEAD
 --- !u!114 &280583217966365259
+=======
+--- !u!114 &1232170671510447193
+>>>>>>> fmod
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
