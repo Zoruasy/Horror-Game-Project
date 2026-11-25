@@ -109009,7 +109009,7 @@ MonoBehaviour:
   requireGrounded: 1
   groundLayers:
     serializedVersion: 2
-    m_Bits: 787
+    m_Bits: 4294967067
   groundCheckDistance: 0.3
 --- !u!43 &1425282813
 Mesh:
