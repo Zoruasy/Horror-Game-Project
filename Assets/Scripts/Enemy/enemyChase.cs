@@ -57,6 +57,8 @@ public class enemyChase : MonoBehaviour
     [SerializeField] private float stoppingDistance = 5f; //so it doesn't get too close to the player OR the patrol points.
     [Tooltip("When not chasing, the enemy still never walks closer to the player than this (so it can't push the player).")]
     [SerializeField] private float personalSpaceDistance = 1.5f;
+    [Tooltip("Extra reach on top of the distance where the enemy stops near the player, for the attack cast towards the player's center (used when the player crouches).")]
+    [SerializeField] private float attackReachMargin = 0.3f;
     private bool isHoldingNearPlayer = false;
     private Coroutine attackVisualCoroutine;
     [SerializeField] private GameObject enemyAttackVisual;
@@ -248,13 +250,57 @@ public class enemyChase : MonoBehaviour
 
         DebugRay.DrawSphereCastResult(eyePoint.position, eyePoint.forward, killRayRadius, killRange, didHit, hit);
 
-        if (didHit &&
-            (hit.transform == player || hit.transform.IsChildOf(player)) &&
-            (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0)
+        if (didHit && isPlayerHit(hit))
         {
-
             StartAttackVisual();
+            return;
         }
+
+        //the straight-forward cast goes over the head of a crouched (smaller) player,
+        //so also cast towards the center of the player's (shrunken) controller when the player is close and in front
+        if (TryAttackCastTowardsPlayer(killRayRadius, sightMask))
+            StartAttackVisual();
+    }
+
+    private bool TryAttackCastTowardsPlayer(float killRayRadius, int sightMask)
+    {
+        Vector3 toTarget = getPlayerTarget() - eyePoint.position;
+        Vector3 flatToTarget = new Vector3(toTarget.x, 0f, toTarget.z);
+        Vector3 flatForward = new Vector3(eyePoint.forward.x, 0f, eyePoint.forward.z);
+
+        //measured the same way as HoldPositionNearPlayer (enemy pivot -> player pivot, flat), so the enemy
+        //can always attack from the spot where it stops walking towards the player
+        Vector3 flatToPlayer = player.position - transform.position;
+        flatToPlayer.y = 0f;
+        float attackReach = Mathf.Max(stoppingDistance, personalSpaceDistance) + attackReachMargin;
+        if (flatToPlayer.magnitude > attackReach)
+            return false;
+
+        //only when the player is roughly in front of the enemy
+        const float maxAttackAngle = 45f;
+        if (flatToTarget.sqrMagnitude > 0.0001f && flatForward.sqrMagnitude > 0.0001f &&
+            Vector3.Angle(flatForward, flatToTarget) > maxAttackAngle)
+            return false;
+
+        float castDistance = toTarget.magnitude;
+        bool didHit = Physics.SphereCast(
+            eyePoint.position,
+            killRayRadius,
+            toTarget.normalized,
+            out RaycastHit hit,
+            castDistance,
+            sightMask,
+            QueryTriggerInteraction.Ignore);
+
+        DebugRay.DrawSphereCastResult(eyePoint.position, toTarget.normalized, killRayRadius, castDistance, didHit, hit);
+
+        return didHit && isPlayerHit(hit);
+    }
+
+    private bool isPlayerHit(RaycastHit hit)
+    {
+        return (hit.transform == player || hit.transform.IsChildOf(player)) &&
+               (playerDetectMask.value & (1 << hit.transform.gameObject.layer)) != 0;
     }
 
     public void PlayerDies()
