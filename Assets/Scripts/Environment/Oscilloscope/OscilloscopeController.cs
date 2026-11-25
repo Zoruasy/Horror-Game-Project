@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,6 +19,8 @@ public class OscilloscopeController : MonoBehaviour
     public int pointsPerPeriod = 40;
     public float screenWidth = 2.0f;
     public float scrollSpeed = 3.0f;
+    [Tooltip("Text on the screen, replaces the waves while a target is reached")]
+    public TMP_Text screenText;
 
     [Header("Wave")]
     public float maxAmplitude = 0.5f;
@@ -31,12 +34,15 @@ public class OscilloscopeController : MonoBehaviour
         public LineRenderer line;
         [Range(0f, 1f)] public float amplitudeRatio = 0.5f;
         [Range(0f, 1f)] public float frequencyRatio = 0.5f;
+        [Tooltip("Shown on the screen instead of the waves while this target is reached")]
+        [TextArea] public string message;
         public bool onSolvedStuck;
         public UnityEvent onSolved;
         public UnityEvent onQuit;
 
         [NonSerialized] public bool solved;
         [NonSerialized] public float matchTimer;
+        [NonSerialized] public bool matched;
     }
 
     [Header("Targets (same 0..1 scale as the levers)")]
@@ -77,14 +83,32 @@ public class OscilloscopeController : MonoBehaviour
 
         foreach (Target target in targets)
             CheckSolved(target, amplitudeRatio, frequencyRatio);
+
+        UpdateScreen();
+    }
+
+    void UpdateScreen()
+    {
+        if (!screenText) return;
+
+        Target reached = targets.FirstOrDefault(t => t.solved && t.matched && !string.IsNullOrEmpty(t.message));
+        bool showText = reached != null;
+
+        screenText.gameObject.SetActive(showText);
+        if (showText) screenText.text = reached.message;
+
+        lineRenderer.enabled = !showText;
+        foreach (Target target in targets)
+            if (target.line) target.line.enabled = !showText;
     }
 
     void CheckSolved(Target target, float amplitudeRatio, float frequencyRatio)
     {
-        if (target.onSolvedStuck && target.solved) return;
-
         bool matched = Mathf.Abs(amplitudeRatio - target.amplitudeRatio) <= tolerance
                     && Mathf.Abs(frequencyRatio - target.frequencyRatio) <= tolerance;
+        target.matched = matched;
+
+        if (target.onSolvedStuck && target.solved) return;
 
         if (target.solved)
         {
