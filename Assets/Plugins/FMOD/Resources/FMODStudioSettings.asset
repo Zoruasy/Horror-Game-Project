@@ -1,6 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
-<<<<<<< HEAD
 --- !u!114 &-7695798061792708693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,8 +594,6 @@ MonoBehaviour:
   codecChannels:
     Value: []
     HasValue: 0
-=======
->>>>>>> parent of ad80109 (player is working now>?)
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -652,7 +649,6 @@ MonoBehaviour:
   HideSetupWizard: 1
   LastEventReferenceScanVersion: 131861
   Platforms:
-<<<<<<< HEAD
   - {fileID: -2824660735485861288}
   - {fileID: -4102395606527272058}
   - {fileID: 4587087214037274530}
@@ -958,18 +954,3 @@ MonoBehaviour:
   codecChannels:
     Value: []
     HasValue: 0
-=======
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  MigratedPlatforms: 0a00000000000000150000000b00000009000000050000001200000008000000060000000c0000000200000001000000
->>>>>>> parent of ad80109 (player is working now>?)
