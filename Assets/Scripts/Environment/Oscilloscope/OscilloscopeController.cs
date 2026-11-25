@@ -39,6 +39,8 @@ public class OscilloscopeController : MonoBehaviour
         [Range(0f, 1f)] public float frequencyRatio = 0.5f;
         [Tooltip("Shown on the screen instead of the waves while this target is reached")]
         [TextArea] public string message;
+        [Tooltip("Button that removes this issue from the screen")]
+        public OscilloscopeButton correctButton;
         public bool onSolvedStuck;
         public UnityEvent onSolved;
         public UnityEvent onQuit;
@@ -46,6 +48,7 @@ public class OscilloscopeController : MonoBehaviour
         [NonSerialized] public bool solved;
         [NonSerialized] public float matchTimer;
         [NonSerialized] public bool matched;
+        [NonSerialized] public bool issueFixed;
     }
 
     [Header("Targets (same 0..1 scale as the levers)")]
@@ -58,6 +61,8 @@ public class OscilloscopeController : MonoBehaviour
     public float holdDuration = 1f;
 
     public bool AllSolved => targets.All(t => t.solved);
+
+    Target ActiveIssue => targets.FirstOrDefault(t => t.solved && t.matched && !t.issueFixed && !string.IsNullOrEmpty(t.message));
 
     private LineRenderer lineRenderer;
     private Rect lastRect;
@@ -102,16 +107,23 @@ public class OscilloscopeController : MonoBehaviour
         DrawTargets();
 
         foreach (Target target in targets)
-            CheckSolved(target, amplitudeRatio, frequencyRatio);
+            if (!target.issueFixed) CheckSolved(target, amplitudeRatio, frequencyRatio);
 
         UpdateScreen();
+    }
+
+    public void Press(OscilloscopeButton button)
+    {
+        Target issue = ActiveIssue;
+        if (issue != null && issue.correctButton == button)
+            issue.issueFixed = true;
     }
 
     void UpdateScreen()
     {
         if (!screenText) return;
 
-        Target reached = targets.FirstOrDefault(t => t.solved && t.matched && !string.IsNullOrEmpty(t.message));
+        Target reached = ActiveIssue;
         bool showText = reached != null;
 
         screenText.gameObject.SetActive(showText);
@@ -119,7 +131,7 @@ public class OscilloscopeController : MonoBehaviour
 
         lineRenderer.enabled = !showText;
         foreach (Target target in targets)
-            if (target.line) target.line.enabled = !showText;
+            if (target.line) target.line.enabled = !showText && !target.issueFixed;
     }
 
     void CheckSolved(Target target, float amplitudeRatio, float frequencyRatio)
@@ -156,7 +168,7 @@ public class OscilloscopeController : MonoBehaviour
 
     void DrawWave(float amplitudeRatio, float frequencyRatio, LineRenderer line)
     {
-        if (!screenArea) return;
+        if (!screenArea || !line.enabled) return;
 
         Rect rect = screenArea.rect;
         float amplitude = amplitudeRatio * maxAmplitude * rect.height / 2f;
