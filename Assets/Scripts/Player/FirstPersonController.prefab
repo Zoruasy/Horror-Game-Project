@@ -58,10 +58,13 @@ GameObject:
   - component: {fileID: 9156347143994207884}
   - component: {fileID: 5646304442106055214}
 <<<<<<< HEAD
+<<<<<<< HEAD
   - component: {fileID: 280583217966365259}
 =======
   - component: {fileID: 1232170671510447193}
 >>>>>>> fmod
+=======
+>>>>>>> parent of 86bf8e4 (fmod.testing1)
   m_Layer: 2
   m_Name: Camera
   m_TagString: MainCamera
@@ -188,6 +191,7 @@ MonoBehaviour:
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!114 &280583217966365259
 =======
 --- !u!114 &1232170671510447193
@@ -205,6 +209,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
   nonRigidbodyVelocity: 0
   attenuationObject: {fileID: 0}
+=======
+>>>>>>> parent of 86bf8e4 (fmod.testing1)
 --- !u!1 &9156347144040445547
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,6 +338,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   successfulParrySound: {fileID: 0}
+  successfulParryVolume: 0.8
   attackGruntSound: {fileID: 0}
   clothesRufflingSound: {fileID: 0}
   parryAudioSource: {fileID: 0}
@@ -415,6 +422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   cam: {fileID: 9156347143994207883}
+  interactAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   promptUI: {fileID: 0}
   range: 2.5
   assistRadius: 0.15
