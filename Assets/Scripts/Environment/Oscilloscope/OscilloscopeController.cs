@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
+[ExecuteAlways]
 [RequireComponent(typeof(LineRenderer))]
 public class OscilloscopeController : MonoBehaviour
 {
@@ -17,13 +18,15 @@ public class OscilloscopeController : MonoBehaviour
     public int pointCount = 100;
     [Tooltip("Minimum points per period: higher = smoother curve")]
     public int pointsPerPeriod = 40;
-    public float screenWidth = 2.0f;
+    [Tooltip("Resize this rectangle (Rect tool): waves and text always fill it")]
+    public RectTransform screenArea;
     public float scrollSpeed = 3.0f;
     [Tooltip("Text on the screen, replaces the waves while a target is reached")]
     public TMP_Text screenText;
 
     [Header("Wave")]
-    public float maxAmplitude = 0.5f;
+    [Tooltip("Fraction of half the screen height")]
+    [Range(0f, 1f)] public float maxAmplitude = 1f;
     public float minFrequency = 1.0f;
     public float maxFrequency = 10.0f;
 
@@ -57,15 +60,21 @@ public class OscilloscopeController : MonoBehaviour
     public bool AllSolved => targets.All(t => t.solved);
 
     private LineRenderer lineRenderer;
+    private Rect lastRect;
+    private Matrix4x4 lastMatrix;
 
     private void OnValidate()
     {
         DrawTargets();
     }
 
-    void Start()
+    void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
+    }
+
+    void Start()
+    {
         lineRenderer.positionCount = pointCount;
 
         for (int i = 0; i < targets.Count; i++)
@@ -77,6 +86,17 @@ public class OscilloscopeController : MonoBehaviour
     {
         float amplitudeRatio = amplitudeLever ? amplitudeLever.Ratio : 0f;
         float frequencyRatio = frequencyLever ? frequencyLever.Ratio : 0f;
+
+        // Edit mode: redraw only when screenArea is resized/moved, nothing else runs
+        if (!Application.isPlaying)
+        {
+            if (!screenArea || (screenArea.rect == lastRect && screenArea.localToWorldMatrix == lastMatrix)) return;
+            lastRect = screenArea.rect;
+            lastMatrix = screenArea.localToWorldMatrix;
+            DrawWave(amplitudeRatio, frequencyRatio, lineRenderer);
+            DrawTargets();
+            return;
+        }
 
         DrawWave(amplitudeRatio, frequencyRatio, lineRenderer);
         DrawTargets();
@@ -136,9 +156,11 @@ public class OscilloscopeController : MonoBehaviour
 
     void DrawWave(float amplitudeRatio, float frequencyRatio, LineRenderer line)
     {
-        float amplitude = amplitudeRatio * maxAmplitude;
+        if (!screenArea) return;
+
+        Rect rect = screenArea.rect;
+        float amplitude = amplitudeRatio * maxAmplitude * rect.height / 2f;
         float frequency = Mathf.Lerp(minFrequency, maxFrequency, frequencyRatio);
-        float startX = -screenWidth / 2f;
 
         int points = Mathf.Max(pointCount, Mathf.CeilToInt(frequency * pointsPerPeriod) + 1);
         if (line.positionCount != points)
@@ -147,10 +169,11 @@ public class OscilloscopeController : MonoBehaviour
         for (int i = 0; i < points; i++)
         {
             float t = (float)i / (points - 1);
-            float x = startX + t * screenWidth;
-            float y = Mathf.Sin(t * frequency * Mathf.PI * 2f + Time.time * scrollSpeed) * amplitude;
+            float x = Mathf.Lerp(rect.xMin, rect.xMax, t);
+            float y = rect.center.y + Mathf.Sin(t * frequency * Mathf.PI * 2f + Time.time * scrollSpeed) * amplitude;
 
-            line.SetPosition(i, new Vector3(x, y, 0f));
+            Vector3 world = screenArea.TransformPoint(new Vector3(x, y, 0f));
+            line.SetPosition(i, line.useWorldSpace ? world : line.transform.InverseTransformPoint(world));
         }
     }
 }
