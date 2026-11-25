@@ -204,7 +204,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 530898508}
     m_Modifications:
     - target: {fileID: 1028991571080914912, guid: 23dfd3c722a9b7c4589323f6d5353cd2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -277,7 +277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7794280878305080061, guid: f0a417d682227604b8cadc8d0ff4e82b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.639
+      value: 2.382
       objectReference: {fileID: 0}
     - target: {fileID: 7794280878305080061, guid: f0a417d682227604b8cadc8d0ff4e82b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10439,6 +10439,11 @@ Transform:
   - {fileID: 924609288}
   m_Father: {fileID: 214197578}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!4 &530898508 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7794280878305080061, guid: f0a417d682227604b8cadc8d0ff4e82b, type: 3}
+  m_PrefabInstance: {fileID: 110139814}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &545926317
 GameObject:
   m_ObjectHideFlags: 0
@@ -22606,8 +22611,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
-  nonRigidbodyVelocity: 0
-  attenuationObject: {fileID: 0}
 --- !u!1 &1671694059
 GameObject:
   m_ObjectHideFlags: 0
@@ -34098,9 +34101,9 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 1616170736}
   - {fileID: 2079212723}
-  - {fileID: 95104329}
   - {fileID: 741472333}
   - {fileID: 1483885050}
+  - {fileID: 110139814}
   - {fileID: 916995169}
   - {fileID: 214197578}
   - {fileID: 149082376}
@@ -34111,4 +34114,4 @@ SceneRoots:
   - {fileID: 1832958794}
   - {fileID: 545926318}
   - {fileID: 2118210318}
-  - {fileID: 110139814}
+  - {fileID: 95104329}
