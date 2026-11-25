@@ -609,12 +609,12 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: ../brutal_audio_1/brutal_audio_1.fspro
-  sourceBankPath: ../brutal_audio_1/Build
+  sourceProjectPath: ../brutal_audio_2/brutal_audio_1.fspro
+  sourceBankPath: ../brutal_audio_2/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
-  AutomaticEventLoading: 1
+  AutomaticEventLoading: 0
   BankLoadType: 0
   AutomaticSampleLoading: 0
   EncryptionKey: 
@@ -638,7 +638,12 @@ MonoBehaviour:
   - ambience
   - music
   - sfx
-  BanksToLoad: []
+  BanksToLoad:
+  - music
+  - ambience
+  - Master
+  - Master.strings
+  - sfx
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
   AndroidUseOBB: 0
