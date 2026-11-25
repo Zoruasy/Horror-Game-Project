@@ -10410,6 +10410,25 @@ Transform:
   - {fileID: 924609288}
   m_Father: {fileID: 214197578}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &532438393 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9156347144824098803, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+  m_PrefabInstance: {fileID: 2104777739}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &532438395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532438393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &545926317
 GameObject:
   m_ObjectHideFlags: 0
@@ -12648,7 +12667,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1832958794}
     m_Modifications:
     - target: {fileID: 4000667520668516784, guid: d0ec0a14054713c4cb454dc5f34fabb2, type: 3}
       propertyPath: m_Name
@@ -12668,7 +12687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6650292440862550807, guid: d0ec0a14054713c4cb454dc5f34fabb2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.3839602
+      value: -9.10929
       objectReference: {fileID: 0}
     - target: {fileID: 6650292440862550807, guid: d0ec0a14054713c4cb454dc5f34fabb2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -12676,7 +12695,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6650292440862550807, guid: d0ec0a14054713c4cb454dc5f34fabb2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.6501693
+      value: -22.53879
       objectReference: {fileID: 0}
     - target: {fileID: 6650292440862550807, guid: d0ec0a14054713c4cb454dc5f34fabb2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -14307,57 +14326,6 @@ MonoBehaviour:
   triggersUIGlitch: 0
   glitchRadius: 6
   glitchOverRealObjects: []
---- !u!1 &932178255
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 932178257}
-  - component: {fileID: 932178258}
-  m_Layer: 0
-  m_Name: SoundTest
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &932178257
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 932178255}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.182, y: 0.71, z: -2.079}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &932178258
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 932178255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 262682c7a565ea74d8fa06d64dcc4af8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FootstepsSound
-  footsteps:
-    Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
 --- !u!1 &939858790
 GameObject:
   m_ObjectHideFlags: 0
@@ -24942,6 +24910,7 @@ Transform:
   - {fileID: 1604758247}
   - {fileID: 631477828}
   - {fileID: 575024795}
+  - {fileID: 798332073}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1844466026
@@ -34261,7 +34230,10 @@ PrefabInstance:
       addedObject: {fileID: 2104777752}
     - targetCorrespondingSourceObject: {fileID: 9156347144040445547, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2104777753}
+      addedObject: {fileID: 2104777759}
+    - targetCorrespondingSourceObject: {fileID: 9156347144824098803, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 532438395}
     - targetCorrespondingSourceObject: {fileID: 9156347143994207886, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2104777745}
@@ -34383,7 +34355,12 @@ MonoBehaviour:
   staminaBar: {fileID: 1407929879}
   staminaBarUI: {fileID: 339109804}
   hideAfterFullSeconds: 1
---- !u!114 &2104777753
+--- !u!143 &2104777758 stripped
+CharacterController:
+  m_CorrespondingSourceObject: {fileID: 9156347144040445545, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+  m_PrefabInstance: {fileID: 2104777739}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2104777759
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -34392,16 +34369,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 2104777740}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 262682c7a565ea74d8fa06d64dcc4af8, type: 3}
+  m_Script: {fileID: 11500000, guid: c0b6108c280ce8646b57e5893cb5f232, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreathingSound
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
+  controller: {fileID: 2104777758}
   footsteps:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: 553905882
+      Data2: 1100061485
+      Data3: -1353982287
+      Data4: -1167692463
+    Path: event:/sfx/char/footsteps
+  stepInterval: 0.45
 --- !u!1 &2118210316
 GameObject:
   m_ObjectHideFlags: 0
@@ -34830,17 +34809,17 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1616170736}
   - {fileID: 1927538152}
   - {fileID: 1475832907}
   - {fileID: 832575519}
+  - {fileID: 1001191485}
+  - {fileID: 1616170736}
   - {fileID: 2079212723}
   - {fileID: 741472333}
   - {fileID: 1483885050}
   - {fileID: 916995169}
   - {fileID: 214197578}
   - {fileID: 149082376}
-  - {fileID: 1001191485}
   - {fileID: 921168057}
   - {fileID: 2072708641}
   - {fileID: 2003762679}
@@ -34848,5 +34827,3 @@ SceneRoots:
   - {fileID: 1832958794}
   - {fileID: 545926318}
   - {fileID: 2118210318}
-  - {fileID: 932178257}
-  - {fileID: 798332069}
