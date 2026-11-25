@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.fmod.fmod-for-unity.v203": "2.3.15",
     "com.unity.ai.assistant": "2.20.0-pre.2",
     "com.unity.ai.inference": "2.6.1",
     "com.unity.ai.navigation": "2.0.14",
