@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3754260034337402842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1046181321054090117}
+  m_Layer: 0
+  m_Name: TriggerHallwayLight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1046181321054090117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3754260034337402842}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 14941241905687370}
+  - {fileID: 446088303512617892}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &860155576511075749
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1046181321054090117}
+    m_Modifications:
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 987286368092652687, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_Name
+      value: Trigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 7797583241730129488, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_Size.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7797583241730129488, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      propertyPath: m_Size.z
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 987286368092652687, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8020561778788630781}
+  m_SourcePrefab: {fileID: 100100000, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+--- !u!4 &14941241905687370 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 854265604260577007, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+  m_PrefabInstance: {fileID: 860155576511075749}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &458357020181664042 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 987286368092652687, guid: 717bef4dfbb142843ac1e3a5194ee035, type: 3}
+  m_PrefabInstance: {fileID: 860155576511075749}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8020561778788630781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458357020181664042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfc492faec3ff1b4a84eeea2308d6bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightTrigger
+  lights:
+  - {fileID: 1281909577063567768}
+  playerTag: Player
+--- !u!1001 &4681585757509751262
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1046181321054090117}
+    m_Modifications:
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5156558131044968759, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+      propertyPath: m_Name
+      value: Hallway Light
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+--- !u!4 &446088303512617892 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5100475578611798650, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+  m_PrefabInstance: {fileID: 4681585757509751262}
+  m_PrefabAsset: {fileID: 0}
+--- !u!108 &1281909577063567768 stripped
+Light:
+  m_CorrespondingSourceObject: {fileID: 5850761435204681798, guid: 5314f18ba2a0fe5479658f1b81b15ce1, type: 3}
+  m_PrefabInstance: {fileID: 4681585757509751262}
+  m_PrefabAsset: {fileID: 0}
