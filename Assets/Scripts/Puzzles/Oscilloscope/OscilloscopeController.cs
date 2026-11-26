@@ -125,8 +125,10 @@ public class OscilloscopeController : MonoBehaviour
     public void Press(OscilloscopeButton button)
     {
         Target issue = ActiveIssue;
-        if (issue != null && issue.correctButton == button)
-            issue.issueFixed = true;
+        if (issue == null || issue.correctButton != button) return;
+
+        issue.issueFixed = true;
+        if (Completed) PuzzleProgressionManager.MarkCompleted(progressionId);
     }
 
     void UpdateScreen()
@@ -173,7 +175,6 @@ public class OscilloscopeController : MonoBehaviour
         if (target.matchTimer < holdDuration) return;
 
         target.solved = true;
-        if (AllSolved) PuzzleProgressionManager.MarkCompleted(progressionId);
         target.onSolved?.Invoke();
     }
 
