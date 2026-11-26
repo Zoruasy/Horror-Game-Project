@@ -8,6 +8,8 @@ using UnityEngine.Events;
 [RequireComponent(typeof(LineRenderer))]
 public class OscilloscopeController : MonoBehaviour
 {
+    [SerializeField] string progressionId = "oscilloscope";
+
     [Header("Levers")]
     public Lever amplitudeLever;
     public Lever frequencyLever;
@@ -101,6 +103,7 @@ public class OscilloscopeController : MonoBehaviour
         if (target.matchTimer < holdDuration) return;
 
         target.solved = true;
+        if (AllSolved) PuzzleProgressionManager.MarkCompleted(progressionId);
         target.onSolved?.Invoke();
     }
 

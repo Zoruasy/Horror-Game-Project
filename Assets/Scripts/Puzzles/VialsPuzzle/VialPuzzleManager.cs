@@ -7,6 +7,8 @@ using UnityEngine.Events;
 /// </summary>
 public class VialPuzzleManager : MonoBehaviour
 {
+    [SerializeField] string progressionId = "vials";
+
     public Vial[] vials;
     public PuzzleLever[] levers;
 
@@ -50,7 +52,11 @@ public class VialPuzzleManager : MonoBehaviour
         if (solved != IsSolved)
         {
             IsSolved = solved;
-            if (solved) onSolved?.Invoke();
+            if (solved)
+            {
+                if (vials.Length > 0) PuzzleProgressionManager.MarkCompleted(progressionId);
+                onSolved?.Invoke();
+            }
             else onUnsolved?.Invoke();
         }
     }
