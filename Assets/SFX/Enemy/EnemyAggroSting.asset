@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyAggroSting
   m_EditorClassIdentifier: Assembly-CSharp::SoundCue
   clips:
-  - {fileID: 8300000, guid: e5c653524c4e65642bb6ec8baf0dc46f, type: 3}
+  - {fileID: 8300000, guid: 92c350f915cfe454788d8757eb69cdaa, type: 3}
   volume: 1
   minPitch: 1
   maxPitch: 1

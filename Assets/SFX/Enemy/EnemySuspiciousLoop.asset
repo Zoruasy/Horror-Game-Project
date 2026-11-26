@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemySuspiciousLoop
   m_EditorClassIdentifier: Assembly-CSharp::SoundCue
   clips:
-  - {fileID: 8300000, guid: 9114f8fc1ad2d654186f0cf3127cd7a1, type: 3}
+  - {fileID: 8300000, guid: e24ebe2758658e846a937058c2803924, type: 3}
   volume: 1
   minPitch: 1
   maxPitch: 1
