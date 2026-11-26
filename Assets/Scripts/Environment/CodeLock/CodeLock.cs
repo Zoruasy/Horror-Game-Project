@@ -4,12 +4,15 @@ public class CodeLock : Interactable
 {
     [Tooltip("Leave empty = automatically searches door in parents")]
     [SerializeField] Interactable doorOverride;
+    [SerializeField] string progressionId = "code-lock";
     [SerializeField] string codeScreenText = "enter code";
     [SerializeField] Renderer indicator;
     [SerializeField] Color solvedColor = Color.green;
 
     ILockableDoor door;
     bool solved;
+
+    public int RequiredCodeLength => door?.RequiredCode?.Length ?? 0;
 
     void Awake()
     {
@@ -39,6 +42,7 @@ public class CodeLock : Interactable
         solved = true;
         door.Unlock();
         if (indicator) indicator.material.color = solvedColor;
+        PuzzleProgressionManager.MarkCompleted(progressionId);
         return true;
     }
 }
