@@ -60,9 +60,13 @@ public class OscilloscopeController : MonoBehaviour
     [Tooltip("Seconds the waves must stay matched")]
     public float holdDuration = 1f;
 
-    public bool AllSolved => targets.All(t => t.solved);
+    [Header("Completion")]
+    [Tooltip("Shown on the screen once every issue is fixed")]
+    [TextArea] public string completionMessage = "Sending power to central door";
 
-    Target ActiveIssue => targets.FirstOrDefault(t => t.solved && t.matched && !t.issueFixed && !string.IsNullOrEmpty(t.message));
+    public bool Completed => targets.Count > 0 && targets.All(t => t.issueFixed);
+
+    Target ActiveIssue => targets.FirstOrDefault(t => t.solved && t.matched && !t.issueFixed);
 
     private LineRenderer lineRenderer;
     private Rect lastRect;
@@ -70,6 +74,10 @@ public class OscilloscopeController : MonoBehaviour
 
     private void OnValidate()
     {
+        for (int i = 0; i < targets.Count; i++)
+            if (string.IsNullOrWhiteSpace(targets[i].message))
+                targets[i].message = $"ISSUE {i + 1}";
+
         DrawTargets();
     }
 
@@ -123,11 +131,11 @@ public class OscilloscopeController : MonoBehaviour
     {
         if (!screenText) return;
 
-        Target reached = ActiveIssue;
-        bool showText = reached != null;
+        string text = Completed ? completionMessage : ActiveIssue?.message;
+        bool showText = !string.IsNullOrEmpty(text);
 
         screenText.gameObject.SetActive(showText);
-        if (showText) screenText.text = reached.message;
+        if (showText) screenText.text = text;
 
         lineRenderer.enabled = !showText;
         foreach (Target target in targets)
