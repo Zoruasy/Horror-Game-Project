@@ -71232,6 +71232,7 @@ GameObject:
   - component: {fileID: 923713237}
   - component: {fileID: 923713239}
   - component: {fileID: 923713238}
+  - component: {fileID: 923713240}
   m_Layer: 6
   m_Name: pointer
   m_TagString: Untagged
@@ -71296,6 +71297,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 923713236}
   m_CullTransparentMesh: 1
+--- !u!114 &923713240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923713236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b3f54ba2c4d4c4f9f3a863e0d8bdfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrosshairUI
+  interactor: {fileID: 1424788304}
+  image: {fileID: 0}
+  defaultSprite: {fileID: 21300000, guid: 36cbc5fa24ef430688d53b7f408a355e, type: 3}
+  interactSprite: {fileID: -7716398010242257392, guid: f4e484c07c40bc94f9a657dbbcfcab8a, type: 3}
+  defaultSize: {x: 10, y: 10}
+  interactSize: {x: 56, y: 56}
+  popSpeed: 18
+  availableColor: {r: 1, g: 1, b: 1, a: 1}
+  unavailableColor: {r: 1, g: 1, b: 1, a: 0.45}
 --- !u!43 &928262250
 Mesh:
   m_ObjectHideFlags: 0
@@ -109011,6 +109033,17 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967067
   groundCheckDistance: 0.3
+--- !u!114 &1424788304 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3327507325589859458, guid: c82236c16aae9d34fbd437f8dea6e2c9, type: 3}
+  m_PrefabInstance: {fileID: 1424788293}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1424788295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ae0d8bd38e4599f9cf9799f05b3870, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
 --- !u!43 &1425282813
 Mesh:
   m_ObjectHideFlags: 0

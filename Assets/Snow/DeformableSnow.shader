@@ -1,15 +1,15 @@
-// URP sneeuw-shader: duwt de vertices omlaag waar voetafdrukken zitten,
-// maakt een klein randje sneeuw rond de afdruk, en berekent per pixel de
-// normals zodat de afdrukken mooi belicht worden.
+// URP snow shader: pushes the vertices down where there are footprints,
+// adds a small rim of snow around each footprint, and computes normals
+// per pixel so the footprints are lit nicely.
 Shader "Custom/DeformableSnow"
 {
     Properties
     {
         _BaseColor      ("Snow Color", Color) = (0.95, 0.97, 1.0, 1)
         _DeepColor      ("Footprint Color", Color) = (0.72, 0.80, 0.90, 1)
-        _BaseMap        ("Snow Texture (optioneel)", 2D) = "white" {}
+        _BaseMap        ("Snow Texture (optional)", 2D) = "white" {}
         _Smoothness     ("Smoothness", Range(0, 1)) = 0.35
-        _RimHeight      ("Rim Height (randje rond afdruk)", Range(0, 0.1)) = 0.02
+        _RimHeight      ("Rim Height (ridge around footprint)", Range(0, 0.1)) = 0.02
         _NormalStrength ("Footprint Normal Strength", Range(0, 4)) = 1
     }
 
@@ -31,10 +31,10 @@ Shader "Custom/DeformableSnow"
 
         TEXTURE2D(_BaseMap);       SAMPLER(sampler_BaseMap);
 
-        // Globals, gezet door SnowSurface.cs
+        // Globals, set by SnowSurface.cs
         TEXTURE2D(_SnowTrailTex);  SAMPLER(sampler_SnowTrailTex);
-        float4 _SnowArea;    // xy = minimum wereld XZ, zw = grootte in meters
-        float4 _SnowParams;  // x = 1 texel in uv, y = max diepte (sneeuwdikte)
+        float4 _SnowArea;    // xy = minimum world XZ, zw = size in meters
+        float4 _SnowParams;  // x = 1 texel in uv, y = max depth (snow thickness)
 
         struct Attributes
         {
@@ -50,11 +50,11 @@ Shader "Custom/DeformableSnow"
 
         float SampleTrail(float2 uv)
         {
-            float2 m = step(0.0, uv) * step(uv, 1.0); // buiten het gebied = 0
+            float2 m = step(0.0, uv) * step(uv, 1.0); // outside the area = 0
             return SAMPLE_TEXTURE2D_LOD(_SnowTrailTex, sampler_SnowTrailTex, uv, 0).r * m.x * m.y;
         }
 
-        // Hoogte-offset in meters (negatief = ingedeukt, positief = randje)
+        // Height offset in meters (negative = pressed down, positive = rim)
         float SnowOffset(float2 uv)
         {
             float t = SampleTrail(uv);
@@ -71,7 +71,7 @@ Shader "Custom/DeformableSnow"
             return positionWS;
         }
 
-        // Normal uit de hoogteverschillen (per pixel, dus scherp ook op een grover mesh)
+        // Normal from the height differences (per pixel, so it stays sharp even on a coarser mesh)
         float3 SnowNormalWS(float3 positionWS, float3 meshNormalWS)
         {
             float2 uv = SnowUV(positionWS);
@@ -132,7 +132,7 @@ Shader "Custom/DeformableSnow"
             {
                 float3 radiance = light.color * (light.distanceAttenuation * light.shadowAttenuation);
                 float  NdotL = saturate(dot(N, light.direction));
-                float  wrap  = saturate((dot(N, light.direction) + 0.2) / 1.2); // sneeuw = zacht licht
+                float  wrap  = saturate((dot(N, light.direction) + 0.2) / 1.2); // snow = soft lighting
                 float3 H = SafeNormalize(light.direction + V);
                 float  spec = pow(saturate(dot(N, H)), exp2(10.0 * _Smoothness + 1.0)) * _Smoothness;
                 return radiance * (albedo * wrap + spec * NdotL);
@@ -153,7 +153,7 @@ Shader "Custom/DeformableSnow"
                 color += ShadeLight(mainLight, N, V, albedo);
 
                 #if defined(_ADDITIONAL_LIGHTS)
-                // Forward+ (jouw project) en gewone Forward, net als URP's eigen shaders
+                // Forward+ (used by this project) and regular Forward, just like URP's own shaders
                 InputData inputData = (InputData)0;
                 inputData.positionWS = IN.positionWS;
                 inputData.normalWS = N;
@@ -234,7 +234,7 @@ Shader "Custom/DeformableSnow"
             ENDHLSL
         }
 
-        // ---------------------------------------------------------------- DepthNormals (SSAO e.d.)
+        // ---------------------------------------------------------------- DepthNormals (SSAO etc.)
         Pass
         {
             Name "DepthNormals"

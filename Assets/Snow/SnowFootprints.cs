@@ -1,49 +1,49 @@
 using UnityEngine;
 
 /// <summary>
-/// Zet dit op de player en op elke enemy. Laat om de zoveel meter een voetafdruk achter,
-/// afwisselend links en rechts. Bij afzetten (springen/eraf vallen) en landen komen er
-/// altijd twee afdrukken naast elkaar.
+/// Put this on the player and on every enemy. Leaves a footprint every few meters,
+/// alternating left and right. Taking off (jumping / falling off something) and landing
+/// always leave two footprints side by side.
 /// </summary>
 public class SnowFootprints : MonoBehaviour
 {
-    [Header("Voeten (optioneel)")]
-    [Tooltip("Voet-bones van je model. Leeg laten = afdrukken naast het midden van het character.")]
+    [Header("Feet (optional)")]
+    [Tooltip("Foot bones of your model. Leave empty = footprints next to the center of the character.")]
     public Transform leftFoot;
     public Transform rightFoot;
-    [Tooltip("Aan = lopen alleen via Animation Events (functie 'Footstep' met string 'Left' of 'Right'). Springen/landen werkt altijd.")]
+    [Tooltip("On = walking footprints only via Animation Events (function 'Footstep' with string 'Left' or 'Right'). Jumping/landing always works.")]
     public bool useAnimationEvents = false;
 
-    [Header("Stappen")]
-    [Tooltip("Afstand in meters tussen twee afdrukken.")]
+    [Header("Steps")]
+    [Tooltip("Distance in meters between two footprints.")]
     public float stepDistance = 0.6f;
-    [Tooltip("Hoe ver links/rechts van het midden (alleen als er geen voet-bones zijn).")]
+    [Tooltip("How far left/right of the center (only used when there are no foot bones).")]
     public float footSpacing = 0.14f;
 
-    [Header("Afdruk")]
+    [Header("Footprint")]
     public float footprintWidth = 0.13f;
     public float footprintLength = 0.30f;
     [Range(0f, 1f)] public float depth = 1f;
 
-    [Header("Springen / landen")]
+    [Header("Jumping / landing")]
     public bool stampOnJumpAndLand = true;
-    [Tooltip("Zo lang moet je minstens in de lucht zijn voordat het als sprong telt (zodat trapjes en hobbels niet meetellen).")]
+    [Tooltip("Minimum time in the air before it counts as a jump (so stairs and bumps don't count).")]
     public float minAirTime = 0.12f;
-    [Tooltip("Landingsafdrukken zijn iets groter, want je komt met je gewicht neer.")]
+    [Tooltip("Landing footprints are slightly bigger, because you come down with your full weight.")]
     public float landingSizeMultiplier = 1.15f;
 
-    [Header("Grond check")]
+    [Header("Ground check")]
     public bool requireGrounded = true;
-    [Tooltip("Alleen de grond-layer, niet de layer van dit character.")]
+    [Tooltip("Ground layer only, not the layer of this character.")]
     public LayerMask groundLayers = ~0;
     public float groundCheckDistance = 0.3f;
 
     Vector3 lastStepPos;
     bool leftNext = true;
     Collider col;
-    UnityEngine.CharacterController cc; // volledig uitgeschreven: je project heeft ook een namespace "CharacterController"
+    UnityEngine.CharacterController cc; // fully qualified: the project also has a namespace called "CharacterController"
 
-    // sprong-status
+    // jump state
     bool wasGrounded = true;
     float airTime;
     bool takeoffStamped;
@@ -72,7 +72,7 @@ public class SnowFootprints : MonoBehaviour
         if (moved.magnitude < stepDistance) return;
 
         lastStepPos = transform.position;
-        if (requireGrounded && !IsGrounded()) return; // in de lucht: geen afdruk
+        if (requireGrounded && !IsGrounded()) return; // in the air: no footprint
 
         StampFoot(leftNext);
         leftNext = !leftNext;
@@ -84,11 +84,11 @@ public class SnowFootprints : MonoBehaviour
 
         if (grounded)
         {
-            // Landing: twee voeten naast elkaar
+            // Landing: two feet side by side
             if (!wasGrounded && airTime >= minAirTime)
             {
                 StampBothFeet(FeetPosition(), FlatForward(), landingSizeMultiplier);
-                lastStepPos = transform.position; // niet meteen nog een stap er bovenop
+                lastStepPos = transform.position; // don't immediately add another step on top of it
             }
             airTime = 0f;
             takeoffStamped = false;
@@ -98,7 +98,7 @@ public class SnowFootprints : MonoBehaviour
         else
         {
             airTime += Time.deltaTime;
-            // Afzet: zodra duidelijk is dat het een echte sprong/val is, afdruk op de plek waar je loskwam
+            // Take-off: once it's clearly a real jump/fall, stamp where you left the ground
             if (!takeoffStamped && airTime >= minAirTime)
             {
                 takeoffStamped = true;
@@ -109,7 +109,7 @@ public class SnowFootprints : MonoBehaviour
         wasGrounded = grounded;
     }
 
-    // Aan te roepen vanuit een Animation Event: Footstep("Left") of Footstep("Right")
+    // Call this from an Animation Event: Footstep("Left") or Footstep("Right")
     public void Footstep(string foot)
     {
         if (SnowSurface.Instance == null) return;
@@ -156,13 +156,13 @@ public class SnowFootprints : MonoBehaviour
         return p;
     }
 
-    // Ruime check voor gewone stappen
+    // Loose check for normal steps
     bool IsGrounded()
     {
         return (cc != null && cc.isGrounded) || RaycastGround(groundCheckDistance);
     }
 
-    // Strakke check voor springen/landen (zelfde idee als je FirstPersonController)
+    // Tight check for jumping/landing (same idea as the FirstPersonController)
     bool IsGroundedTight()
     {
         return (cc != null && cc.isGrounded) || RaycastGround(0.08f);
@@ -170,7 +170,7 @@ public class SnowFootprints : MonoBehaviour
 
     bool RaycastGround(float distance)
     {
-        // Start onderaan de collider (werkt ook als de pivot in het midden zit)
+        // Start at the bottom of the collider (also works when the pivot is in the middle)
         Vector3 origin = FeetPosition();
         origin.y += 0.1f;
         return Physics.Raycast(origin, Vector3.down, 0.1f + distance,

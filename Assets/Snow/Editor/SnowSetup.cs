@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Menu: Tools > Snow
-/// Zet de sneeuw in de AlexSnow-scene (Game/Section 1/Room 2, de lockerkamer),
-/// of op een vloer die je zelf selecteert.
+/// Places the snow in the AlexSnow scene (Game/Section 1/Room 2, the locker room),
+/// or on a floor you select yourself.
 /// </summary>
 public static class SnowSetup
 {
@@ -15,7 +15,7 @@ public static class SnowSetup
     const string RoomPath = "Game/Section 1/Room 2";
     const string MaterialPath = "Assets/Snow/SnowMaterial.mat";
 
-    [MenuItem("Tools/Snow/Setup AlexSnow (Room 2 - lockerkamer)")]
+    [MenuItem("Tools/Snow/Setup AlexSnow (Room 2 - locker room)")]
     static void SetupAlexSnow()
     {
         Scene scene = SceneManager.GetActiveScene();
@@ -29,8 +29,8 @@ public static class SnowSetup
         Transform floor = room != null ? room.Find("Floor") : null;
         if (floor == null)
         {
-            EditorUtility.DisplayDialog("Snow", $"Kon '{RoomPath}/Floor' niet vinden in de scene.\n" +
-                "Selecteer de vloer zelf en gebruik Tools > Snow > Add Snow To Selected Floor.", "OK");
+            EditorUtility.DisplayDialog("Snow", $"Could not find '{RoomPath}/Floor' in the scene.\n" +
+                "Select the floor yourself and use Tools > Snow > Add Snow To Selected Floor.", "OK");
             return;
         }
 
@@ -42,7 +42,7 @@ public static class SnowSetup
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = snow;
         EditorGUIUtility.PingObject(snow);
-        Debug.Log($"[Snow] Sneeuw geplaatst in {RoomPath}, footprints op {count} character(s). Scene opgeslagen.");
+        Debug.Log($"[Snow] Snow placed in {RoomPath}, footprints added to {count} character(s). Scene saved.");
     }
 
     [MenuItem("Tools/Snow/Add Snow To Selected Floor")]
@@ -54,7 +54,7 @@ public static class SnowSetup
         int count = AddFootprintsToCharacters(floor.scene);
         EditorSceneManager.MarkSceneDirty(floor.scene);
         Selection.activeGameObject = snow;
-        Debug.Log($"[Snow] Sneeuw geplaatst op '{floor.name}', footprints op {count} character(s). Vergeet niet op te slaan (Ctrl+S).");
+        Debug.Log($"[Snow] Snow placed on '{floor.name}', footprints added to {count} character(s). Don't forget to save (Ctrl+S).");
     }
 
     [MenuItem("Tools/Snow/Add Snow To Selected Floor", true)]
@@ -81,7 +81,7 @@ public static class SnowSetup
     {
         if (!TryGetBounds(floor, out Bounds b))
         {
-            EditorUtility.DisplayDialog("Snow", $"'{floor.name}' heeft geen Renderer of Collider, dus ik weet niet hoe groot de vloer is.", "OK");
+            EditorUtility.DisplayDialog("Snow", $"'{floor.name}' has no Renderer or Collider, so the size of the floor is unknown.", "OK");
             return null;
         }
 
@@ -89,21 +89,21 @@ public static class SnowSetup
         Shader updateShader = Shader.Find("Hidden/SnowTrailUpdate");
         if (mat == null || updateShader == null)
         {
-            EditorUtility.DisplayDialog("Snow", "De snow-shaders zijn (nog) niet gevonden. Wacht tot Unity klaar is met importeren en probeer opnieuw.", "OK");
+            EditorUtility.DisplayDialog("Snow", "The snow shaders were not found (yet). Wait until Unity has finished importing and try again.", "OK");
             return null;
         }
 
-        // Het systeem ondersteunt één sneeuwveld tegelijk: oude weghalen
+        // The system supports one snow field at a time: remove the old one
         foreach (SnowSurface old in Object.FindObjectsByType<SnowSurface>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             if (old.gameObject.scene == floor.scene)
                 Undo.DestroyObjectImmediate(old.gameObject);
 
         var go = new GameObject("Snow");
-        go.SetActive(false); // eerst alles instellen, dan pas aanzetten
+        go.SetActive(false); // configure everything first, then enable
         Undo.RegisterCreatedObjectUndo(go, "Create Snow");
         SceneManager.MoveGameObjectToScene(go, floor.scene);
 
-        // Netjes onder de kamer hangen als die niet gedraaid/geschaald is
+        // Parent it neatly under the room if the room isn't rotated/scaled
         Transform parent = floor.transform.parent;
         if (parent != null && parent.rotation == Quaternion.identity && parent.lossyScale == Vector3.one)
             go.transform.SetParent(parent, false);
@@ -114,10 +114,10 @@ public static class SnowSetup
         snow.size = new Vector2(b.size.x, b.size.z);
         snow.snowThickness = 0.15f;
         float longest = Mathf.Max(b.size.x, b.size.z);
-        snow.meshResolution = Mathf.Clamp(Mathf.CeilToInt(longest / 0.035f), 64, 512); // ~3,5 cm per vakje
+        snow.meshResolution = Mathf.Clamp(Mathf.CeilToInt(longest / 0.035f), 64, 512); // ~3.5 cm per grid cell
         snow.trailTextureSize = longest > 20f ? 2048 : 1024;
         snow.fadeDuration = 30f;
-        snow.conformToGround = false; // binnen: de raycast zou anders het plafond raken
+        snow.conformToGround = false; // indoors: the raycast would hit the ceiling otherwise
         snow.trailUpdateShader = updateShader;
 
         var mr = go.GetComponent<MeshRenderer>();
@@ -162,7 +162,7 @@ public static class SnowSetup
     /// <summary>Player = CharacterController, enemies = NavMeshAgent.</summary>
     static int AddFootprintsToCharacters(Scene scene)
     {
-        // Grond = alles behalve de player/enemy/ignore-raycast layers
+        // Ground = everything except the player/enemy/ignore-raycast layers
         int groundMask = ~LayerMask.GetMask("Player", "Enemy", "Ignore Raycast", "UI");
 
         var targets = new List<(GameObject go, bool isEnemy)>();
@@ -174,7 +174,7 @@ public static class SnowSetup
         foreach (var (go, isEnemy) in targets)
         {
             var fp = go.GetComponent<SnowFootprints>();
-            if (fp == null) fp = Undo.AddComponent<SnowFootprints>(go); // scene-override, prefab blijft ongewijzigd
+            if (fp == null) fp = Undo.AddComponent<SnowFootprints>(go); // scene override, the prefab itself stays unchanged
             else Undo.RecordObject(fp, "Configure Footprints");
 
             fp.groundLayers = groundMask;
