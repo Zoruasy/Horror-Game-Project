@@ -44,6 +44,10 @@ public class PuzzleLever : MonoBehaviour
     public float maxInteractDistance = 3f;
     public LayerMask interactMask = ~0;
 
+    ElectrocutionPuzzleSequence powerSource;
+    VialPuzzleManager puzzleManager;
+    bool isLocked;
+
     [Header("Events")]
     public UnityEvent onGrab;
     public UnityEvent onRelease;
@@ -59,6 +63,24 @@ public class PuzzleLever : MonoBehaviour
 
     Vector3 handleStartPos; // positie bij stand 0
     float dragAccumulator;
+
+    public void SetPowerSource(ElectrocutionPuzzleSequence source)
+    {
+        powerSource = source;
+    }
+
+    public void SetPuzzleManager(VialPuzzleManager manager)
+    {
+        puzzleManager = manager;
+        if (puzzleManager != null && puzzleManager.IsSolved)
+            Lock();
+    }
+
+    public void Lock()
+    {
+        isLocked = true;
+        if (IsDragging) EndDrag();
+    }
 
     void Awake()
     {
@@ -82,6 +104,12 @@ public class PuzzleLever : MonoBehaviour
 
     void HandleInput()
     {
+        if (isLocked)
+        {
+            if (IsDragging) EndDrag();
+            return;
+        }
+
         if (!IsDragging)
         {
             if (LeftMouseDown() && TryGrab())
@@ -115,6 +143,8 @@ public class PuzzleLever : MonoBehaviour
     bool TryGrab()
     {
         if (handle == null) return false;
+        if (isLocked || (puzzleManager != null && puzzleManager.IsSolved)) return false;
+
         Camera cam = Camera.main;
         if (cam == null) return false;
 
@@ -125,7 +155,18 @@ public class PuzzleLever : MonoBehaviour
 
         Ray ray = cam.ScreenPointToRay(screenPos);
         if (Physics.Raycast(ray, out RaycastHit hit, maxInteractDistance, interactMask, QueryTriggerInteraction.Ignore))
-            return hit.collider.transform == handle || hit.collider.transform.IsChildOf(handle);
+        {
+            bool hitHandle = hit.collider.transform == handle || hit.collider.transform.IsChildOf(handle);
+            if (!hitHandle) return false;
+
+            if (powerSource != null && !powerSource.PowerOn)
+            {
+                powerSource.LogBlockedPuzzleAttempt("blood vials", this);
+                return false;
+            }
+
+            return true;
+        }
 
         return false;
     }
@@ -152,11 +193,14 @@ public class PuzzleLever : MonoBehaviour
 
     public void SetStep(int step)
     {
+        if (isLocked || (puzzleManager != null && puzzleManager.IsSolved)) return;
+
         step = Mathf.Clamp(step, 0, MaxStep);
         if (step == CurrentStep) return;
         CurrentStep = step;
         onStepChanged?.Invoke();
         Changed?.Invoke();
+        Debug.Log($"{name} moved to stand {CurrentStep + 1}/{breakpoints} (internal index {CurrentStep}).", this);
     }
 
     public float GetContribution(int vialIndex)

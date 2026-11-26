@@ -30715,6 +30715,8 @@ Transform:
   - {fileID: 1255736210}
   - {fileID: 1156459358}
   - {fileID: 1265420102}
+  - {fileID: 125416920}
+  - {fileID: 695878061}
   m_Father: {fileID: 2092072928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &408023811
@@ -84670,7 +84672,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8cecf4e0e155aec429830f4467c93fc2, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 39a32fe378b7a1246bb81617e90dab49, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1083019091
 Transform:

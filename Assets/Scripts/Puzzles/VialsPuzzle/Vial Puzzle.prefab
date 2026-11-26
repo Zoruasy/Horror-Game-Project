@@ -6458,7 +6458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vial
   maxLevel: 10
-  targetLevel: 5
+  targetLevel: 8
   tolerance: 0.01
   liquid: {fileID: 0}
   fillSpeed: 4
@@ -6859,9 +6859,9 @@ MonoBehaviour:
   breakpoints: 7
   startStep: 0
   amountPerStep:
-  - 0.5
-  - 0.5
-  - 1
+  - 1.5
+  - 4
+  - 2.5
   handle: {fileID: 3795953715711477502}
   slideDirection: {x: 0, y: 1, z: 0}
   stepDistance: 0.2
@@ -7277,9 +7277,9 @@ MonoBehaviour:
   breakpoints: 7
   startStep: 0
   amountPerStep:
-  - 1.5
-  - 2
-  - 1.5
+  - 0
+  - 1
+  - 0
   handle: {fileID: 7551902240323847388}
   slideDirection: {x: 0, y: 1, z: 0}
   stepDistance: 0.2
@@ -12375,9 +12375,9 @@ MonoBehaviour:
   breakpoints: 7
   startStep: 0
   amountPerStep:
+  - 0
+  - 0
   - 1
-  - 1.5
-  - 0.5
   handle: {fileID: 4774399821592014660}
   slideDirection: {x: 0, y: 1, z: 0}
   stepDistance: 0.2
@@ -14078,7 +14078,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Vial
   maxLevel: 10
-  targetLevel: 5
+  targetLevel: 3
   tolerance: 0.01
   liquid: {fileID: 0}
   fillSpeed: 4
