@@ -131,15 +131,21 @@ public class OscilloscopeController : MonoBehaviour
     {
         if (!screenText) return;
 
-        string text = Completed ? completionMessage : ActiveIssue?.message;
+        Target issue = ActiveIssue;
+        string text = Completed ? completionMessage : issue?.message;
         bool showText = !string.IsNullOrEmpty(text);
 
         screenText.gameObject.SetActive(showText);
-        if (showText) screenText.text = text;
+        if (showText)
+        {
+            screenText.text = text;
+            LineRenderer colorSource = Completed ? lineRenderer : issue.line;
+            if (colorSource) screenText.color = colorSource.startColor;
+        }
 
         lineRenderer.enabled = !showText;
         foreach (Target target in targets)
-            if (target.line) target.line.enabled = !showText && !target.issueFixed;
+            if (target.line) target.line.gameObject.SetActive(!showText && !target.issueFixed);
     }
 
     void CheckSolved(Target target, float amplitudeRatio, float frequencyRatio)
@@ -176,7 +182,7 @@ public class OscilloscopeController : MonoBehaviour
 
     void DrawWave(float amplitudeRatio, float frequencyRatio, LineRenderer line)
     {
-        if (!screenArea || !line.enabled) return;
+        if (!screenArea || !line.enabled || !line.gameObject.activeInHierarchy) return;
 
         Rect rect = screenArea.rect;
         float amplitude = amplitudeRatio * maxAmplitude * rect.height / 2f;
