@@ -23991,7 +23991,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cooldown
+  m_text: F
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -31832,7 +31832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba1ae6b043a8e19458d5ba27337d0e12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlashCooldownUI
-  eye: {fileID: 0}
+  eye: {fileID: 1361799105}
   slider: {fileID: 623769258}
   fillImage: {fileID: 1728057674}
   timerText: {fileID: 341427819}
@@ -46788,6 +46788,11 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!1 &573880288 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1776077227666633953, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+  m_PrefabInstance: {fileID: 1144119081}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &576390677
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -50823,7 +50828,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -89424,6 +89429,10 @@ PrefabInstance:
       propertyPath: sprintSpeed
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5303458788899073544, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+      propertyPath: promptUI
+      value: 
+      objectReference: {fileID: 1747700370}
     - target: {fileID: 5909980650493079664, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
       propertyPath: eye
       value: 
@@ -89439,7 +89448,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1776077227666633953, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1899880212}
+    - targetCorrespondingSourceObject: {fileID: 1776077227666633953, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1899880211}
+    - targetCorrespondingSourceObject: {fileID: 1776077227666633953, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1899880210}
   m_SourcePrefab: {fileID: 100100000, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
 --- !u!43 &1147854080
 Mesh:
@@ -105984,6 +106002,7 @@ GameObject:
   - component: {fileID: 1361799105}
   - component: {fileID: 1361799104}
   - component: {fileID: 1361799106}
+  - component: {fileID: 1361799107}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -106000,7 +106019,7 @@ Transform:
   m_GameObject: {fileID: 1361799102}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 36.20546, y: 4.45682, z: -38.04575}
+  m_LocalPosition: {x: 36.20546, y: 4.472, z: -38.04575}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -106049,6 +106068,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HideHUD
   eye: {fileID: 1361799105}
   hudCanvas: {fileID: 916995168}
+--- !u!114 &1361799107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361799102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc5977ba565ebeec29cc73fafded6c14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectInspector
+  cam: {fileID: 2034813288}
+  root: {fileID: 0}
+  hintLabel: {fileID: 0}
+  rotationSpeed: 0.3
+  zoomStep: 0.1
+  zoomRange: {x: 0.5, y: 1.5}
+  screenFill: 0.6
+  moveSpeed: 10
+  inspectLayer: Inspect
+  blur: 1.5
+  darken: 1.5
+  vignette: 0.4
 --- !u!43 &1362797995
 Mesh:
   m_ObjectHideFlags: 0
@@ -149969,7 +150012,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 660105937406751486, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
   m_PrefabInstance: {fileID: 1144119081}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 573880288}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b608804b4052b784e9c6015685a915c8, type: 3}
@@ -149980,6 +150023,45 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1776077227666633952, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
   m_PrefabInstance: {fileID: 1144119081}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1899880210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573880288}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d1420bffd98de4478bbd184600cad80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EyeLight
+  eye: {fileID: 1361799105}
+  eyeLight: {fileID: 0}
+--- !u!114 &1899880211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573880288}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e503c6c686846f541b7474bb89457463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 100
+--- !u!114 &1899880212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573880288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c35ad0a790de4806b3aff3ed982c0474, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
 --- !u!43 &1904567033
 Mesh:
   m_ObjectHideFlags: 0
@@ -161257,6 +161339,11 @@ Mesh:
       - serializedVersion: 1
         m_IndexStart: 0
         m_IndexCount: 0
+--- !u!20 &2034813288 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1776077227350584321, guid: dae9f112fa2fc654a95b0e98ba059393, type: 3}
+  m_PrefabInstance: {fileID: 1144119081}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &2037825626
 Mesh:
   m_ObjectHideFlags: 0
