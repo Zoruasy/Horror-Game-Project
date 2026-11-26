@@ -2,39 +2,39 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Maakt een dichte sneeuw-mesh en houdt een "footprint map" (RenderTexture) bij.
-/// Zet dit op een leeg GameObject op grondhoogte (rotatie 0, scale 1).
+/// Builds a dense snow mesh and maintains a "footprint map" (RenderTexture).
+/// Put this on an empty GameObject at floor height (rotation 0, scale 1).
 /// </summary>
-[ExecuteAlways] // zodat je de sneeuw ook in de editor ziet
+[ExecuteAlways] // so you can also see the snow in the editor
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SnowSurface : MonoBehaviour
 {
     public static SnowSurface Instance { get; private set; }
 
-    [Header("Gebied")]
-    [Tooltip("Grootte van het sneeuwveld in meters (X, Z). Midden = positie van dit object.")]
+    [Header("Area")]
+    [Tooltip("Size of the snow field in meters (X, Z). Center = position of this object.")]
     public Vector2 size = new Vector2(20f, 20f);
-    [Tooltip("Aantal vakjes per zijde. Hoger = mooiere afdrukken, maar zwaarder. 256-512 is goed.")]
+    [Tooltip("Number of grid cells per side. Higher = nicer footprints, but heavier. 256-512 works well.")]
     [Range(16, 1024)] public int meshResolution = 384;
-    [Tooltip("Dikte van de sneeuwlaag in meters. Een volle afdruk gaat tot de grond.")]
+    [Tooltip("Thickness of the snow layer in meters. A full-depth footprint goes all the way down to the floor.")]
     public float snowThickness = 0.15f;
-    [Tooltip("Voeten die verder dan dit boven/onder de sneeuw zijn (andere verdieping) maken geen afdruk.")]
+    [Tooltip("Feet that are further than this above/below the snow (another floor level) leave no footprint.")]
     public float heightTolerance = 1.0f;
 
-    [Header("Grond volgen (voor heuvels / terrain)")]
+    [Header("Conform to ground (for hills / terrain)")]
     public bool conformToGround = false;
-    [Tooltip("Alleen de grond! Niet de layer van player/enemies.")]
+    [Tooltip("Ground only! Not the player/enemy layers.")]
     public LayerMask groundLayers = ~0;
     public float raycastHeight = 50f;
 
     [Header("Footprints")]
-    [Tooltip("Resolutie van de footprint map. 1024 op 20m = 2 cm per pixel.")]
+    [Tooltip("Resolution of the footprint map. 1024 over 20 m = 2 cm per pixel.")]
     public int trailTextureSize = 1024;
-    [Tooltip("Hoeveel seconden het duurt voor een afdruk helemaal weg is.")]
+    [Tooltip("How many seconds it takes for a footprint to fully disappear.")]
     public float fadeDuration = 30f;
 
     [Header("Shader")]
-    [Tooltip("Sleep hier 'Hidden/SnowTrailUpdate' in (anders wordt hij in een build weggelaten).")]
+    [Tooltip("Drag 'Hidden/SnowTrailUpdate' in here (otherwise it gets stripped from builds).")]
     public Shader trailUpdateShader;
 
     const int MaxStamps = 32;
@@ -64,7 +64,7 @@ public class SnowSurface : MonoBehaviour
     void OnEnable()
     {
         if (Application.isPlaying) return;
-        BuildMesh(); // preview in de editor
+        BuildMesh(); // preview in the editor
         ResetGlobals();
     }
 #endif
@@ -73,7 +73,7 @@ public class SnowSurface : MonoBehaviour
     {
         if (!Application.isPlaying) return;
         if (Instance != null && Instance != this)
-            Debug.LogWarning("Er is meer dan één SnowSurface; alleen de laatste krijgt footprints.");
+            Debug.LogWarning("There is more than one SnowSurface; only the last one receives footprints.");
         Instance = this;
 
         BuildMesh();
@@ -81,7 +81,7 @@ public class SnowSurface : MonoBehaviour
         if (trailUpdateShader == null) trailUpdateShader = Shader.Find("Hidden/SnowTrailUpdate");
         if (trailUpdateShader == null)
         {
-            Debug.LogError("SnowSurface: shader 'Hidden/SnowTrailUpdate' niet gevonden.");
+            Debug.LogError("SnowSurface: shader 'Hidden/SnowTrailUpdate' not found.");
             enabled = false;
             return;
         }
@@ -94,7 +94,7 @@ public class SnowSurface : MonoBehaviour
 
     RenderTexture CreateTrailTexture()
     {
-        // RFloat: nodig omdat we elke frame een héél klein beetje aftrekken (30 sec fade)
+        // RFloat: needed because we subtract a very small amount every frame (30 sec fade)
         var format = SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RFloat)
             ? RenderTextureFormat.RFloat : RenderTextureFormat.RHalf;
         var rt = new RenderTexture(trailTextureSize, trailTextureSize, 0, format)
@@ -123,7 +123,7 @@ public class SnowSurface : MonoBehaviour
     {
         if (!Application.isPlaying || updateMat == null) return;
 
-        // Nieuwe voetafdrukken van deze frame klaarzetten (max 32, rest volgende frame)
+        // Queue this frame's new footprints (max 32, the rest go next frame)
         int count = Mathf.Min(pendingA.Count, MaxStamps);
         for (int i = 0; i < MaxStamps; i++)
         {
@@ -140,7 +140,7 @@ public class SnowSurface : MonoBehaviour
         updateMat.SetVectorArray(StampAId, stampA);
         updateMat.SetVectorArray(StampBId, stampB);
 
-        // Ping-pong: lees uit A, schrijf naar B, wissel om
+        // Ping-pong: read from A, write to B, then swap
         Graphics.Blit(trailA, trailB, updateMat);
         (trailA, trailB) = (trailB, trailA);
 
@@ -148,19 +148,19 @@ public class SnowSurface : MonoBehaviour
     }
 
     /// <summary>
-    /// Druk een voetafdruk in de sneeuw.
+    /// Press a footprint into the snow.
     /// </summary>
-    /// <param name="worldPos">Positie van de voet (alleen X en Z tellen).</param>
-    /// <param name="forward">Richting waarin de voet wijst.</param>
-    /// <param name="width">Breedte van de afdruk in meters.</param>
-    /// <param name="length">Lengte van de afdruk in meters.</param>
-    /// <param name="depth">0..1, 1 = helemaal tot de grond.</param>
+    /// <param name="worldPos">Position of the foot (only X and Z are used).</param>
+    /// <param name="forward">Direction the foot is pointing.</param>
+    /// <param name="width">Width of the footprint in meters.</param>
+    /// <param name="length">Length of the footprint in meters.</param>
+    /// <param name="depth">0..1, 1 = all the way down to the floor.</param>
     public void AddFootprint(Vector3 worldPos, Vector3 forward, float width, float length, float depth = 1f)
     {
         Vector2 min = AreaMin;
         Vector2 uv = new Vector2((worldPos.x - min.x) / size.x, (worldPos.z - min.y) / size.y);
-        if (uv.x < -0.05f || uv.x > 1.05f || uv.y < -0.05f || uv.y > 1.05f) return; // buiten de sneeuw
-        if (Mathf.Abs(worldPos.y - transform.position.y) > heightTolerance) return;   // andere verdieping
+        if (uv.x < -0.05f || uv.x > 1.05f || uv.y < -0.05f || uv.y > 1.05f) return; // outside the snow
+        if (Mathf.Abs(worldPos.y - transform.position.y) > heightTolerance) return;   // different floor level
 
         Vector2 f = new Vector2(forward.x, forward.z);
         if (f.sqrMagnitude < 0.0001f) f = Vector2.up;
@@ -199,7 +199,7 @@ public class SnowSurface : MonoBehaviour
 
                 int i = z * vx + x;
                 verts[i] = local;
-                uvs[i] = new Vector2(fx * size.x, fz * size.y); // 1 texture-tile per meter
+                uvs[i] = new Vector2(fx * size.x, fz * size.y); // 1 texture tile per meter
             }
         }
 
@@ -219,7 +219,7 @@ public class SnowSurface : MonoBehaviour
             if (Application.isPlaying) Destroy(generatedMesh);
             else DestroyImmediate(generatedMesh);
         }
-        // DontSave: de mesh wordt niet in de scene opgeslagen (scheelt MB's), hij wordt steeds opnieuw gemaakt
+        // DontSave: the mesh is not saved into the scene (saves megabytes); it is rebuilt every time
         var mesh = new Mesh { name = "SnowMesh", hideFlags = HideFlags.DontSave };
         generatedMesh = mesh;
         if (verts.Length > 65535) mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
@@ -229,7 +229,7 @@ public class SnowSurface : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         var b = mesh.bounds;
-        b.Expand(new Vector3(0f, snowThickness * 2f + 0.5f, 0f)); // ruimte voor het indeuken
+        b.Expand(new Vector3(0f, snowThickness * 2f + 0.5f, 0f)); // room for the snow to be pressed down
         mesh.bounds = b;
 
         GetComponent<MeshFilter>().sharedMesh = mesh;
@@ -249,7 +249,7 @@ public class SnowSurface : MonoBehaviour
         ResetGlobals();
     }
 
-    // Zonder dit zou de sneeuw na het stoppen van Play mode raar ingezakt blijven in de editor
+    // Without this the snow would stay oddly sunken in the editor after leaving Play mode
     static void ResetGlobals()
     {
         Shader.SetGlobalTexture(TrailTexId, Texture2D.blackTexture);
