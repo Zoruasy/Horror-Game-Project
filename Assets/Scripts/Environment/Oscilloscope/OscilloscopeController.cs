@@ -182,7 +182,7 @@ public class OscilloscopeController : MonoBehaviour
         {
             float t = (float)i / (points - 1);
             float x = Mathf.Lerp(rect.xMin, rect.xMax, t);
-            float y = rect.center.y + Mathf.Sin(t * frequency * Mathf.PI * 2f + Time.time * scrollSpeed) * amplitude;
+            float y = rect.center.y + Mathf.Sin((t - 0.5f) * frequency * Mathf.PI * 2f + Time.time * scrollSpeed) * amplitude;
 
             Vector3 world = screenArea.TransformPoint(new Vector3(x, y, 0f));
             line.SetPosition(i, line.useWorldSpace ? world : line.transform.InverseTransformPoint(world));
