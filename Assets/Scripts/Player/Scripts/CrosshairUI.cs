@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Zet dit op je crosshair-Image ("pointer" onder HUD Canvas).
-/// Toont een stip, en een hand-icoon zodra de PlayerInteractor iets heeft gevonden
-/// waarmee je kunt interacteren (dezelfde momenten waarop de interactie-tekst verschijnt).
+/// Put this on your crosshair Image ("pointer" under HUD Canvas).
+/// Shows a dot, and a hand icon as soon as the PlayerInteractor has found something
+/// you can interact with (the same moments the interaction prompt text appears).
 /// </summary>
 [RequireComponent(typeof(Image))]
 public class CrosshairUI : MonoBehaviour
@@ -14,20 +14,20 @@ public class CrosshairUI : MonoBehaviour
     [SerializeField] Image image;
 
     [Header("Sprites")]
-    [Tooltip("Normale crosshair. Leeg = gewoon een wit vierkantje (zoals het eerst was).")]
+    [Tooltip("Normal crosshair. Empty = just a white square (like it was originally).")]
     [SerializeField] Sprite defaultSprite;
-    [Tooltip("Crosshair als je naar iets interactiefs kijkt.")]
+    [Tooltip("Crosshair when you are looking at something interactable.")]
     [SerializeField] Sprite interactSprite;
 
-    [Header("Grootte (pixels)")]
+    [Header("Size (pixels)")]
     [SerializeField] Vector2 defaultSize = new Vector2(10f, 10f);
     [SerializeField] Vector2 interactSize = new Vector2(36f, 36f);
-    [Tooltip("Hoe snel de hand 'oppopt'. Hoger = sneller.")]
+    [Tooltip("How fast the hand 'pops' in. Higher = faster.")]
     [SerializeField] float popSpeed = 18f;
 
-    [Header("Kleur")]
+    [Header("Color")]
     [SerializeField] Color availableColor = Color.white;
-    [Tooltip("Als je er wel naar kijkt, maar (nog) niet mee kunt interacteren, bijv. een deur die op slot zit.")]
+    [Tooltip("When you are looking at it but can't interact with it (yet), e.g. a locked door.")]
     [SerializeField] Color unavailableColor = new Color(1f, 1f, 1f, 0.45f);
 
     RectTransform rect;
@@ -41,7 +41,7 @@ public class CrosshairUI : MonoBehaviour
         rect = (RectTransform)transform;
         if (!interactor) interactor = FindFirstObjectByType<PlayerInteractor>();
 
-        image.raycastTarget = false;   // de crosshair mag nooit muisklikken opvangen
+        image.raycastTarget = false;   // the crosshair must never block mouse clicks
         image.preserveAspect = true;
         SetHand(false);
     }
@@ -56,7 +56,7 @@ public class CrosshairUI : MonoBehaviour
         if (hand)
         {
             image.color = target.CanInteract(interactor.gameObject) ? availableColor : unavailableColor;
-            // klein "pop"-effect van klein naar groot
+            // small "pop" effect from small to big
             float t = 1f - Mathf.Exp(-popSpeed * Time.unscaledDeltaTime);
             rect.sizeDelta = Vector2.Lerp(rect.sizeDelta, interactSize, t);
         }
@@ -67,12 +67,12 @@ public class CrosshairUI : MonoBehaviour
         showingHand = hand;
         image.sprite = hand ? interactSprite : defaultSprite;
         image.color = availableColor;
-        // terug naar de stip: meteen klein, anders zie je even een grote stip
+        // back to the dot: shrink immediately, otherwise you briefly see a big dot
         rect.sizeDelta = defaultSize;
     }
 
-    // Zelfde regel als PlayerInteractor gebruikt voor de prompt-tekst:
-    // alleen als er minstens één zichtbare renderer aan het object zit.
+    // Same rule PlayerInteractor uses for the prompt text:
+    // only if the object has at least one visible renderer.
     bool IsVisible(Interactable target)
     {
         if (target != cachedTarget)

@@ -1,6 +1,6 @@
-// Interne shader: houdt de "footprint map" bij.
-// Elke frame: oude waarde langzaam omlaag (sneeuw vult weer op) + nieuwe voetafdrukken erin stempelen.
-// 0 = onaangeroerde sneeuw, 1 = volledig ingedeukt.
+// Internal shader: maintains the "footprint map".
+// Every frame: old values slowly go down (the snow fills back in) + new footprints are stamped in.
+// 0 = untouched snow, 1 = fully pressed down.
 Shader "Hidden/SnowTrailUpdate"
 {
     Properties
@@ -21,14 +21,14 @@ Shader "Hidden/SnowTrailUpdate"
             #define MAX_STAMPS 32
 
             sampler2D _MainTex;
-            float  _FadeAmount;   // hoeveel er deze frame "terugveert"
-            float  _StampCount;   // aantal nieuwe voetafdrukken deze frame
-            float4 _AreaSize;     // xy = grootte van het sneeuwgebied in meters
-            float4 _StampA[MAX_STAMPS]; // xy = uv-positie, z = halve breedte (m), w = halve lengte (m)
-            float4 _StampB[MAX_STAMPS]; // xy = kijkrichting (wereld XZ), z = diepte 0..1
+            float  _FadeAmount;   // how much "springs back" this frame
+            float  _StampCount;   // number of new footprints this frame
+            float4 _AreaSize;     // xy = size of the snow area in meters
+            float4 _StampA[MAX_STAMPS]; // xy = uv position, z = half width (m), w = half length (m)
+            float4 _StampB[MAX_STAMPS]; // xy = facing direction (world XZ), z = depth 0..1
 
-            // Simpele schoenzool-vorm: grote ellips (voorvoet) + kleine ellips (hak).
-            // p is in "voet-ruimte": x = zijwaarts, y = naar voren, ongeveer -1..1.
+            // Simple shoe-sole shape: big ellipse (forefoot) + small ellipse (heel).
+            // p is in "foot space": x = sideways, y = forward, roughly -1..1.
             float FootprintShape(float2 p)
             {
                 float sole = length(float2(p.x / 1.0, (p.y - 0.25) / 0.70));
@@ -46,12 +46,12 @@ Shader "Hidden/SnowTrailUpdate"
                 [loop]
                 for (int s = 0; s < count; s++)
                 {
-                    // afstand tot het midden van de voetafdruk, in meters
+                    // distance to the center of the footprint, in meters
                     float2 d = (i.uv - _StampA[s].xy) * _AreaSize.xy;
 
-                    // draai naar voet-ruimte
-                    float2 f = _StampB[s].xy;          // vooruit
-                    float2 r = float2(f.y, -f.x);      // rechts
+                    // rotate into foot space
+                    float2 f = _StampB[s].xy;          // forward
+                    float2 r = float2(f.y, -f.x);      // right
                     float2 local = float2(dot(d, r), dot(d, f));
                     local /= _StampA[s].zw;
 

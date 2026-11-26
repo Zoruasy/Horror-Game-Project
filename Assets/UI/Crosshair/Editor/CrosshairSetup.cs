@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Menu: Tools > UI
-/// Zet CrosshairUI op de crosshair ("pointer") in de geopende scene en koppelt de sprites.
+/// Adds CrosshairUI to the crosshair ("pointer") in the open scene and assigns the sprites.
 /// </summary>
 public static class CrosshairSetup
 {
@@ -14,7 +14,7 @@ public static class CrosshairSetup
     const string HandPath = "Assets/UI/Crosshair/Crosshair_Hand.png";
     const string PointerName = "pointer";
 
-    [MenuItem("Tools/UI/Setup Crosshair Hand (huidige scene)")]
+    [MenuItem("Tools/UI/Setup Crosshair Hand (current scene)")]
     static void SetupCurrentScene()
     {
         Scene scene = SceneManager.GetActiveScene();
@@ -22,23 +22,23 @@ public static class CrosshairSetup
         if (pointer == null)
         {
             EditorUtility.DisplayDialog("Crosshair",
-                $"Geen Image met de naam '{PointerName}' gevonden in '{scene.name}'.\n" +
-                "Selecteer je crosshair-Image en gebruik Tools > UI > Setup Crosshair Hand (geselecteerde Image).", "OK");
+                $"No Image named '{PointerName}' found in '{scene.name}'.\n" +
+                "Select your crosshair Image and use Tools > UI > Setup Crosshair Hand (selected Image).", "OK");
             return;
         }
         if (Setup(pointer))
         {
             EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[Crosshair] Hand-crosshair ingesteld op '{GetPath(pointer.transform)}' in {scene.name}. Scene opgeslagen.");
+            Debug.Log($"[Crosshair] Hand crosshair set up on '{GetPath(pointer.transform)}' in {scene.name}. Scene saved.");
         }
     }
 
-    [MenuItem("Tools/UI/Setup Crosshair Hand (geselecteerde Image)")]
+    [MenuItem("Tools/UI/Setup Crosshair Hand (selected Image)")]
     static void SetupSelected()
     {
         var img = Selection.activeGameObject ? Selection.activeGameObject.GetComponent<Image>() : null;
-        if (img == null) { EditorUtility.DisplayDialog("Crosshair", "Selecteer een GameObject met een Image-component.", "OK"); return; }
-        if (Setup(img)) Debug.Log("[Crosshair] Ingesteld. Vergeet niet op te slaan (Ctrl+S).");
+        if (img == null) { EditorUtility.DisplayDialog("Crosshair", "Select a GameObject with an Image component.", "OK"); return; }
+        if (Setup(img)) Debug.Log("[Crosshair] Done. Don't forget to save (Ctrl+S).");
     }
 
     static bool Setup(Image pointer)
@@ -49,7 +49,7 @@ public static class CrosshairSetup
         Sprite hand = AssetDatabase.LoadAssetAtPath<Sprite>(HandPath);
         if (dot == null || hand == null)
         {
-            EditorUtility.DisplayDialog("Crosshair", $"Kon de sprites niet laden:\n{DotPath}\n{HandPath}", "OK");
+            EditorUtility.DisplayDialog("Crosshair", $"Could not load the sprites:\n{DotPath}\n{HandPath}", "OK");
             return false;
         }
 
@@ -57,7 +57,7 @@ public static class CrosshairSetup
         foreach (var pi in Object.FindObjectsByType<PlayerInteractor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             if (pi.gameObject.scene == pointer.gameObject.scene) { interactor = pi; break; }
         if (interactor == null)
-            Debug.LogWarning("[Crosshair] Geen PlayerInteractor in de scene gevonden; hij zoekt er in Play mode zelf naar.");
+            Debug.LogWarning("[Crosshair] No PlayerInteractor found in the scene; it will search for one itself in Play mode.");
 
         Undo.RecordObject(pointer, "Setup Crosshair");
         pointer.sprite = dot;
@@ -91,7 +91,7 @@ public static class CrosshairSetup
         return null;
     }
 
-    // Zorgt dat de png's als UI-sprite geïmporteerd zijn
+    // Makes sure the PNGs are imported as UI sprites
     static void EnsureSpriteImport(string path)
     {
         var ti = AssetImporter.GetAtPath(path) as TextureImporter;
