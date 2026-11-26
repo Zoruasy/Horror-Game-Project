@@ -148,7 +148,7 @@ namespace CharacterController
             CheckForEnemies();
 
 
-            Debug.Log(targetRadius);//has to be LAST
+            // Debug.Log(targetRadius);//has to be LAST
         }
 
         private void CheckForLanding()
@@ -163,7 +163,7 @@ namespace CharacterController
                 // Jump straight to the landing radius and keep it there for landingNoiseDuration
                 currentRadius = Mathf.Max(currentRadius, landingRadius);
                 landingNoiseTimer = landingNoiseDuration;
-                Debug.Log("Landing radius: " + currentRadius);
+                // Debug.Log("Landing radius: " + currentRadius);
             }
 
             wasGrounded = player.isGrounded;
