@@ -121,6 +121,7 @@ namespace CharacterController
         private float visionZoomAmount;
         private bool controlsLocked;
         private VisionTurningSE visionTurning;
+        private PlayerInteractor interactor;
 
         [Header("Height Settings")]
         public float standingCameraHeight = 1.75f;
@@ -161,6 +162,7 @@ namespace CharacterController
         private void Awake()
         {
             visionTurning = GetComponent<VisionTurningSE>();
+            interactor = GetComponent<PlayerInteractor>();
             cam = playerCamera.GetComponent<Camera>();
             if (screenShake == null)
                 screenShake = playerCamera.GetComponentInParent<ScreenShake>();
@@ -208,7 +210,7 @@ namespace CharacterController
 
             if (input != null && input.climbing)
             {
-                Debug.Log("E was pressed!");
+                Debug.Log("Interact was pressed!");
 
                 if (CheckLedge(out Vector3 climbPos))
                 {
@@ -238,7 +240,7 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
 
-            if (input != null && input.attack)
+            if (input != null && input.attack && !(interactor && interactor.StartedInteractionThisFrame))
                 Attack();
 
         }

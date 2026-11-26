@@ -227,7 +227,8 @@ public class ObjectInspector : MonoBehaviour
         Keyboard keyboard = Keyboard.current;
 
         bool close = (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
-                     || (interactAction != null && interactAction.WasPressedThisFrame());
+                     || (interactAction != null && interactAction.WasPressedThisFrame()
+                         && (mouse == null || !mouse.leftButton.wasPressedThisFrame));
         if (close)
         {
             Close();
@@ -356,11 +357,7 @@ public class ObjectInspector : MonoBehaviour
         if (!root) return;
 
         if (hintLabel)
-        {
-            string key = interactAction?.GetBindingDisplayString();
-            string close = string.IsNullOrEmpty(key) ? "[Esc]" : $"[{key}] / [Esc]";
-            hintLabel.text = $"[Left Click] Rotate   [Scroll] Zoom   {close} Close";
-        }
+            hintLabel.text = "[Left Click] Rotate   [Scroll] Zoom   [Esc] Close";
         root.SetActive(true);
     }
 }

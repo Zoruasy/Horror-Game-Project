@@ -309,7 +309,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   successfulParrySound: {fileID: 0}
-  successfulParryVolume: 0.8
   attackGruntSound: {fileID: 0}
   clothesRufflingSound: {fileID: 0}
   parryAudioSource: {fileID: 0}
@@ -393,7 +392,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   cam: {fileID: 9156347143994207883}
-  interactAction: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   promptUI: {fileID: 0}
   range: 2.5
   assistRadius: 0.15
