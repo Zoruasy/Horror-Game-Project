@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Generic sliding lever with breakpoints. Hold Interact on it and drag the mouse up/down:
+/// Generic sliding lever with breakpoints. Hold the interact button on it and drag the mouse up/down:
 /// the handle jumps one breakpoint per 'pixelsPerStep'. Player controls are locked while held.
 /// Puzzles read CurrentStep / Ratio or listen to Changed; puzzle-specific data goes in a subclass.
 /// </summary>
@@ -44,7 +44,6 @@ public class Lever : Interactable
 
     Vector3 handleStartPos;
     float dragAccumulator;
-    InputAction interactAction;
     FirstPersonController player;
 
     protected virtual void Awake()
@@ -52,7 +51,6 @@ public class Lever : Interactable
         if (!handle) handle = transform;
         CurrentStep = Mathf.Clamp(startStep, 0, MaxStep);
         handleStartPos = handle.localPosition - slideDirection.normalized * stepDistance * CurrentStep;
-        interactAction = InputSystem.actions != null ? InputSystem.actions.FindAction("Player/Interact") : null;
     }
 
     void Update()
@@ -67,9 +65,6 @@ public class Lever : Interactable
 
     void Drag()
     {
-        bool held = interactAction != null ? interactAction.IsPressed()
-                  : Mouse.current != null && Mouse.current.leftButton.isPressed;
-        if (!held) { Release(); return; }
         if (Mouse.current == null) return;
 
         dragAccumulator += Mouse.current.delta.ReadValue().y * GameSettings.MouseSensitivity;
@@ -100,8 +95,11 @@ public class Lever : Interactable
         onGrab?.Invoke();
     }
 
+    public override void StopInteract(GameObject interactor) => Release();
+
     void Release()
     {
+        if (!IsDragging) return;
         IsDragging = false;
         if (player) player.SetControlsLocked(false);
         player = null;
@@ -119,6 +117,6 @@ public class Lever : Interactable
 
     void OnDisable()
     {
-        if (IsDragging) Release();
+        Release();
     }
 }

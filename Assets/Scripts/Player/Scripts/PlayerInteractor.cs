@@ -15,6 +15,7 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] QueryTriggerInteraction triggers = QueryTriggerInteraction.Ignore;
 
     Interactable current;
+    Interactable active;
     Collider lastCollider;
     Interactable lastColliderInteractable;
 
@@ -40,11 +41,15 @@ public class PlayerInteractor : MonoBehaviour
 
     void OnDisable()
     {
+        StopActive();
         SetCurrent(null);
     }
 
     void Update()
     {
+        if (active && (Mouse.current == null || !Mouse.current.leftButton.isPressed))
+            StopActive();
+
         if (controlsLocked)
         {
             SetCurrent(null);
@@ -90,8 +95,15 @@ public class PlayerInteractor : MonoBehaviour
         if (holdTimer >= current.GetHoldTime())
         {
             isHolding = false;
+            active = current;
             current.Interact(gameObject);
         }
+    }
+
+    void StopActive()
+    {
+        if (active) active.StopInteract(gameObject);
+        active = null;
     }
 
     Interactable FindTarget()
