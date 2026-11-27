@@ -891,13 +891,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Lever
   prompt: Interact
-  axis: {x: 1, y: 0, z: 0}
-  angleMin: -45
-  angleMax: 45
-  startAngle: -45
-  sensitivity: 0.3
-  invert: 0
-  smoothingSpeed: 12
+  breakpoints: 11
+  startStep: 0
 --- !u!1 &6349347985684401881
 GameObject:
   m_ObjectHideFlags: 0
@@ -7436,10 +7431,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Lever
   prompt: Interact
-  axis: {x: 1, y: 0, z: 0}
-  angleMin: -45
-  angleMax: 45
-  startAngle: -45
-  sensitivity: 0.3
-  invert: 0
-  smoothingSpeed: 12
+  breakpoints: 11
+  startStep: 0
