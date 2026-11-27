@@ -133,8 +133,7 @@ public class OscilloscopeController : MonoBehaviour
         Target issue = ActiveIssue;
         if (issue == null || issue.correctButton != button) return;
 
-        issue.issueFixed = true;
-        if (Completed) PuzzleProgressionManager.MarkCompleted(progressionId);
+        Fix(issue);
     }
 
     void UpdateScreen()
@@ -162,12 +161,15 @@ public class OscilloscopeController : MonoBehaviour
     {
         bool matched = Mathf.Abs(amplitudeRatio - target.amplitudeRatio) <= tolerance
                     && Mathf.Abs(frequencyRatio - target.frequencyRatio) <= tolerance;
+        if (target.solved && !matched && target.correctButton == null) Fix(target);
         target.matchTimer = matched ? target.matchTimer + Time.deltaTime : 0f;
         target.solved = target.matchTimer >= holdDuration;
-        if (target.solved && target.correctButton == null) {
-            target.issueFixed = true;
-            PuzzleProgressionManager.MarkCompleted(progressionId);
-        }
+    }
+
+    void Fix(Target target)
+    {
+        target.issueFixed = true;
+        if (Completed) PuzzleProgressionManager.MarkCompleted(progressionId);
     }
 
     void DrawTargets()
