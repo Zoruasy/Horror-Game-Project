@@ -103,7 +103,7 @@ namespace CharacterController
             }
 
             // Jump while grounded
-            if (ctx.input.jump && ctx.isGrounded)
+            if (ctx.jumpSpeed > 0f && ctx.input.jump && ctx.isGrounded)
             {
                 SwitchState(factory.Jumping());
                 return true;

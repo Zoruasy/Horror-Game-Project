@@ -248,7 +248,11 @@ namespace CharacterController
             HandleRotation();
             UpdateVisuals();
 
-            if (input != null && input.attack && !(interactor && interactor.StartedInteractionThisFrame))
+            bool primaryClick = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            if (primaryClick && interactor && interactor.TryConsumePrimaryClick())
+                return;
+
+            if (input != null && input.attack)
                 Attack();
 
         }
