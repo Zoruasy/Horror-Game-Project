@@ -23,12 +23,17 @@ public class enemyChase : MonoBehaviour
     [Header("Sound Effects")]
     [Tooltip("Plays the alert sounds. Auto-found (or added) on this enemy if left empty.")]
     [SerializeField] private AudioSource alertAudioSource;
-    [Tooltip("Played once when the enemy starts getting suspicious.")]
-    [SerializeField] private SoundCue suspiciousSound;
-    [Tooltip("Played once when the enemy becomes aggro.")]
+    [Tooltip("Loops while the enemy is suspicious (and keeps looping while it is aggro). Slowly fades out when the enemy loses its suspicion.")]
+    [SerializeField] private SoundCue suspiciousLoopSound;
+    [Tooltip("Seconds the suspicious loop takes to fade in.")]
+    [SerializeField] private float suspiciousLoopFadeInTime = 0.5f;
+    [Tooltip("Seconds the suspicious loop takes to fade out after the enemy loses its suspicion.")]
+    [SerializeField] private float suspiciousLoopFadeOutTime = 3f;
+    [Tooltip("Played once when the enemy becomes aggro, on top of the suspicious loop.")]
     [SerializeField] private SoundCue aggroSound;
     [Tooltip("Played once when the enemy loses all aggro/suspicion and goes back to patrolling.")]
     [SerializeField] private SoundCue lostSuspicionSound;
+    private AudioSource suspiciousLoopSource; //separate source, so the loop never gets cut off by the other sounds
     private bool wasAggro = false;
     private bool wasSuspicious = false;
 
@@ -200,35 +205,88 @@ public class enemyChase : MonoBehaviour
 
     }
 
-    //plays a sound once when the enemy enters the suspicious or aggro state, or calms down completely
+    //suspicious (or aggro) = the suspicious loop plays, becoming aggro = the aggro sting plays once on top of it,
+    //calming down completely = the loop slowly fades out and the lost suspicion sound plays once
     private void PlayAlertSounds()
     {
         bool suspiciousNow = keepsSuspiciousForABit && !isAggro;
-        bool calmNow = !isAggro && !keepsSuspiciousForABit;
+        bool alertNow = isAggro || keepsSuspiciousForABit;
+        bool wasAlert = wasAggro || wasSuspicious;
 
         if (isAggro && !wasAggro)
         {
-            PlayAlertSound(aggroSound);
+            PlayAlertSoundOnce(aggroSound);
         }
-        else if (suspiciousNow && !wasSuspicious && !wasAggro) //not when calming down from aggro to suspicious
+        else if (!alertNow && wasAlert) //lost all aggro/suspicion, back to patrolling
         {
-            PlayAlertSound(suspiciousSound);
+            PlayAlertSoundOnce(lostSuspicionSound);
         }
-        else if (calmNow && (wasAggro || wasSuspicious)) //lost all aggro/suspicion, back to patrolling
-        {
-            PlayAlertSound(lostSuspicionSound);
-        }
+
+        UpdateSuspiciousLoop(alertNow);
 
         wasAggro = isAggro;
         wasSuspicious = suspiciousNow;
     }
 
-    private void PlayAlertSound(SoundCue cue)
+    //one shot: doesn't replace the clip that is already playing on the alert source (e.g. the enemy's close sound)
+    private void PlayAlertSoundOnce(SoundCue cue)
     {
         if (cue == null || alertAudioSource == null)
             return;
 
-        cue.Play(alertAudioSource);
+        cue.PlayOneShot(alertAudioSource);
+    }
+
+    //fades the suspicious loop in while the enemy is suspicious/aggro, and slowly out when it calms down
+    private void UpdateSuspiciousLoop(bool shouldPlay)
+    {
+        if (suspiciousLoopSound == null || suspiciousLoopSource == null)
+            return;
+
+        float fullVolume = suspiciousLoopSound.volume;
+
+        if (shouldPlay && !suspiciousLoopSource.isPlaying)
+        {
+            suspiciousLoopSound.Play(suspiciousLoopSource); //sets the clip, mixer group and pitch from the cue
+            suspiciousLoopSource.volume = 0f; //start silent, then fade in
+        }
+
+        if (!suspiciousLoopSource.isPlaying)
+            return;
+
+        float targetVolume = shouldPlay ? fullVolume : 0f;
+        float fadeTime = shouldPlay ? suspiciousLoopFadeInTime : suspiciousLoopFadeOutTime;
+        float step = fullVolume / Mathf.Max(fadeTime, 0.01f) * Time.deltaTime;
+        suspiciousLoopSource.volume = Mathf.MoveTowards(suspiciousLoopSource.volume, targetVolume, step);
+
+        if (!shouldPlay && suspiciousLoopSource.volume <= 0f)
+            suspiciousLoopSource.Stop(); //fully faded out
+    }
+
+    //a second audio source with the same 3D settings as the alert source, used for the suspicious loop
+    private void CreateSuspiciousLoopSource()
+    {
+        suspiciousLoopSource = gameObject.AddComponent<AudioSource>();
+        suspiciousLoopSource.playOnAwake = false;
+        suspiciousLoopSource.loop = true;
+        suspiciousLoopSource.volume = 0f;
+
+        if (alertAudioSource == null)
+            return;
+
+        suspiciousLoopSource.spatialBlend = alertAudioSource.spatialBlend;
+        suspiciousLoopSource.rolloffMode = alertAudioSource.rolloffMode;
+        suspiciousLoopSource.minDistance = alertAudioSource.minDistance;
+        suspiciousLoopSource.maxDistance = alertAudioSource.maxDistance;
+        suspiciousLoopSource.dopplerLevel = alertAudioSource.dopplerLevel;
+        suspiciousLoopSource.spread = alertAudioSource.spread;
+        suspiciousLoopSource.priority = alertAudioSource.priority;
+        suspiciousLoopSource.outputAudioMixerGroup = alertAudioSource.outputAudioMixerGroup;
+        if (alertAudioSource.rolloffMode == AudioRolloffMode.Custom)
+        {
+            suspiciousLoopSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+                alertAudioSource.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+        }
     }
 
     private void TryKillPlayerAtCloseRange()
@@ -323,6 +381,7 @@ public class enemyChase : MonoBehaviour
             alertAudioSource.rolloffMode = AudioRolloffMode.Linear;
             alertAudioSource.maxDistance = 25f;
         }
+        CreateSuspiciousLoopSource();
 
 
 

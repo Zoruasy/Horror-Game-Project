@@ -508,8 +508,10 @@ MonoBehaviour:
   spottedVisionColor: {r: 1, g: 0.9841288, b: 0.3254717, a: 1}
   aggroVisionColor: {r: 1, g: 0, b: 0, a: 1}
   alertAudioSource: {fileID: 7676415683765142751}
-  suspiciousSound: {fileID: 11400000, guid: 077348867804485eaaaf21f49cd2db2d, type: 2}
-  aggroSound: {fileID: 11400000, guid: 22d7473041ac422184fc440b9b165530, type: 2}
+  suspiciousLoopSound: {fileID: 11400000, guid: 6436b833d6e44f63ad56bc9e53059ba0, type: 2}
+  suspiciousLoopFadeInTime: 0.5
+  suspiciousLoopFadeOutTime: 3
+  aggroSound: {fileID: 11400000, guid: 5e13462d8ec74fbc8051a08cf055de2b, type: 2}
   lostSuspicionSound: {fileID: 11400000, guid: b5dcabacd3e44802bf072ad8aea8a1ed, type: 2}
   viewDistance: 20
   viewAngle: 90
