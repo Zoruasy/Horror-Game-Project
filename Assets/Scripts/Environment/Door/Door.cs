@@ -69,7 +69,22 @@ public class Door : Interactable, ILockableDoor
             locked = false;
         }
 
-        isOpen = !isOpen;
+        SetOpen(!isOpen);
+    }
+
+    public bool TryOpenWithCode(string code)
+    {
+        if (lockType != LockType.Code || string.IsNullOrEmpty(requiredCode) || code != requiredCode)
+            return false;
+
+        Unlock();
+        if (!isOpen) SetOpen(true);
+        return true;
+    }
+
+    void SetOpen(bool open)
+    {
+        isOpen = open;
         if (animation != null) StopCoroutine(animation);
         animation = StartCoroutine(RotateAll(isOpen));
     }
