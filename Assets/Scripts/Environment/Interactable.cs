@@ -10,6 +10,8 @@ public abstract class Interactable : MonoBehaviour
 
     public abstract void Interact(GameObject interactor);
 
+    public virtual void StopInteract(GameObject interactor) { }
+
     public virtual void OnFocus() { }
 
     public virtual void OnLoseFocus() { }
