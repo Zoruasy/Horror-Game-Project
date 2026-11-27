@@ -97,7 +97,7 @@ namespace CharacterController
 
         public override void CheckSwitchStates()
         {
-            if (ctx.input.jump && ctx.isGrounded && !ctx.HasCeiling())
+            if (ctx.jumpSpeed > 0f && ctx.input.jump && ctx.isGrounded && !ctx.HasCeiling())
             {
                 SwitchState(factory.Jumping());
                 return;
