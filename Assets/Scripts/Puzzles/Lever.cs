@@ -4,8 +4,8 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Generic sliding lever with breakpoints. Hold the interact button on it and drag the mouse up/down:
-/// the handle jumps one breakpoint per 'pixelsPerStep'. Player controls are locked while held.
+/// Generic sliding lever with breakpoints. Hold the interact button on it and look up/down:
+/// the handle follows the player's gaze, snapping to the nearest breakpoint.
 /// Puzzles read CurrentStep / Ratio or listen to Changed; puzzle-specific data goes in a subclass.
 /// </summary>
 public class Lever : Interactable
@@ -26,6 +26,7 @@ public class Lever : Interactable
     [SerializeField] float slideSpeed = 0f;
 
     [Header("Drag")]
+    [SerializeField] bool isGazeLock = false;
     [Tooltip("Mouse pixels (up/down) per breakpoint")]
     [SerializeField] float pixelsPerStep = 25f;
 
@@ -44,6 +45,7 @@ public class Lever : Interactable
 
     Vector3 handleStartPos;
     float dragAccumulator;
+    Camera cam;
     FirstPersonController player;
 
     protected virtual void Awake()
@@ -64,6 +66,32 @@ public class Lever : Interactable
     }
 
     void Drag()
+    {
+        if (isGazeLock) DragWithoutGaze();
+        else DragWithGaze();
+    }
+
+    void DragWithGaze()
+    {
+        if (!cam) return;
+
+        Transform parent = handle.parent;
+        Vector3 origin = parent ? parent.TransformPoint(handleStartPos) : handleStartPos;
+        Vector3 stepVec = slideDirection.normalized * stepDistance;
+        if (parent) stepVec = parent.TransformVector(stepVec);
+
+        Vector3 dir = cam.transform.forward;
+        Vector3 w = origin - cam.transform.position;
+        float a = Vector3.Dot(stepVec, stepVec);
+        float b = Vector3.Dot(stepVec, dir);
+        float denom = a - b * b;
+        if (denom < 1e-6f * a) return;
+
+        float steps = (b * Vector3.Dot(dir, w) - Vector3.Dot(stepVec, w)) / denom;
+        SetStep(Mathf.RoundToInt(steps));
+    }
+
+    void DragWithoutGaze()
     {
         if (Mouse.current == null) return;
 
@@ -87,11 +115,12 @@ public class Lever : Interactable
     {
         if (IsDragging) return;
         IsDragging = true;
-        dragAccumulator = 0f;
+        if (isGazeLock) dragAccumulator = 0f;
+        else cam = Camera.main;
 
         player = interactor.GetComponentInParent<FirstPersonController>();
         if (!player) player = interactor.GetComponentInChildren<FirstPersonController>();
-        if (player) player.SetControlsLocked(true);
+        LockPlayer(true);
         onGrab?.Invoke();
     }
 
@@ -101,9 +130,16 @@ public class Lever : Interactable
     {
         if (!IsDragging) return;
         IsDragging = false;
-        if (player) player.SetControlsLocked(false);
+        LockPlayer(false);
         player = null;
         onRelease?.Invoke();
+    }
+
+    void LockPlayer(bool locked)
+    {
+        if (!player) return;
+        if (isGazeLock) player.SetControlsLocked(locked);
+        else player.SetMovementLocked(locked);
     }
 
     public void SetStep(int step)

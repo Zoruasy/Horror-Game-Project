@@ -120,6 +120,7 @@ namespace CharacterController
         private float originalCamY;
         private float visionZoomAmount;
         private bool controlsLocked;
+        private bool movementLocked;
         private VisionTurningSE visionTurning;
         private PlayerInteractor interactor;
 
@@ -208,6 +209,13 @@ namespace CharacterController
                 return;
             }
 
+            if (movementLocked)
+            {
+                HandleRotation();
+                UpdateVisuals();
+                return;
+            }
+
             if (input != null && input.climbing)
             {
                 Debug.Log("Interact was pressed!");
@@ -284,6 +292,11 @@ namespace CharacterController
             controlsLocked = locked;
         }
 
+        public void SetMovementLocked(bool locked)
+        {
+            movementLocked = locked;
+        }
+
         public void UpdateVisuals()
         {
             if (!useFovKick)
@@ -300,13 +313,13 @@ namespace CharacterController
             originalCamY = Mathf.Lerp(originalCamY, targetCameraY, Time.deltaTime * 8f);
 
             float targetBobOffset = 0f;
-            if (!controlsLocked && useHeadBob &&
+            if (!controlsLocked && !movementLocked && useHeadBob &&
                 characterController.velocity.magnitude > 0.1f && isGrounded)
             {
                 bobTimer += Time.deltaTime * currentBobSpeed;
                 targetBobOffset = Mathf.Sin(bobTimer) * currentBobIntensity;
             }
-            else if (controlsLocked)
+            else if (controlsLocked || movementLocked)
             {
                 bobTimer = 0f;
             }
