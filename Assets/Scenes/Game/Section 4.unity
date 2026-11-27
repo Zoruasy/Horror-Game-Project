@@ -942,6 +942,10 @@ MonoBehaviour:
   minLandingVelocity: 0
   landingRadius: 15
   landingNoiseDuration: 1
+  flashMakesNoise: 1
+  eyeController: {fileID: 0}
+  flashRadius: 15
+  flashNoiseDuration: 1
   enemyMask:
     serializedVersion: 2
     m_Bits: 128

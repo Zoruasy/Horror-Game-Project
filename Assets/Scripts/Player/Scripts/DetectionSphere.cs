@@ -19,6 +19,13 @@ namespace CharacterController
         [SerializeField] private float landingRadius = 15f;
         [SerializeField] private float landingNoiseDuration = 1f; // how long the landing radius is held before it shrinks
 
+        [Header("Noise when flashing")]
+        [Tooltip("Only enable this in scenes where activating the flash (F) should be heard by enemies.")]
+        [SerializeField] private bool flashMakesNoise = false;
+        [SerializeField] private EyeController eyeController; // found automatically if left empty
+        [SerializeField] private float flashRadius = 15f;
+        [SerializeField] private float flashNoiseDuration = 1f; // how long the flash radius is held before it shrinks
+
         [Header("Enemy Detection")]
         public LayerMask enemyMask = ~0; //enemy layer
 
@@ -33,6 +40,7 @@ namespace CharacterController
         private bool wasGrounded = true;
         private float lastAirborneYVelocity;
         private float landingNoiseTimer;
+        private float flashNoiseTimer;
         private float spawnSilenceTimer;
 
         public float SpawnSilenceDuration => spawnSilenceDuration;
@@ -47,7 +55,33 @@ namespace CharacterController
             if (player == null)
                 player = GetComponent<FirstPersonController>();
 
+            if (flashMakesNoise)
+            {
+                if (eyeController == null)
+                    eyeController = FindFirstObjectByType<EyeController>();
+
+                if (eyeController != null)
+                    eyeController.OnEyeToggled += HandleEyeToggled;
+            }
+
             ForceSilence(spawnSilenceDuration);
+        }
+
+        private void OnDestroy()
+        {
+            if (eyeController != null)
+                eyeController.OnEyeToggled -= HandleEyeToggled;
+        }
+
+        //OnEyeToggled fires both when the flash starts and when it ends, only the start makes noise
+        private void HandleEyeToggled(bool eyeIn)
+        {
+            if (!flashMakesNoise || !eyeController.VisionActive || spawnSilenceTimer > 0f)
+                return;
+
+            // Same as landing: jump straight to the flash radius and hold it for flashNoiseDuration
+            currentRadius = Mathf.Max(currentRadius, flashRadius);
+            flashNoiseTimer = flashNoiseDuration;
         }
 
         //forces the radius to 0 for a while, e.g. after (re)spawning so falling onto the spawn point isn't heard
@@ -56,6 +90,7 @@ namespace CharacterController
             spawnSilenceTimer = Mathf.Max(spawnSilenceTimer, duration);
             currentRadius = 0f;
             landingNoiseTimer = 0f;
+            flashNoiseTimer = 0f;
             wasGrounded = true; //don't count the first landing after spawning as a loud landing
             lastAirborneYVelocity = 0f;
 
@@ -74,6 +109,7 @@ namespace CharacterController
                 spawnSilenceTimer -= Time.deltaTime;
                 currentRadius = 0f;
                 landingNoiseTimer = 0f;
+                flashNoiseTimer = 0f;
                 wasGrounded = player.isGrounded;
                 lastAirborneYVelocity = 0f;
                 detectionSphere.localScale = Vector3.zero;
@@ -126,6 +162,13 @@ namespace CharacterController
             {
                 landingNoiseTimer -= Time.deltaTime;
                 targetRadius = Mathf.Max(targetRadius, landingRadius);
+            }
+
+            // Same for the flash noise
+            if (flashNoiseTimer > 0f)
+            {
+                flashNoiseTimer -= Time.deltaTime;
+                targetRadius = Mathf.Max(targetRadius, flashRadius);
             }
 
             // Smoothly change the detection radius
