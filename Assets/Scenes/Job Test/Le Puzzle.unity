@@ -85493,7 +85493,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 1
   m_VoxelSize: 0.1
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 8cecf4e0e155aec429830f4467c93fc2, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: bb4ab104885b57b46b6c24d8903892be, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1083019091
 Transform:
@@ -106743,6 +106743,7 @@ GameObject:
   - component: {fileID: 1361799104}
   - component: {fileID: 1361799106}
   - component: {fileID: 1361799107}
+  - component: {fileID: 1361799108}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -106832,6 +106833,21 @@ MonoBehaviour:
   blur: 1.5
   darken: 1.5
   vignette: 0.4
+--- !u!114 &1361799108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1361799102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ced20858dbafdf428d327dbd055ce20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitchEffects
+  eye: {fileID: 1361799105}
+  screenGlitchMaterial: {fileID: 0}
+  smoothing: 6
 --- !u!43 &1362797995
 Mesh:
   m_ObjectHideFlags: 0
@@ -112277,6 +112293,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CodeLock
   prompt: Interact
   doorOverride: {fileID: 0}
+  progressionId: code-lock
   codeScreenText: enter code
   indicator: {fileID: 1188870651}
   solvedColor: {r: 0, g: 1, b: 0, a: 1}
@@ -114518,7 +114535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ff631e29ecc7e4a80a8f71c059ec30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIGlitchOverlay
-  glitch: {fileID: 0}
+  glitch: {fileID: 1361799108}
   overlay: {fileID: 1999813484}
   maxAlpha: 0.5
   flickerSpeed: 12
@@ -152878,7 +152895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07087f1be8723ae4aab62289fbd430d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfiniteHall
-  player: {fileID: 0}
+  player: {fileID: 1361799103}
   segmentPrefab: {fileID: 4524456343327570714, guid: ee42320d04234b740bac9fb52796c22a, type: 3}
   backWall: {fileID: 1777531047}
   segmentLength: 1
@@ -165252,12 +165269,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079212721}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c2aea208f6ad05e4999ca14cd61be611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisibilityController
-  eye: {fileID: 0}
+  eye: {fileID: 1361799105}
 --- !u!4 &2079212723
 Transform:
   m_ObjectHideFlags: 0
