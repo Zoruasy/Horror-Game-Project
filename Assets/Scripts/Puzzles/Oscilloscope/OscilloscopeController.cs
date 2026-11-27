@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 
 [ExecuteAlways]
 [RequireComponent(typeof(LineRenderer))]
@@ -17,7 +15,6 @@ public class OscilloscopeController : MonoBehaviour
     public Lever frequencyLever;
 
     [Header("Screen")]
-    public int pointCount = 100;
     [Tooltip("Minimum points per period: higher = smoother curve")]
     public int pointsPerPeriod = 40;
     [Tooltip("Resize this rectangle (Rect tool): waves and text always fill it")]
@@ -43,13 +40,9 @@ public class OscilloscopeController : MonoBehaviour
         [TextArea] public string message;
         [Tooltip("Button that removes this issue from the screen")]
         public OscilloscopeButton correctButton;
-        public bool onSolvedStuck;
-        public UnityEvent onSolved;
-        public UnityEvent onQuit;
 
         [NonSerialized] public bool solved;
         [NonSerialized] public float matchTimer;
-        [NonSerialized] public bool matched;
         [NonSerialized] public bool issueFixed;
     }
 
@@ -68,7 +61,7 @@ public class OscilloscopeController : MonoBehaviour
 
     public bool Completed => targets.Count > 0 && targets.All(t => t.issueFixed);
 
-    Target ActiveIssue => targets.FirstOrDefault(t => t.solved && t.matched && !t.issueFixed);
+    Target ActiveIssue => targets.FirstOrDefault(t => t.solved && !t.issueFixed);
 
     private LineRenderer lineRenderer;
     private Rect lastRect;
@@ -105,8 +98,6 @@ public class OscilloscopeController : MonoBehaviour
 
     void Start()
     {
-        lineRenderer.positionCount = pointCount;
-
         for (int i = 0; i < targets.Count; i++)
             if (targets[i].line) targets[i].line.sortingOrder = i;
         lineRenderer.sortingOrder = targets.Count;
@@ -171,26 +162,8 @@ public class OscilloscopeController : MonoBehaviour
     {
         bool matched = Mathf.Abs(amplitudeRatio - target.amplitudeRatio) <= tolerance
                     && Mathf.Abs(frequencyRatio - target.frequencyRatio) <= tolerance;
-        target.matched = matched;
-
-        if (target.onSolvedStuck && target.solved) return;
-
-        if (target.solved)
-        {
-            if (!matched)
-            {
-                target.solved = false;
-                target.matchTimer = 0;
-                target.onQuit?.Invoke();
-            }
-            return;
-        }
-
         target.matchTimer = matched ? target.matchTimer + Time.deltaTime : 0f;
-        if (target.matchTimer < holdDuration) return;
-
-        target.solved = true;
-        target.onSolved?.Invoke();
+        target.solved = target.matchTimer >= holdDuration;
     }
 
     void DrawTargets()
@@ -207,7 +180,7 @@ public class OscilloscopeController : MonoBehaviour
         float amplitude = amplitudeRatio * maxAmplitude * rect.height / 2f;
         float frequency = Mathf.Lerp(minFrequency, maxFrequency, frequencyRatio);
 
-        int points = Mathf.Max(pointCount, Mathf.CeilToInt(frequency * pointsPerPeriod) + 1);
+        int points = Mathf.CeilToInt(frequency * pointsPerPeriod) + 1;
         if (line.positionCount != points)
             line.positionCount = points;
 
