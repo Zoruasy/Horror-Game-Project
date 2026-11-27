@@ -164,6 +164,10 @@ public class OscilloscopeController : MonoBehaviour
                     && Mathf.Abs(frequencyRatio - target.frequencyRatio) <= tolerance;
         target.matchTimer = matched ? target.matchTimer + Time.deltaTime : 0f;
         target.solved = target.matchTimer >= holdDuration;
+        if (target.solved && target.correctButton == null) {
+            target.issueFixed = true;
+            PuzzleProgressionManager.MarkCompleted(progressionId);
+        }
     }
 
     void DrawTargets()
