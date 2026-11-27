@@ -80,7 +80,22 @@ public class OscilloscopeController : MonoBehaviour
             if (string.IsNullOrWhiteSpace(targets[i].message))
                 targets[i].message = $"ISSUE {i + 1}";
 
+        for (int i = 0; i < targets.Count; i++)
+        {
+            WarnIfUnreachable(i, "amplitude", targets[i].amplitudeRatio, amplitudeLever);
+            WarnIfUnreachable(i, "frequency", targets[i].frequencyRatio, frequencyLever);
+        }
+
         DrawTargets();
+    }
+
+    void WarnIfUnreachable(int index, string axis, float ratio, Lever lever)
+    {
+        if (!lever) return;
+        float nearest = Mathf.Round(ratio * lever.MaxStep) / lever.MaxStep;
+        if (Mathf.Abs(ratio - nearest) <= tolerance) return;
+        Debug.LogWarning($"{name}: target {index + 1} {axis} {ratio:0.###} unreachable by {lever.name} " +
+                         $"({lever.MaxStep + 1} breakpoints). Nearest: {nearest:0.###}", this);
     }
 
     void Awake()
