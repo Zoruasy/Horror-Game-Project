@@ -21,21 +21,16 @@ public class PlayerInteractor : MonoBehaviour
     float holdTimer;
     bool isHolding;
     bool controlsLocked;
-    int interactionStartedFrame = -1;
+    CharacterController.FirstPersonController controller;
 
     public Interactable Current => current;
-    public bool StartedInteractionThisFrame => interactionStartedFrame == Time.frameCount;
 
     public float HoldRemaining => isHolding && current ? Mathf.Max(0f, current.GetHoldTime() - holdTimer) : 0f;
 
     void Awake()
     {
         if (!cam) cam = Camera.main;
-    }
-
-    void OnEnable()
-    {
-        // Interaction is nu via left mouse button in Update()
+        controller = GetComponent<CharacterController.FirstPersonController>();
     }
 
     void OnDisable()
@@ -68,20 +63,17 @@ public class PlayerInteractor : MonoBehaviour
 
         if (promptUI) promptUI.SetHoldRemaining(HoldRemaining);
 
-        // Check for left mouse button click
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            OnInteract();
-        }
+        if (!controller && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+            TryConsumePrimaryClick();
     }
 
     void UpdateHold()
     {
         if (!isHolding || !current) return;
 
-        if (!current.CanInteract(gameObject))
+        if (Mouse.current == null || !Mouse.current.leftButton.isPressed || !current.CanInteract(gameObject))
         {
-            holdTimer = 0f;
+            CancelHold();
             return;
         }
 
@@ -96,6 +88,8 @@ public class PlayerInteractor : MonoBehaviour
 
     Interactable FindTarget()
     {
+        if (!cam) return null;
+
         Ray ray = new Ray(cam.transform.position, cam.transform.forward);
         float maxDistance = range;
 
@@ -128,8 +122,7 @@ public class PlayerInteractor : MonoBehaviour
     void SetCurrent(Interactable target)
     {
         if (target == current) return;
-
-        holdTimer = 0f;
+        CancelHold();
 
         if (current) current.OnLoseFocus();
         current = target;
@@ -138,26 +131,36 @@ public class PlayerInteractor : MonoBehaviour
         if (!current && promptUI) promptUI.Hide();
     }
 
-    void OnInteract()
+    public bool TryConsumePrimaryClick()
     {
-        if (controlsLocked) return;
+        if (!isActiveAndEnabled) return false;
+        if (controlsLocked) return true;
 
-        if (current && current.CanInteract(gameObject))
+        SetCurrent(FindTarget());
+        if (!current) return false;
+        if (!current.CanInteract(gameObject)) return true;
+
+        if (current.GetHoldTime() <= 0f)
+            current.Interact(gameObject);
+        else
         {
-            interactionStartedFrame = Time.frameCount;
             isHolding = true;
             holdTimer = 0f;
         }
+
+        return true;
+    }
+
+    void CancelHold()
+    {
+        isHolding = false;
+        holdTimer = 0f;
     }
 
     public void SetControlsLocked(bool locked)
     {
         controlsLocked = locked;
-        if (locked)
-        {
-            isHolding = false;
-            holdTimer = 0f;
-        }
+        if (locked) CancelHold();
     }
 
 #if UNITY_EDITOR
